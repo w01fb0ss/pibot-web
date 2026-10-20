@@ -105,7 +105,7 @@ function renderRelease() {
     if (!downloadURL(platform?.url)) return;
     button.querySelector('small').textContent=t(platform.detail||'下载应用');
     button.querySelector('.platform-arrow').textContent='↓';
-    setLabel(button,'下载 Pi Bot {platform}',{platform:platform.label});
+    setLabel(button,'下载 Pi Bot {platform}',{platform:t(platform.label)});
   });
   if (Object.values(releaseConfig.platforms||{}).some(platform=>downloadURL(platform.url))) {
     document.querySelector('#release-summary').textContent=t('Pi Bot {version} 已发布。选择你的平台，认识新队友。',{version:releaseConfig.version||''});
@@ -120,7 +120,7 @@ function renderRelease() {
 }
 let dialogPlatform='';
 function renderReleaseDialog() {
-  document.querySelector('#dialog-description').textContent=t('Pi Bot 的 {platform} 版本尚未开放下载。我们正在打磨桌面体验，正式发布后，你可以直接在这里获取安装包。',{platform:dialogPlatform});
+  document.querySelector('#dialog-description').textContent=t('Pi Bot 的 {platform} 版本尚未开放下载。我们正在打磨桌面体验，正式发布后，你可以直接在这里获取安装包。',{platform:t(dialogPlatform)});
 }
 function syncDisplay() {
   if(frameReady) frame.contentWindow.postMessage({type:'pi-product-display',display:{language:display.language,theme:display.theme}},location.origin);
