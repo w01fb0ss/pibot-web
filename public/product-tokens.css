@@ -1,0 +1,138 @@
+:root {
+  --brand: #9159fe;
+  --avatar-orange: #ff6700;
+  --avatar-amber: #ffa826;
+  --avatar-blue: #1084fe;
+  --avatar-violet: var(--brand);
+  --avatar-pink: #ff309b;
+  --avatar-teal: #00a693;
+  --avatar-green: #00a85f;
+  --avatar-brown: #97683d;
+  --avatar-ink: #141414;
+  --avatar-gray: #d9d9d9;
+  --avatar-eye: #ffffff;
+  --avatar-eye-gray: #141414;
+  --logo-violet: var(--brand);
+  --logo-violet-ink: #ffffff;
+  --logo-ink: #141414;
+  --logo-ink-ink: #fcfcfc;
+  --logo-paper: #f0f0f0;
+  --logo-paper-ink: #141414;
+  --logo-night: #1f1f1f;
+  --logo-night-ink: var(--brand);
+  --tray-ink: #000000;
+  --tray-paper: #ffffff;
+  --logo-mask-solid: #ffffff;
+  --logo-mask-cutout: #000000;
+  --switch-knob: #fcfcfc;
+  --shadow: 0 1px 3px #0000001f;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei",
+    "Noto Sans CJK SC", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --radius-row: 12px;
+  --radius-card: 16px;
+  --radius-pill: 999px;
+  font-family: var(--font-sans);
+}
+
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #fcfcfc;
+  --overlay: #14141466;
+  --side: #f7f7f7;
+  --card: #fcfcfc;
+  --tert: #f4f4f4;
+  --text: #141414;
+  --text2: #14141499;
+  --b1: #1414140d;
+  --b2: #1414141a;
+  --b3: #14141426;
+  --hover: #77777717;
+  --prim: #070707;
+  --onPrim: #fcfcfc;
+  /* An on switch is a --prim track; its knob must contrast with that track in both themes. */
+  --switch-knob-on: #fcfcfc;
+  --userBubble: #070707;
+  --onUser: #fcfcfc;
+  /* D46 favors white text on deeper hues over reusing bright avatar fills. */
+  --userBubble-orange: #a33f00;
+  --onUser-orange: #ffffff;
+  --userBubble-amber: #885713;
+  --onUser-amber: #ffffff;
+  --userBubble-blue: #0954a3;
+  --onUser-blue: #ffffff;
+  --userBubble-violet: #6939c6;
+  --onUser-violet: #ffffff;
+  --userBubble-pink: #a71e65;
+  --onUser-pink: #ffffff;
+  --userBubble-teal: #00695d;
+  --onUser-teal: #ffffff;
+  --userBubble-green: #006b3b;
+  --onUser-green: #ffffff;
+  --userBubble-brown: #704921;
+  --onUser-brown: #ffffff;
+  --userBubble-ink: #252525;
+  --onUser-ink: #ffffff;
+  --userBubble-gray: #53565c;
+  --onUser-gray: #ffffff;
+  --bubble: #eeeeee;
+  --accent: #0c64c1;
+  --accentBg: #1084fe17;
+  --warn: #824e00;
+  --warnBg: #ff980017;
+  --ok: #00673a;
+  --okBg: #00c97217;
+  --danger: #c21d2e;
+  --dangerBg: #ff263c17;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #141414;
+  --overlay: #00000099;
+  --side: #1b1b1b;
+  --card: #1b1b1b;
+  --tert: #222222;
+  --text: #f0f0f0;
+  --text2: #f0f0f0a6;
+  --b1: #f0f0f014;
+  --b2: #f0f0f01f;
+  --b3: #f0f0f02e;
+  --hover: #ffffff14;
+  --prim: #f0f0f0;
+  --onPrim: #141414;
+  --switch-knob-on: #141414;
+  --userBubble: #f0f0f0;
+  --onUser: #141414;
+  --userBubble-orange: #a64000;
+  --onUser-orange: #ffffff;
+  --userBubble-amber: #8a5815;
+  --onUser-amber: #ffffff;
+  --userBubble-blue: #1260b7;
+  --onUser-blue: #ffffff;
+  --userBubble-violet: #7542d4;
+  --onUser-violet: #ffffff;
+  --userBubble-pink: #b3236e;
+  --onUser-pink: #ffffff;
+  --userBubble-teal: #006e61;
+  --onUser-teal: #ffffff;
+  --userBubble-green: #006e3f;
+  --onUser-green: #ffffff;
+  --userBubble-brown: #7b5433;
+  --onUser-brown: #ffffff;
+  --userBubble-ink: #303030;
+  --onUser-ink: #ffffff;
+  --userBubble-gray: #5a5d63;
+  --onUser-gray: #ffffff;
+  --bubble: #262626;
+  --accent: #5aa9ff;
+  --accentBg: #1084fe29;
+  --warn: #ffb54d;
+  --warnBg: #ff980029;
+  --ok: #4cd69a;
+  --okBg: #00c97229;
+  --danger: #ff6b78;
+  --dangerBg: #ff263c29;
+}

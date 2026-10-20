@@ -1,0 +1,2 @@
+<!-- Geometry and eyes from PiBot packages/ui/src/Avatar.tsx; colors from tokens.css. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M14 50 C14 24 30 8 50 8 C70 8 86 24 86 50 V90 L76 82 L66 90 L56 82 L50 88 L44 82 L34 90 L24 82 L14 90 Z" fill="#9159fe" stroke="#9159fe" stroke-width="6" stroke-linejoin="round"/><path d="M35 35 L39 47 M65 35 L61 47" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>

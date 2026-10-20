@@ -1,0 +1,9 @@
+{
+  "status": "coming-soon",
+  "version": null,
+  "platforms": {
+    "mac": { "url": null, "label": "macOS", "detail": "即将发布" },
+    "windows": { "url": null, "label": "Windows", "detail": "即将发布" },
+    "linux": { "url": null, "label": "Linux", "detail": "即将发布" }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "pi-bot-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/serve.mjs --dist",
+    "sync:product": "node scripts/sync-product.mjs ../PiBot",
+    "sync:theme": "node scripts/sync-theme.mjs ../PiBot"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
