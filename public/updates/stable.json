@@ -1,8 +1,8 @@
 {
-  "version": "0.0.3",
+  "version": "0.0.4",
   "downloads": {
-    "darwin-arm64": "https://pibot.space/downloads/0.0.3/PiBot-0.0.3-mac-arm64.dmg",
-    "darwin-x64": "https://pibot.space/downloads/0.0.3/PiBot-0.0.3-mac-x64.dmg",
-    "win32-x64": "https://pibot.space/downloads/0.0.3/PiBot-0.0.3-win-x64.exe"
+    "darwin-arm64": "https://pibot.space/downloads/0.0.4/PiBot-0.0.4-mac-arm64.dmg",
+    "darwin-x64": "https://pibot.space/downloads/0.0.4/PiBot-0.0.4-mac-x64.dmg",
+    "win32-x64": "https://pibot.space/downloads/0.0.4/PiBot-0.0.4-win-x64.exe"
   }
 }

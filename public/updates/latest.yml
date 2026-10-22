@@ -1,8 +1,8 @@
-version: 0.0.3
+version: 0.0.4
 files:
-  - url: https://pibot.space/downloads/0.0.3/PiBot-0.0.3-win-x64.exe
-    sha512: KPjSIRBfAFz/b9M8MfWZpabmfedAYMn8R0xIRyh0qSQuWItd2uMmMNjXwq4OiggeTjmd8OMijFjSfmNoi3HlXA==
-    size: 198343615
-path: https://pibot.space/downloads/0.0.3/PiBot-0.0.3-win-x64.exe
-sha512: KPjSIRBfAFz/b9M8MfWZpabmfedAYMn8R0xIRyh0qSQuWItd2uMmMNjXwq4OiggeTjmd8OMijFjSfmNoi3HlXA==
-releaseDate: '2026-10-22T12:01:14.255Z'
+  - url: https://pibot.space/downloads/0.0.4/PiBot-0.0.4-win-x64.exe
+    sha512: hiMdvw/Q6/h/dX75CK5h8DNda9Y5hRXVYDhXMNtCvFDh10IaYcm4FBJFUqexk6CrefJHMxnWbiPR6Xzd84Q0iA==
+    size: 198367865
+path: https://pibot.space/downloads/0.0.4/PiBot-0.0.4-win-x64.exe
+sha512: hiMdvw/Q6/h/dX75CK5h8DNda9Y5hRXVYDhXMNtCvFDh10IaYcm4FBJFUqexk6CrefJHMxnWbiPR6Xzd84Q0iA==
+releaseDate: '2026-10-22T14:48:20.279Z'
