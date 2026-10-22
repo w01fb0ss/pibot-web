@@ -1,5 +1,7 @@
 import {display,t,translatePage,setDisplay,setLabel} from './display.js';
 const tabs = [...document.querySelectorAll('.demo-tabs [data-scene]')];
+const tabStrip = document.querySelector('.demo-tabs');
+const tabWrap = document.querySelector('.demo-tabs-wrap');
 const panel = document.querySelector('#demo-panel');
 const frame = document.querySelector('#product-frame');
 frame.src = `product/index.html?lang=${display.language}&theme=${display.theme}`;
@@ -29,6 +31,7 @@ function selectScene(key, send = true) {
   panel.setAttribute('aria-labelledby', `tab-${key}`);
   const index = tabs.findIndex(tab => tab.dataset.scene === key);
   tabs.forEach(tab => { const active = tab.dataset.scene === key; tab.setAttribute('aria-selected', String(active));tab.tabIndex = active ? 0 : -1; });
+  revealTab(tabs[index]);
   document.querySelector('#tour-position').textContent = `${String(index + 1).padStart(2, '0')} / ${tabs.length}`;
   document.querySelector('#tour-previous').disabled = index === 0;
   document.querySelector('#tour-next').disabled = index === tabs.length - 1;
@@ -155,3 +158,22 @@ releaseDialog.addEventListener('click', event => {
   if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) releaseDialog.close();
 });
 document.querySelector('#year').textContent = new Date().getFullYear();
+
+// Product tour tabs scroll in one row: arrows step through, and the chosen scene is kept in view.
+function syncTabEdges() {
+  if (!tabStrip || !tabWrap) return;
+  const max = tabStrip.scrollWidth - tabStrip.clientWidth;
+  tabWrap.classList.toggle('can-start', tabStrip.scrollLeft > 2);
+  tabWrap.classList.toggle('can-end', tabStrip.scrollLeft < max - 2);
+}
+function revealTab(tab) {
+  if (!tabStrip || !tab) return;
+  const left = tab.offsetLeft - (tabStrip.clientWidth - tab.offsetWidth) / 2;
+  tabStrip.scrollTo({ left, behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'instant' : 'smooth' });
+}
+tabStrip?.addEventListener('scroll', syncTabEdges, { passive: true });
+addEventListener('resize', syncTabEdges);
+document.querySelectorAll('[data-tabs-step]').forEach(button => button.addEventListener('click', () => {
+  tabStrip.scrollBy({ left: Number(button.dataset.tabsStep) * tabStrip.clientWidth * 0.7, behavior: 'smooth' });
+}));
+syncTabEdges();
