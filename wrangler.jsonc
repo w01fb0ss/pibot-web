@@ -1,5 +1,9 @@
 {
   "name": "pibot",
   "compatibility_date": "2026-10-19",
-  "assets": { "directory": "./dist" }
+  "main": "./worker/index.js",
+  "send_metrics": false,
+  "observability": { "enabled": false },
+  "assets": { "directory": "./dist", "binding": "ASSETS" },
+  "r2_buckets": [{ "binding": "RELEASES", "bucket_name": "pibot-releases" }]
 }
