@@ -1,21 +1,21 @@
 {
   "status": "available",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "platforms": {
     "mac-arm64": {
-      "url": "https://pibot.space/downloads/0.0.2/PiBot-0.0.2-mac-arm64.dmg",
+      "url": "https://pibot.space/downloads/0.0.3/PiBot-0.0.3-mac-arm64.dmg",
       "label": "macOS · Apple 芯片",
-      "detail": "v0.0.2"
+      "detail": "v0.0.3"
     },
     "mac-x64": {
-      "url": "https://pibot.space/downloads/0.0.2/PiBot-0.0.2-mac-x64.dmg",
+      "url": "https://pibot.space/downloads/0.0.3/PiBot-0.0.3-mac-x64.dmg",
       "label": "macOS · Intel 芯片",
-      "detail": "v0.0.2"
+      "detail": "v0.0.3"
     },
     "windows": {
-      "url": "https://pibot.space/downloads/0.0.2/PiBot-0.0.2-win-x64.exe",
+      "url": "https://pibot.space/downloads/0.0.3/PiBot-0.0.3-win-x64.exe",
       "label": "Windows",
-      "detail": "v0.0.2"
+      "detail": "v0.0.3"
     },
     "linux": {
       "url": null,

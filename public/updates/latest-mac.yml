@@ -1,0 +1,17 @@
+version: 0.0.3
+files:
+  - url: https://pibot.space/downloads/0.0.3/PiBot-0.0.3-mac-arm64.zip
+    sha512: QyPHkpbMjq25xj2gl/rn+cYHe3jPGIZKLq4m+Zz+Qa9iuUJF2xLIp1orO5SnYGclERM4H058/NRoY3faDpAveg==
+    size: 251402677
+  - url: https://pibot.space/downloads/0.0.3/PiBot-0.0.3-mac-arm64.dmg
+    sha512: Mth2vV0jo6wiMcRFqtmjFRgUPQjkFDaKhG1rQDeNq0zxfqwmwN3lZRSWISMT5BmklhLQqdItsffXtgnH/3ggrg==
+    size: 250518673
+  - url: https://pibot.space/downloads/0.0.3/PiBot-0.0.3-mac-x64.zip
+    sha512: BZCYZcwutHvcvxDKsyyMZuWNgcsNdUD86MLcM7Wy/LloeNsR3z/AC5Rzmf/eZhJde+fp3HnSXWP3iqRqXDpqfg==
+    size: 258652315
+  - url: https://pibot.space/downloads/0.0.3/PiBot-0.0.3-mac-x64.dmg
+    sha512: gwjPYtJ3mROt3Dtq62WXCdmZMhpM5TpsDmbK2tTVgUpXpddixkKrB1muep+B4taI2Go0lf8caeXvAy6jl2w0Cg==
+    size: 257731985
+path: https://pibot.space/downloads/0.0.3/PiBot-0.0.3-mac-arm64.zip
+sha512: QyPHkpbMjq25xj2gl/rn+cYHe3jPGIZKLq4m+Zz+Qa9iuUJF2xLIp1orO5SnYGclERM4H058/NRoY3faDpAveg==
+releaseDate: '2026-10-22T11:40:23.335Z'
