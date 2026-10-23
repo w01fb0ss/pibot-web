@@ -1,17 +1,17 @@
-version: 0.0.4
+version: 0.0.5
 files:
-  - url: https://pibot.space/downloads/0.0.4/PiBot-0.0.4-mac-arm64.zip
-    sha512: lvE5dDB39imd0E8h0eqx+MScAFCyFk9xP62DSjIdNEz/JT+6tsM866aAwt5Gbz73l3ltvU2KWPWUlglJgZbKYQ==
-    size: 251432153
-  - url: https://pibot.space/downloads/0.0.4/PiBot-0.0.4-mac-arm64.dmg
-    sha512: /FfN22KKKVPGN+EvIriVEJK2Lv0ql4SomUBBTgBxicoWPW1ZLhH95K5psCRvzFNPeUSsfRN1k0b/YsMV4JQWPA==
-    size: 250539055
-  - url: https://pibot.space/downloads/0.0.4/PiBot-0.0.4-mac-x64.zip
-    sha512: gubC4VUl79UCQ0eyIPZYPpFc76Zeti1AE6s6M+v/D5BYpuAVtO4IkI9APNGtkOvM6nxMRWJCoSgG/1fXPChTSg==
-    size: 258681641
-  - url: https://pibot.space/downloads/0.0.4/PiBot-0.0.4-mac-x64.dmg
-    sha512: 6CxiP/gKeKMa7QRkuMl3az43jVZ5eKTZhzsohwuG0EMBuIzTdimEDptLpCQaDCKtI8ZumDlxx4Fqp0uOgRBKbQ==
-    size: 257733837
-path: https://pibot.space/downloads/0.0.4/PiBot-0.0.4-mac-arm64.zip
-sha512: lvE5dDB39imd0E8h0eqx+MScAFCyFk9xP62DSjIdNEz/JT+6tsM866aAwt5Gbz73l3ltvU2KWPWUlglJgZbKYQ==
-releaseDate: '2026-10-22T14:44:13.529Z'
+  - url: https://pibot.space/downloads/0.0.5/PiBot-0.0.5-mac-arm64.zip
+    sha512: LHc2/Iys1BIGDMKEWZvE9/4MA43NMi7YQOe9uEJnE4aC8Jlu6pGgTiTd4SKkvOoRSha9y6GNWWd8Eqq0xPxTzw==
+    size: 251678194
+  - url: https://pibot.space/downloads/0.0.5/PiBot-0.0.5-mac-arm64.dmg
+    sha512: 0ZL+y2JZ0EeywmvyxLr1FtR/jQNRCSHxM3LN/P8MergeZbMCgdIYep0Y27P8mGVkXgxE9PDnqCRDVJK/3dn7TQ==
+    size: 250800716
+  - url: https://pibot.space/downloads/0.0.5/PiBot-0.0.5-mac-x64.zip
+    sha512: ByibUN54QzlOi0yDBwWuQBG4tv91q/McoJ49Bh/wwzIsCmFGgvMvMdJ/sNIxDyTUxDQTr+dcggvopHEnIZhKkg==
+    size: 258927641
+  - url: https://pibot.space/downloads/0.0.5/PiBot-0.0.5-mac-x64.dmg
+    sha512: 97XFbNyGI86dT6L2hbwOqJr+dUmE9TyQFq8xeGaU1CMYQkLx2tvx0wjcS5uLoR2tyCk21oCv8yijSHGJfHWvgg==
+    size: 258002966
+path: https://pibot.space/downloads/0.0.5/PiBot-0.0.5-mac-arm64.zip
+sha512: LHc2/Iys1BIGDMKEWZvE9/4MA43NMi7YQOe9uEJnE4aC8Jlu6pGgTiTd4SKkvOoRSha9y6GNWWd8Eqq0xPxTzw==
+releaseDate: '2026-10-22T23:33:06.993Z'
