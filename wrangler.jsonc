@@ -4,6 +4,9 @@
   "main": "./worker/index.js",
   "send_metrics": false,
   "observability": { "enabled": false },
-  "assets": { "directory": "./dist", "binding": "ASSETS" },
+  "assets": { "directory": "./dist", "binding": "ASSETS", "run_worker_first": ["/updates/*"] },
+  // A66: aggregate update-check counts (day × source × version × platform × arch), no identifiers.
+  "durable_objects": { "bindings": [{ "name": "COUNTER", "class_name": "Counter" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Counter"] }],
   "r2_buckets": [{ "binding": "RELEASES", "bucket_name": "pibot-releases" }]
 }

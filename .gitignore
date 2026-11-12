@@ -6,3 +6,4 @@ public/downloads/*
 !public/downloads/.gitkeep
 .wrangler/
 .review/
+.dev.vars
