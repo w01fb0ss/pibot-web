@@ -10,7 +10,8 @@ await syncTheme(app);
 const require = createRequire(path.join(app, 'apps/desktop/package.json'));
 const { build } = await import(pathToFileURL(require.resolve('vite')));
 const records = new Map();
-const builtin = path.join(app, 'packages/brain/builtin');
+const rendererEntry = path.join(app, 'apps/desktop/src/renderer/main.tsx');
+const builtin = path.join(app, 'packages/teams/builtin');
 for (const language of ['zh','en']) {
 const zh = value => typeof value === 'string' ? value : value?.[language] || '';
 const roles = [];
@@ -32,28 +33,19 @@ await build({
   configFile: false, root: path.join(root, 'demo'), base: './',
   cacheDir: path.join(root, 'node_modules/.cache/product'),
   resolve: {
-    dedupe: ['react', 'react-dom'],
-    alias: {
-      '@pibot/ui/tokens.css?raw': path.join(app, 'packages/ui/src/tokens.css') + '?raw',
-      '@pibot/ui/tokens.css': path.join(app, 'packages/ui/src/tokens.css'),
-      '@app': path.join(app, 'apps/desktop/src/renderer'),
-      '@pibot/ui': path.join(app, 'packages/ui/src/index.ts'),
-      '@pibot/protocol': path.join(app, 'packages/protocol/src/index.ts'),
-      '@pibot/i18n': path.join(app, 'packages/i18n/src/index.ts'),
-      '@pibot/connectors-builtins': path.join(app, 'packages/connectors/src/builtins.ts'),
-      'react-dom/client': require.resolve('react-dom/client'),
-      'react-dom': require.resolve('react-dom'),
-      'react/jsx-runtime': require.resolve('react/jsx-runtime'),
-      'react': require.resolve('react'),
-    },
+    alias: { '@app': path.join(app, 'apps/desktop/src/renderer') },
   },
   assetsInclude: ['**/*.xlsx'],
   esbuild: { jsx: 'automatic' },
+  define: { __PIBOT_COMMIT__: 'null' },
+  optimizeDeps: { exclude: ['@silurus/ooxml'] },
   plugins: [{
     name: 'product-demo-port', enforce: 'pre',
-    resolveId(id, importer) {
-      if (id.endsWith('/rpc.tsx') && importer?.startsWith(app)) return path.join(root, 'demo/rpc.tsx');
-      if (id === '@pibot/ui/tokens.css') return path.join(app, 'packages/ui/src/tokens.css');
+    // The tour's own files live outside the app workspace; resolve their bare imports
+    // (@pibot/*, react, ...) exactly as the app's renderer entry would, so both share one copy.
+    async resolveId(id, importer, options) {
+      if (!importer || importer.startsWith(app + path.sep) || id.startsWith('.') || id.startsWith('/') || id.startsWith('@app') || id.startsWith('\0')) return null;
+      return this.resolve(id, rendererEntry, { ...options, skipSelf: true });
     },
     async load(id) {
       const file = id.split('?')[0];

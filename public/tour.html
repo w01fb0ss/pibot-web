@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fcfcfc">
+  <meta name="description" content="Pi Bot 的实际界面导览：用示例数据，在网页里直接操作 App 的真实前端组件。">
+  <meta property="og:title" content="Pi Bot · 实际界面">
+  <meta property="og:description" content="Pi Bot 的实际界面导览：用示例数据，在网页里直接操作 App 的真实前端组件。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://pibot.leen-zhou-cn.workers.dev/assets/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Pi Bot 群聊界面（示例数据）">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Pi Bot · 实际界面</title>
+  <script src="display-init.js"></script>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="product-tokens.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="display.css">
+  <script type="module" src="tour.js"></script>
+</head>
+<body class="tour-page">
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html" aria-label="Pi Bot 首页"><img src="assets/logo.svg" width="34" height="34" alt=""><span>Pi Bot<span class="brand-dot">.</span></span></a>
+      <nav class="desktop-nav" aria-label="主导航"><a href="index.html#devices">三台设备</a><a href="index.html#capabilities">能做什么</a><a href="index.html#control">你说了算</a><a href="index.html#faq">常见问题</a></nav>
+      <div class="display-controls"><div class="language-control" role="group" aria-label="切换网站语言"><button type="button" data-site-language="zh" aria-label="中文" aria-pressed="true" data-no-translate lang="zh-CN">中</button><button type="button" data-site-language="en" aria-label="English" aria-pressed="false" data-no-translate lang="en">EN</button></div><label class="theme-control"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/></svg><span class="sr-only">外观</span><select id="theme-select" aria-label="选择外观"><option value="system">跟随系统</option><option value="light">浅色</option><option value="dark">深色</option></select></label></div>
+      <a class="button button-small button-dark nav-download" href="index.html#download">获取 Pi Bot <span aria-hidden="true">↗</span></a>
+      <button class="menu-toggle" type="button" aria-label="打开导航" aria-expanded="false" aria-controls="mobile-nav"><span></span><span></span></button>
+    </div>
+    <nav id="mobile-nav" class="mobile-nav" aria-label="移动端导航" hidden><a href="index.html#devices">三台设备</a><a href="index.html#capabilities">能做什么</a><a href="index.html#control">你说了算</a><a href="index.html#faq">常见问题</a><a href="index.html#download">获取 Pi Bot</a></nav>
+  </header>
+  <main id="main">
+    <section class="tour-intro section-wrap" aria-labelledby="tour-title"><span class="eyebrow">THE REAL APP, SAMPLE DATA</span><h1 id="tour-title">看看实际界面。</h1><p>下面是 App 的真实前端组件，接的是示例数据，不连接你的电脑，也不调用任何模型。</p></section>
+    <div class="product-showcase section-wrap" id="playground">
+      <div class="demo-tabs-wrap"><button type="button" class="tabs-arrow" data-tabs-step="-1" aria-label="向前滚动">‹</button><div class="demo-tabs" role="tablist" aria-label="从初次见面到日常工作的产品导览"><button id="tab-welcome" type="button" role="tab" aria-selected="true" aria-controls="demo-panel" data-scene="welcome">欢迎页</button><button id="tab-presets" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="presets" tabindex="-1">选择职业</button><button id="tab-main" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="main" tabindex="-1">主界面</button><button id="tab-team" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="team" tabindex="-1">团队协作</button><button id="tab-plan" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="plan" tabindex="-1">规划与子任务</button><button id="tab-browser" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="browser" tabindex="-1">Bot 浏览器</button><button id="tab-teach" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="teach" tabindex="-1">教它做一次</button><button id="tab-changes" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="changes" tabindex="-1">Git 改动</button><button id="tab-preview" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="preview" tabindex="-1">文件预览</button><button id="tab-connectors" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="connectors" tabindex="-1">连接应用</button><button id="tab-memory" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="memory" tabindex="-1">技能</button><button id="tab-devices" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="devices" tabindex="-1">设备</button><button id="tab-inbox" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="inbox" tabindex="-1">待办</button><button id="tab-routine" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="routine" tabindex="-1">调度</button><button id="tab-audit" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="audit" tabindex="-1">记录</button><button id="tab-yolo" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" data-scene="yolo" tabindex="-1">YOLO 模式</button></div><button type="button" class="tabs-arrow" data-tabs-step="1" aria-label="向后滚动">›</button></div>
+      <div class="app-window actual-product-window" id="demo-panel" role="tabpanel" aria-labelledby="tab-welcome" data-mode="welcome"><iframe id="product-frame" title="Pi Bot 真实前端组件产品导览" loading="eager"></iframe></div>
+      <nav class="tour-controls" aria-label="产品导览翻页"><button type="button" id="tour-previous" aria-label="上一页" disabled>← <span>上一页</span></button><span id="tour-position" aria-live="polite" aria-atomic="true">01 / 16</span><button type="button" id="tour-next" aria-label="下一页"><span>下一页</span> →</button></nav>
+      <div class="scene-explainer" id="scene-explainer" aria-live="polite"></div>
+      <p class="product-demo-note">App 原生界面 · 示例数据 · <a id="tour-open" href="product/index.html?scene=welcome" target="_blank" rel="noopener">在新窗口查看 ↗</a></p>
+    </div>
+  </main>
+  <footer class="site-footer section-wrap"><a class="brand" href="index.html"><img src="assets/logo.svg" width="30" height="30" alt=""><span>Pi Bot<span class="brand-dot">.</span></span></a><p>小小的 Bot，大大的可能。</p><div><span>© <span id="year" data-no-translate>2026</span> Pi Bot</span><a href="index.html#devices">三台设备 ↗</a><a href="tour.html">看看实际界面 ↗</a><a href="index.html#download">获取应用 ↗</a></div></footer>
+</body>
+</html>

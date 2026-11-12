@@ -1,106 +1,97 @@
-import {display,t,translatePage,setDisplay,setLabel} from './display.js';
-const tabs = [...document.querySelectorAll('.demo-tabs [data-scene]')];
-const tabStrip = document.querySelector('.demo-tabs');
-const tabWrap = document.querySelector('.demo-tabs-wrap');
-const panel = document.querySelector('#demo-panel');
-const frame = document.querySelector('#product-frame');
-frame.src = `product/index.html?lang=${display.language}&theme=${display.theme}`;
-const descriptions = {
-  welcome: ['从第一次见面开始。', '认识 Pi Bot，了解它怎样在你的电脑上工作。'],
-  presets: ['先选职业，再见队友。', '按职业选择内置 Bot 和群聊，预览后创建你的团队。'],
-  main: ['从一句话开始。', '和 Pi 私聊，也可以从侧栏找到其他 Bot 与群聊。'],
-  team: ['有专长，也有协作。', '私聊深入，拉群分工；任务有独立线程，结果回到同一个地方。'],
-  plan: ['先想清楚，再动手。', '只规划模式下 Bot 只看和分析；计划、子任务和用量都在右侧「任务」里。'],
-  browser: ['看得见，也接得住。', '查看 Bot 的独立浏览器；需要登录或手动操作时接管，再交还继续。'],
-  teach: ['照做一遍，它就学会了。', '在 Bot 浏览器里操作一次，检查记下的步骤，再整理成可以反复使用的技能。'],
-  changes: ['每一处改动，都由你把关。', '查看 Git 改动、diff 与提交记录，批注后交给 Bot 审查。'],
-  preview: ['文件，就地打开。', 'Bot 交付的表格、文档和提纲，在侧栏多标签预览，不用切换应用。'],
-  connectors: ['接上你常用的应用。', 'GitHub、Notion、Figma、本机日历与通讯录，授权在本机完成；也能导入自定义 MCP。'],
-  memory: ['越用，越懂你。', '每个 Bot 的技能和记忆都能查看；记下什么、要不要先问你，由你决定。'],
-  inbox: ['轮到你决定时，集中看。', '审批、记忆提议和错过的任务，处理后可到记录中回看。'],
-  routine: ['一次约定，按时执行。', '查看后台状态、今天的时间轴、触发规则与最近运行结果。'],
-  audit: ['少一点猜测，多一份记录。', '按 Bot 和类型筛选，展开核对授权来源、执行过程与结果。'],
-  yolo: ['什么时候放手，由你决定。', '从对话菜单开启 YOLO；自动放行也会留下操作记录。'],
-};
-let currentScene = 'welcome';
-let frameReady = false;
-function selectScene(key, send = true) {
-  if (!descriptions[key]) return;
-  currentScene = key;
-  panel.dataset.mode = key;
-  panel.setAttribute('aria-labelledby', `tab-${key}`);
-  const index = tabs.findIndex(tab => tab.dataset.scene === key);
-  tabs.forEach(tab => { const active = tab.dataset.scene === key; tab.setAttribute('aria-selected', String(active));tab.tabIndex = active ? 0 : -1; });
-  revealTab(tabs[index]);
-  document.querySelector('#tour-position').textContent = `${String(index + 1).padStart(2, '0')} / ${tabs.length}`;
-  document.querySelector('#tour-previous').disabled = index === 0;
-  document.querySelector('#tour-next').disabled = index === tabs.length - 1;
-  document.querySelector('#tour-open').href = `product/index.html?scene=${key}&lang=${display.language}&theme=${display.theme}`;
-  const caption = document.querySelector('#scene-explainer');
-  caption.replaceChildren();
-  const heading = document.createElement('strong'); heading.textContent = t(descriptions[key][0]);
-  const copy = document.createElement('span'); copy.textContent = t(descriptions[key][1]);
-  caption.append(heading, copy);
-  if (send && frameReady) frame.contentWindow.postMessage({type:'pi-product-scene',scene:key},location.origin);
+import {display,t,setLabel} from './display.js';
+import './site.js';
+
+// ---- Real app screenshots: one file per language and theme ----
+function syncShots() {
+  const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+  const variant = `${display.language === 'en' ? 'en' : 'zh'}-${theme}`;
+  document.querySelectorAll('picture[data-shot]').forEach(picture => {
+    const base = `assets/shots/${picture.dataset.shot}-${variant}`;
+    picture.querySelector('source').srcset = `${base}.webp`;
+    const img = picture.querySelector('img');
+    if (!img.src.endsWith(`${base}.jpg`)) img.src = `${base}.jpg`;
+  });
 }
-window.addEventListener('message', event => {
-  if (event.source !== frame.contentWindow || event.origin !== location.origin) return;
-  if (event.data?.type === 'pi-product-ready') {frameReady = true; syncDisplay(); selectScene(currentScene);}
-  if (event.data?.type === 'pi-product-selected') selectScene(event.data.scene, false);
-  if (event.data?.type === 'pi-product-display-changed') setDisplay(event.data.display);
-});
-new ResizeObserver(() => {
-  const width = panel.clientWidth;
-  const logicalWidth = Math.max(960, width);
-  const scale = width / logicalWidth;
-  frame.style.width = `${logicalWidth}px`;
-  frame.style.transform = `scale(${scale})`;
-  panel.style.height = `${680 * scale}px`;
-}).observe(panel);
-tabs.forEach((tab, index) => {
-  tab.addEventListener('click', () => selectScene(tab.dataset.scene));
+syncShots();
+
+// ---- Data flow: video scenes 0/7/14/21 s (a logo plays 28–32 s), synced with the tabs ----
+const video = document.querySelector('#flow-video');
+const still = document.querySelector('#flow-still');
+const play = document.querySelector('#flow-play');
+const flowTabs = [...document.querySelectorAll('.flow-tabs [data-flow]')];
+const flowPanel = document.querySelector('#flow-panel');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+let flowScene = 'runner';
+let videoFailed = false;
+let inView = false;
+let userPaused = false;
+const sceneAt = time => [...flowTabs].reverse().find(tab => time >= Number(tab.dataset.start))?.dataset.flow || 'phone';
+function showScene(key, focus = false) {
+  flowScene = key;
+  flowTabs.forEach(tab => {
+    const active = tab.dataset.flow === key;
+    tab.setAttribute('aria-selected', String(active));
+    tab.tabIndex = active ? 0 : -1;
+    if (active && focus) tab.focus();
+  });
+  flowPanel.setAttribute('aria-labelledby', `flow-tab-${key}`);
+  flowPanel.querySelectorAll('[data-flow-text]').forEach(p => { p.hidden = p.dataset.flowText !== key; });
+  const active = flowTabs.find(tab => tab.dataset.flow === key);
+  active?.parentElement.scrollTo({ left: active.offsetLeft - 16, behavior: 'instant' });
+  still.querySelector('source').srcset = `assets/flow/${key}.webp`;
+  const img = still.querySelector('img');
+  img.src = `assets/flow/${key}.jpg`;
+  img.alt = t('{scene}的数据流转图', { scene: t(active.querySelector('span').textContent) });
+}
+// Reduced motion or a video that cannot play: the scene's still image is the visual; the video
+// stays one click away.
+function useStill(on) {
+  still.hidden = !on;
+  play.hidden = !on || videoFailed;
+  video.hidden = on;
+}
+function maybePlay() {
+  if (videoFailed || reducedMotion.matches || userPaused || !inView) return;
+  video.play().catch(() => {});
+}
+function selectFlow(key, focus = false) {
+  showScene(key, focus);
+  if (videoFailed) return;
+  const start = Number(flowTabs.find(tab => tab.dataset.flow === key).dataset.start);
+  try { video.currentTime = start; } catch { /* metadata not loaded yet; playback starts at 0 */ }
+  if (!reducedMotion.matches || !video.hidden) { userPaused = false; inView = true; video.play().catch(() => {}); }
+}
+video.addEventListener('timeupdate', () => { if (video.paused) return; const key = sceneAt(video.currentTime); if (key !== flowScene) showScene(key); });
+video.addEventListener('pause', () => { if (inView && !document.hidden) userPaused = true; });
+video.addEventListener('play', () => { userPaused = false; });
+video.addEventListener('error', () => { videoFailed = true; useStill(true); }, true);
+video.querySelector('source').addEventListener('error', () => { videoFailed = true; useStill(true); });
+play.addEventListener('click', () => { useStill(false); userPaused = false; inView = true; video.play().catch(() => {}); video.focus(); });
+flowTabs.forEach((tab, index) => {
+  tab.addEventListener('click', () => selectFlow(tab.dataset.flow));
   tab.addEventListener('keydown', event => {
-    const next = event.key === 'ArrowRight' ? (index + 1) % tabs.length : event.key === 'ArrowLeft' ? (index + tabs.length - 1) % tabs.length : event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : undefined;
+    const next = event.key === 'ArrowRight' ? (index + 1) % flowTabs.length : event.key === 'ArrowLeft' ? (index + flowTabs.length - 1) % flowTabs.length : event.key === 'Home' ? 0 : event.key === 'End' ? flowTabs.length - 1 : undefined;
     if (next === undefined) return;
-    event.preventDefault();tabs[next].focus();selectScene(tabs[next].dataset.scene);
+    event.preventDefault(); selectFlow(flowTabs[next].dataset.flow, true);
   });
 });
-for (const [id, direction] of [['tour-previous',-1],['tour-next',1]]) document.querySelector(`#${id}`).addEventListener('click', () => {
-  const index = tabs.findIndex(tab => tab.dataset.scene === currentScene);
-  const next = tabs[index + direction];if (next) selectScene(next.dataset.scene);
-});
-document.addEventListener('click', event => {
-  const jump = event.target.closest('[data-demo-target]');
-  if (jump) {selectScene(jump.dataset.demoTarget);document.querySelector('#playground').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});}
-});
-selectScene('welcome');
+useStill(reducedMotion.matches);
+reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) { video.pause(); useStill(true); } else { useStill(false); maybePlay(); } });
+new IntersectionObserver(entries => {
+  for (const entry of entries) {
+    inView = entry.isIntersecting;
+    // Pausing because it scrolled away is not the viewer's choice; keep autoplay allowed.
+    if (inView) maybePlay(); else if (!video.paused) { video.pause(); userPaused = false; }
+  }
+}, { threshold: 0.5 }).observe(video.parentElement);
 
-const menuToggle = document.querySelector('.menu-toggle');
-const mobileNav = document.querySelector('#mobile-nav');
-function closeMenu() {
-  menuToggle.setAttribute('aria-expanded', 'false');
-  setLabel(menuToggle,'打开导航');
-  mobileNav.hidden = true;
-}
-menuToggle.addEventListener('click', () => {
-  const open = menuToggle.getAttribute('aria-expanded') === 'true';
-  menuToggle.setAttribute('aria-expanded', String(!open));
-  setLabel(menuToggle,open ? '打开导航' : '关闭导航');
-  mobileNav.hidden = open;
-});
-mobileNav.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
-document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
-document.addEventListener('click', event => { if (!event.target.closest('.site-header')) closeMenu(); });
-
+// ---- Downloads: releases.json decides; an unavailable config never enables a download ----
 const releaseDialog = document.querySelector('#release-dialog');
 let releaseConfig;
 const configReady = fetch('releases.json', { cache: 'no-store', signal: AbortSignal.timeout(5000) })
   .then(response => { if (!response.ok) throw new Error('Release configuration unavailable'); return response.json(); })
-  .then(config => {
-    releaseConfig = config;
-    renderRelease();
-  }).catch(() => { /* Fail closed: unavailable config never enables a download. */ });
-
+  .then(config => { releaseConfig = config; renderRelease(); })
+  .catch(() => { /* Fail closed: unavailable config never enables a download. */ });
 function renderRelease() {
   if (!releaseConfig) return;
   document.querySelectorAll('[data-platform]').forEach(button => {
@@ -116,23 +107,16 @@ function renderRelease() {
     document.querySelector('.download-note').textContent=t('点击下载，或查看对应平台的发布状态');
     const pill=document.querySelector('.release-pill');
     pill.replaceChildren(Object.assign(document.createElement('span'),{className:'status-dot'}),document.createTextNode(' '+t('你的 AI 新队友')+' '),Object.assign(document.createElement('span'),{className:'pill-divider'}),document.createTextNode(' '+t('现已登场')+' ↗'));
-    document.querySelector('.platform-note').lastChild.textContent=t('桌面应用 · 现已发布');
+    document.querySelector('.platform-note').lastChild.textContent=t('现已发布');
+    document.querySelector('.hero-actions .button').firstChild.textContent=t('获取 Pi Bot')+' ';
     document.querySelector('#faq details p').textContent=t('Pi Bot 已开放部分或全部平台下载。请在上方下载区选择操作系统，查看安装包和对应平台状态。');
   }
   if (releaseDialog.open) renderReleaseDialog();
 }
 let dialogPlatform='';
 function renderReleaseDialog() {
-  document.querySelector('#dialog-description').textContent=t('Pi Bot 的 {platform} 版本尚未开放下载。我们正在打磨桌面体验，正式发布后，你可以直接在这里获取安装包。',{platform:t(dialogPlatform)});
+  document.querySelector('#dialog-description').textContent=t('Pi Bot 的 {platform} 版本尚未开放下载。我们正在打磨体验，正式发布后，你可以直接在这里获取安装包。',{platform:t(dialogPlatform)});
 }
-function syncDisplay() {
-  if(frameReady) frame.contentWindow.postMessage({type:'pi-product-display',display:{language:display.language,theme:display.theme}},location.origin);
-}
-document.addEventListener('pi-display-change',()=>{
-  selectScene(currentScene,false); renderRelease();syncDisplay();
-  setLabel(menuToggle,menuToggle.getAttribute('aria-expanded')==='true'?'关闭导航':'打开导航');
-});
-
 function downloadURL(value) {
   if (typeof value !== 'string' || !value.trim()) return null;
   try {
@@ -141,7 +125,6 @@ function downloadURL(value) {
   } catch { return null; }
   return null;
 }
-
 document.querySelectorAll('[data-platform]').forEach(button => button.addEventListener('click', async () => {
   await configReady;
   const platform = releaseConfig?.platforms?.[button.dataset.platform];
@@ -157,23 +140,4 @@ releaseDialog.addEventListener('click', event => {
   const rect = releaseDialog.getBoundingClientRect();
   if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) releaseDialog.close();
 });
-document.querySelector('#year').textContent = new Date().getFullYear();
-
-// Product tour tabs scroll in one row: arrows step through, and the chosen scene is kept in view.
-function syncTabEdges() {
-  if (!tabStrip || !tabWrap) return;
-  const max = tabStrip.scrollWidth - tabStrip.clientWidth;
-  tabWrap.classList.toggle('can-start', tabStrip.scrollLeft > 2);
-  tabWrap.classList.toggle('can-end', tabStrip.scrollLeft < max - 2);
-}
-function revealTab(tab) {
-  if (!tabStrip || !tab) return;
-  const left = tab.offsetLeft - (tabStrip.clientWidth - tab.offsetWidth) / 2;
-  tabStrip.scrollTo({ left, behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'instant' : 'smooth' });
-}
-tabStrip?.addEventListener('scroll', syncTabEdges, { passive: true });
-addEventListener('resize', syncTabEdges);
-document.querySelectorAll('[data-tabs-step]').forEach(button => button.addEventListener('click', () => {
-  tabStrip.scrollBy({ left: Number(button.dataset.tabsStep) * tabStrip.clientWidth * 0.7, behavior: 'smooth' });
-}));
-syncTabEdges();
+document.addEventListener('pi-display-change',()=>{ syncShots(); showScene(flowScene); renderRelease(); });

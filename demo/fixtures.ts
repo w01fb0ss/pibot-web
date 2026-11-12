@@ -1,5 +1,7 @@
 import { DEFAULT_EXECUTION_LIMITS, RpcError, RpcErrorCodes } from '@pibot/protocol';
-import { builtinApps } from '@pibot/connectors-builtins';
+import { defaultRemoteDirect } from '@pibot/remote-contract';
+import calendarPlugin from '@app/../../../plugins/calendar/pibot.json';
+import contactsPlugin from '@app/../../../plugins/contacts/pibot.json';
 import { previewFiles } from './preview-files';
 import {catalogsByLanguage,localize,preserveUserMessage} from './locale';
 // Every record below belongs to this in-memory product tour, never to the desktop app.
@@ -8,7 +10,7 @@ const now=()=>new Date().toISOString();
 let scene='welcome';
 const ids=new Map<string,string>();
 export function id(value:string){if(!ids.has(value))ids.set(value,crypto.randomUUID());return ids.get(value)!;}
-const idKeys=new Set(['id','botId','groupId','coordinatorBotId','assigneeBotId','createdByBotId','conversationId','threadConversationId','topicId','messageId','userMessageId','assistantMessageId','runId','triggerId','routineId','threadId','topicConversationId','primaryFolderId','rootRunId','parentRunId','parentTaskId','taskId','pluginInstallationId','connectorId']);
+const idKeys=new Set(['id','botId','groupId','coordinatorBotId','assigneeBotId','createdByBotId','conversationId','threadConversationId','topicId','messageId','userMessageId','assistantMessageId','runId','triggerId','routineId','threadId','topicConversationId','primaryFolderId','rootRunId','parentRunId','parentTaskId','taskId','pluginInstallationId','connectorId','deviceId','endpointId']);
 function wire(value:any,key=''):any {
  if(Array.isArray(value))return value.map(v=>wire(v,key));
  if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([k,v])=>[k,wire(v,k)]));
@@ -98,13 +100,32 @@ async function browserFrame(botId:string,display?:any){
 const planTodo={goal:'发布「让工作轻一点」newsletter',items:[['todo-sources','收集并核对参考资料','done'],['todo-outline','确定提纲与结构','done'],['todo-story','准备开头小故事','in_progress'],['todo-draft','写完整初稿','pending'],['todo-send','排版、预览并定时发送','pending']].map(([id,title,status])=>({id,title,status})),version:3,updatedAt:time(9,46)};
 const planTasks=[['task-check','核对三组参考资料的来源链接','done','三组资料的来源链接都能打开，其中一篇改用原始出处。'],['task-story','准备两个开头小故事备选','running',null],['task-tone','对比往期语气，给出写作建议','queued',null]].map(([taskId,title,status,result],index)=>({id:taskId,botId:'pi',conversationId:'topic-plan',parentTaskId:null,rootRunId:'run-plan',parentRunId:'run-plan',runId:status==='queued'?null:`run-${taskId}`,title,status,version:1,createdAt:time(9,44+index),updatedAt:time(9,46),result,resultTruncated:false,needsVerification:false}));
 const installedAt=time(8,50);
-const connectorApps=()=>builtinApps('darwin');
+// The same app cards the desktop lists, as the brain projects them for macOS.
+const connectorApps=()=>[calendarPlugin,contactsPlugin].map(({id,card}:any)=>{const {platforms,order,unsupportedReason,...rest}=card;const supported=!platforms||platforms.includes('darwin');return {id,...rest,supported,unsupportedReason:supported?null:unsupportedReason??null};});
 const connectors=[{id:'connector-github',pluginInstallationId:'install-github',serverId:'github',revision:1,catalogVersion:1,kind:'mcp_remote',identity:'user',appId:'github',name:'GitHub',enabled:true,status:'ready',statusDetailCode:null,createdAt:installedAt,updatedAt:installedAt},{id:'connector-calendar',pluginInstallationId:'install-calendar',serverId:'calendar',revision:1,catalogVersion:1,kind:'builtin',identity:'user',appId:'calendar',name:'本机日历',enabled:true,status:'ready',statusDetailCode:null,createdAt:installedAt,updatedAt:installedAt}];
 const installations=connectors.map(c=>({id:c.pluginInstallationId,pluginId:c.serverId,version:'1',digest:'d'.repeat(64),revision:1,sourceKind:'builtin',status:'installed',enabled:true,createdAt:installedAt,updatedAt:installedAt}));
 const teachSteps=[['navigate','https://example.com/login','报表中心登录页'],['type','https://example.com/login','账号','demo@example.com'],['type','https://example.com/login','密码',null,true],['submit','https://example.com/login','登录'],['click','https://example.com/reports','报名统计'],['select','https://example.com/reports','时间范围','本周'],['download','https://example.com/reports','导出 CSV']].map(([kind,url,target,value,secret],index)=>({index,kind,url,target,...(value?{value}:{}),secret:!!secret,hasThumbnail:false,at:time(10,index)}));
 const teachRecording={id:'recording-demo',botId:'steward',status:'review',startedAt:time(10,0),endedAt:time(10,7),steps:teachSteps};
 const teachDraft={recordingId:'recording-demo',name:'导出本周报名表',description:'登录报表中心，按时间范围导出报名表 CSV，保存到收件箱。',body:'1. 打开报表中心并登录（账号密码由已保存的凭据自动填写）。\n2. 进入「报名统计」。\n3. 时间范围选择 {range}。\n4. 点击「导出 CSV」，保存到 /工作空间/收件箱。',params:[{name:'range',description:'时间范围',default:'本周'}],permissions:{domains:['example.com'],writePaths:['/工作空间/收件箱'],sendTo:[]},trigger:'chat'};
 const memories=[['memory-1','about_you','你更喜欢先看结论，再看细节。'],['memory-2','work','newsletter 每周一 08:30 发送，读者主要是独立工作者。'],['memory-3','how_to','整理资料时保留原始来源链接。']].map(([memoryId,category,text])=>({id:memoryId,botId:'pi',text,category,sourceMessageId:null,createdAt:time(9,30),updatedAt:time(9,30)}));
+const deviceSeen=()=>new Date(Date.now()-60000).toISOString();
+// A paired phone and a runner, both on the local network; names are generic samples.
+const devices=()=>[
+ {id:'device-phone',name:'我的手机',kind:'phone',createdAt:time(8),lastSeenAt:deviceSeen(),revokedAt:null,online:true,path:'lan',phoneData:{platform:'android',media:true,smsCode:true}},
+ {id:'device-runner',name:'书房的电脑',kind:'runner',target:`runner:${'e'.repeat(64)}`,createdAt:time(8),lastSeenAt:deviceSeen(),revokedAt:null,online:true,path:'lan',runnerConnection:{state:'online',path:'lan'},isolation:{available:true}},
+];
+const capability=(endpointId:string,endpointKind:string,endpointName:any,capabilityId:string,name:any,state:string)=>({endpointId,capabilityId,version:1,state,availability:state==='off'?'local_switch_off':'available',firstSeenAt:time(8),lastSeenAt:deviceSeen(),lastCalledAt:capabilityId==='phone.sms'?time(9,20):null,scope:{botIds:null,groupIds:null},online:true,endpointKind,endpointName,name});
+const phoneName={zh:'我的手机',en:'My phone'},runnerName={zh:'书房的电脑',en:'Study computer'};
+const endpointRows=()=>[
+ capability('device-phone','phone',phoneName,'phone.media',{zh:'照片与视频',en:'Photos and videos'},'user_on'),
+ capability('device-phone','phone',phoneName,'phone.sms',{zh:'短信验证码',en:'SMS codes'},'user_on'),
+ capability('device-runner','runner',runnerName,'runner.exec',{zh:'运行命令',en:'Run commands'},'auto_on'),
+ capability('device-runner','runner',runnerName,'runner.files',{zh:'文件',en:'Files'},'auto_on'),
+ capability('device-runner','runner',runnerName,'runner.background',{zh:'后台作业',en:'Background jobs'},'auto_on'),
+ capability('device-runner','runner',runnerName,'runner.computer',{zh:'操作电脑',en:'Computer'},'off'),
+];
+let remoteSettings={enabled:true,relay:'official',relayUrl:null,desktopName:'我的电脑',keepAwake:false,direct:defaultRemoteDirect(),lanDiscovery:true,version:1};
+const offlineView=(deviceId:string)=>({deviceId,models:[{providerId:'demo',providerName:'自选模型',modelId:'demo-model',modelName:'自选模型',selected:true,delivered:true}],bots:bots.map(b=>({botId:b.id,name:b.name,offline:b.id==='pi',modelName:'自选模型'})),pending:false});
 const calls=new Set<string>();
 export function configureScene(next:string){scene=next;if(!['welcome','presets','main'].includes(next)){bots=[...new Map([...bots,...baseBots].map(b=>[b.id,b])).values()];if(!groups.some(g=>g.id==='demo-team'))groups=[...groups,group];}emit('bots.changed',{});}
 export function finishProfession(result:any){if(!result){bots=[baseBots[0]];groups=[];emit('bots.changed');emit('groups.changed');emit('sidebar.changed');}}
@@ -113,6 +134,27 @@ export const peer={
  async call(method:string,p:any={}) : Promise<any> {
   p ||= {};calls.add(method);(window as any).__productCalls=[...calls];
   switch(method){
+   case 'chat.retryDraft':case 'teach.current':return null;
+   case 'chat.contextHint':return {show:false};
+   case 'plugins.available':case 'knowledge.list':case 'plugins.pendingSkillAssignments':return {items:[],nextBefore:null,totalCount:0};
+   case 'skills.catalog':return {items:[],nextCursor:null,total:0};
+   case 'skills.workflows':return {items:[]};
+   case 'connections.discover':return {scannedAt:null,consent:false,sources:[]};
+   case 'connections.availability':return {connection:p.connection,name:{zh:p.connection,en:p.connection},reason:'available'};
+   case 'memory.browse':{const items=p.scope==='bot'&&p.ownerId==='pi'&&p.state!=='archived'&&!p.before?memories.map(m=>({...m,scope:'bot',ownerId:'pi'})):[];return {items,proposals:[],undoable:[],undoNext:null,revision:1,activeCount:items.length,archivedCount:0,unusedCount:0,needsOrganization:false};}
+   case 'audit.counts':return [];
+   case 'routines.history.count':return 1;
+   case 'computer.permissions':return {platform:'darwin',available:true,unavailableReason:null,items:[{kind:'accessibility',status:'granted'},{kind:'screen',status:'granted'},{kind:'automation',status:'unknown'}]};
+   case 'computer.settings.get':case 'computer.settings.set':return {screenshotRetentionDays:7};
+   case 'backgroundCommands.list':return [];
+   case 'acp.state':return {connected:false};
+   case 'continuations.list':return {items:[],nextAfter:null};
+   case 'devices.list':return {items:p.after?[]:devices(),nextAfter:null};
+   case 'endpoints.list':return {items:p.after?[]:endpointRows().filter(r=>!p.endpointId||r.endpointId===p.endpointId),nextAfter:null};
+   case 'remote.settings.get':return {...remoteSettings};
+   case 'remote.settings.set':remoteSettings={...remoteSettings,...p.patch,version:remoteSettings.version+1};return {...remoteSettings};
+   case 'remote.status':return {reason:'ready',onlineDevices:2,pairingAvailable:true,keepAwake:remoteSettings.keepAwake?'requested':'off'};
+   case 'remote.offline.get':case 'remote.offline.set':return offlineView(p.deviceId);
    case 'settings.get':return {...settings};
    case 'settings.set':setProductDisplay(p,true);return {...settings};
    case 'network.getConfig':return {mode:'system'};
@@ -222,7 +264,10 @@ peer.call=async(method:string,params:any={})=>{
 function addAudit(kind:string,detail:any){audit.unshift({id:crypto.randomUUID(),kind,detail,summary:'产品演示操作',at:now(),botId:'pi',runId:null});emit('audit.changed');}
 export function installDesktopDemo(){
  try {localStorage.setItem('pibot.appearance',JSON.stringify({language:settings.language,theme:settings.theme}));} catch {}
- (window as any).pibot={platform:'darwin',onPort:()=>()=>{},onBrowserFrames:(callback:any)=>{browserReceivers.add(callback);return()=>browserReceivers.delete(callback);},exportLogs:async()=> 'canceled',background:{state:async()=>({state:'ready'}),serviceState:async()=>({installed:false,running:true,preferences:{}})}};
+ (window as any).pibot={platform:'darwin',onPort:()=>()=>{},onBrowserFrames:(callback:any)=>{browserReceivers.add(callback);return()=>browserReceivers.delete(callback);},exportLogs:async()=> 'canceled',restartApp:async()=>({status:'requested'}),
+  // The tour never checks for updates: the state request stays pending, so no update notice shows.
+  updates:{run:()=>new Promise(()=>{}),onState:()=>()=>{}},
+  background:{state:async()=>({state:'ready'}),restart:async()=>({status:'requested'}),serviceState:async()=>({installed:false,running:true,preferences:{}}),preferences:async()=>({installed:false,running:true,preferences:{}}),stopService:async()=>({status:'requested'})}};
 }
 export function setCatalog(catalog:any){Object.assign(catalogs,catalog);}
 

@@ -5,9 +5,9 @@ import { createHash } from 'node:crypto';
 
 export async function syncTheme(app) {
   const root = fileURLToPath(new URL('../', import.meta.url));
-  const file = 'packages/ui/src/tokens.css';
+  const file = 'packages/ui/src/theme/tokens.css';
   const source = await readFile(path.join(app, file), 'utf8');
-  const iconFile = 'packages/ui/src/Icon.tsx';
+  const iconFile = 'packages/ui/src/components/icon-paths.ts';
   const iconSource = await readFile(path.join(app, iconFile), 'utf8');
   const icons = new Map([...iconSource.matchAll(/^\s+(\w+):\s*"([^"]+)"/gm)].map(match => [match[1], match[2]]));
   const htmlPath = path.join(root, 'public/index.html');

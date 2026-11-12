@@ -5,3 +5,4 @@ node_modules/
 public/downloads/*
 !public/downloads/.gitkeep
 .wrangler/
+.review/

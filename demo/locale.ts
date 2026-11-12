@@ -2,7 +2,7 @@ import zhCatalog from './catalog.json';
 import enCatalog from './catalog.en.json';
 export const catalogsByLanguage={zh:zhCatalog,en:enCatalog};
 const entries:Record<string,string>={
-'自选模型':'Your chosen model','你的日常搭子':'Your everyday teammate','研究员':'Researcher','把好奇变成答案':'Turn curiosity into answers','写作搭子':'Writer','一起找到好表达':'Find the right words together','小管家':'Steward','琐事放心交给我':'Leave the little things to me','灵感小分队':'Idea Studio','一起收集灵感、梳理想法，把内容做好。':'Find inspiration, shape ideas and create something together.',
+'自选模型':'Your chosen model','我的手机':'My phone','书房的电脑':'Study computer','我的电脑':'My computer','你的日常搭子':'Your everyday teammate','研究员':'Researcher','把好奇变成答案':'Turn curiosity into answers','写作搭子':'Writer','一起找到好表达':'Find the right words together','小管家':'Steward','琐事放心交给我':'Leave the little things to me','灵感小分队':'Idea Studio','一起收集灵感、梳理想法，把内容做好。':'Find inspiration, shape ideas and create something together.',
 '想写一期「让工作轻一点」的 newsletter，帮我找找灵感，再整理一个提纲。':'I’m writing a newsletter about making work feel lighter. Find some inspiration and put together an outline.',
 '好，我们分头行动。研究员收集参考资料，写作搭子整理提纲，我来汇总。':'Let’s split the work. Researcher will gather sources, Writer will draft an outline, and I’ll bring it together.',
 '参考资料已整理好。我选了三个切入点：注意力、日常习惯，以及给计划留一点余地。':'The research is ready. I found three angles: attention, everyday habits, and leaving a little breathing room in our plans.',

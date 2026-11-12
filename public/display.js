@@ -18,10 +18,10 @@ export function translatePage(scope = document.documentElement) {
     const value = source.replace(/\S(?:[\s\S]*\S)?/,text => t(text));
     if (node.textContent !== value) node.textContent = value;
   }
-  const elements = [scope,...scope.querySelectorAll('[aria-label],[title],meta[content]')];
+  const elements = [scope,...scope.querySelectorAll('[aria-label],[title],[alt],meta[content]')];
   for (const element of elements) {
     const source = attributes.get(element) ?? {};
-    for (const name of ['aria-label','title',...(element.tagName === 'META' ? ['content'] : [])]) {
+    for (const name of ['aria-label','title','alt',...(element.tagName === 'META' ? ['content'] : [])]) {
       if (!element.hasAttribute(name)) continue;
       source[name] ??= element.getAttribute(name);
       element.setAttribute(name,t(source[name]));
