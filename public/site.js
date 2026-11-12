@@ -1,4 +1,4 @@
-// Shared by the home page and the tour page: header menu and footer year.
+// Home page header menu and footer year.
 import {setLabel} from './display.js';
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('#mobile-nav');
