@@ -22,4 +22,4 @@ npm run deploy         # 构建并部署到 Cloudflare（首次需 npx wrangler 
 
 - 主项目欢迎页 `welcome.apps.body` 的文案已过时，改完后运行 `npm run sync:product`。
 - 数据流转视频和场景图里的文字只有中文；英文页面在说明里标注了「labels in Chinese」。
-- `og:image` 用的是 workers.dev 的绝对地址，换正式域名时要一起改。
+- `og:image` 用正式域名 pibot.space 的绝对地址。
