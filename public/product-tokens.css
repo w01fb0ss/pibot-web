@@ -33,6 +33,11 @@
   --radius-row: 12px;
   --radius-card: 16px;
   --radius-pill: 999px;
+  /* A69 motion: a slight overshoot for toggles, a quick settle for sliding selections. */
+  --ease-spring: cubic-bezier(0.3, 1.4, 0.5, 1);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Icons and text on a filled tone (icon tiles, coloured buttons) stay white in both themes. */
+  --on-tone: #ffffff;
   font-family: var(--font-sans);
 }
 
@@ -86,6 +91,28 @@
   --okBg: #00c97217;
   --danger: #c21d2e;
   --dangerBg: #ff263c17;
+  /*
+   * A67 phone surfaces. Glass is the floating tab bar and pinned action bars: a translucent fill
+   * over the blur, a bright rim and a sheen at the top edge; the chosen tab is a brighter bubble.
+   */
+  --glass: #ffffff59;
+  --glass-edge: #ffffffd9;
+  --glass-sheen: #ffffff8c;
+  --glass-on: #ffffffe6;
+  --wash-pill: #fcfcfcb3;
+  --shadow-soft: 0 6px 20px -8px #1414142e, 0 1px 2px #1414140f;
+  --shadow-bubble: 0 1px 6px #0000001a;
+  /* Text and marks in a Bot's or tab's colour on the page; deepened where white text fails. */
+  --ink-orange: var(--userBubble-orange);
+  --ink-amber: var(--userBubble-amber);
+  --ink-blue: var(--userBubble-blue);
+  --ink-violet: var(--userBubble-violet);
+  --ink-pink: var(--userBubble-pink);
+  --ink-teal: var(--userBubble-teal);
+  --ink-green: var(--userBubble-green);
+  --ink-brown: var(--userBubble-brown);
+  --ink-ink: var(--text);
+  --ink-gray: var(--userBubble-gray);
 }
 
 [data-theme="dark"] {
@@ -135,4 +162,22 @@
   --okBg: #00c97229;
   --danger: #ff6b78;
   --dangerBg: #ff263c29;
+  --glass: #1c1c20bf;
+  --glass-edge: #ffffff2e;
+  --glass-sheen: #ffffff26;
+  --glass-on: #ffffff24;
+  --wash-pill: #1b1b1bb3;
+  --shadow-soft: 0 8px 24px -10px #000000b0, 0 1px 2px #00000080;
+  --shadow-bubble: 0 1px 6px #00000066;
+  /* The bright fills read on the dark page; the deepened ones would not. */
+  --ink-orange: #ff8a3d;
+  --ink-amber: var(--avatar-amber);
+  --ink-blue: #5aa9ff;
+  --ink-violet: #b48cff;
+  --ink-pink: #ff6bb5;
+  --ink-teal: #2fd1bd;
+  --ink-green: #4cd69a;
+  --ink-brown: #c9996b;
+  --ink-ink: var(--text);
+  --ink-gray: var(--avatar-gray);
 }

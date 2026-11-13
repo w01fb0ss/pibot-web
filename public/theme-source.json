@@ -1,6 +1,6 @@
 {
   "file": "packages/ui/src/theme/tokens.css",
-  "sha256": "7067b9f702bac68f5669ae6582c43cb25ffb4f2e66e691851dc9fa5c23ab8b90",
+  "sha256": "21b16170b99f14a3ec009324818a8231b9eb74afcca4ac1d2b66c82a18265b8d",
   "iconFile": "packages/ui/src/components/icon-paths.ts",
-  "iconSha256": "6c0f0d079dc1d2764bb9a04548df8d9b1edd5041ba8dd7fbdb46d2c90cdcf1ac"
+  "iconSha256": "32d22b6067cc431bfa495adc70c48ee145bc81bc5f81f895fac17a56a69fc4ce"
 }
