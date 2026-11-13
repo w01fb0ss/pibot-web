@@ -1,8 +1,0 @@
-version: 0.0.5
-files:
-  - url: https://pibot.space/downloads/0.0.5/PiBot-0.0.5-win-x64.exe
-    sha512: 0vzr4wkKJtAFdRZzn+NxR70UQVMVT3KdHVJx/p2MkexhaQngBfloKK7haSD9az2E5a00LjofXjG4CtovKmu8Sg==
-    size: 198523799
-path: https://pibot.space/downloads/0.0.5/PiBot-0.0.5-win-x64.exe
-sha512: 0vzr4wkKJtAFdRZzn+NxR70UQVMVT3KdHVJx/p2MkexhaQngBfloKK7haSD9az2E5a00LjofXjG4CtovKmu8Sg==
-releaseDate: '2026-10-22T23:35:04.863Z'
