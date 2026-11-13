@@ -1,4 +1,5 @@
-import {display,t,setLabel} from './display.js';
+import {display,t} from './display.js';
+import {renderRelease} from './downloads.js';
 import './site.js';
 
 // ---- Real app screenshots: one file per language and theme ----
@@ -85,59 +86,5 @@ new IntersectionObserver(entries => {
   }
 }, { threshold: 0.5 }).observe(video.parentElement);
 
-// ---- Downloads: releases.json decides; an unavailable config never enables a download ----
-const releaseDialog = document.querySelector('#release-dialog');
-let releaseConfig;
-const configReady = fetch('releases.json', { cache: 'no-store', signal: AbortSignal.timeout(5000) })
-  .then(response => { if (!response.ok) throw new Error('Release configuration unavailable'); return response.json(); })
-  .then(config => { releaseConfig = config; renderRelease(); })
-  .catch(() => { /* Fail closed: unavailable config never enables a download. */ });
-function renderRelease() {
-  if (!releaseConfig) return;
-  document.querySelectorAll('[data-platform]').forEach(button => {
-    const platform=releaseConfig.platforms?.[button.dataset.platform];
-    if (!downloadURL(platform?.url)) return;
-    button.querySelector('small').textContent=t(platform.detail||'下载应用');
-    button.querySelector('.platform-arrow').textContent='↓';
-    setLabel(button,'下载 Pi Bot {platform}',{platform:t(platform.label)});
-  });
-  if (Object.values(releaseConfig.platforms||{}).some(platform=>downloadURL(platform.url))) {
-    document.querySelector('#release-summary').textContent=t('Pi Bot {version} 已发布。选择你的平台，认识新队友。',{version:releaseConfig.version||''});
-    document.querySelector('.download-status').replaceChildren(Object.assign(document.createElement('span'),{className:'status-dot'}),document.createTextNode(t('安装前请查看对应平台的系统要求')));
-    document.querySelector('.download-note').textContent=t('点击下载，或查看对应平台的发布状态');
-    const pill=document.querySelector('.release-pill');
-    pill.replaceChildren(Object.assign(document.createElement('span'),{className:'status-dot'}),document.createTextNode(' '+t('你的 AI 新队友')+' '),Object.assign(document.createElement('span'),{className:'pill-divider'}),document.createTextNode(' '+t('现已登场')+' ↗'));
-    document.querySelector('.platform-note').lastChild.textContent=t('现已发布');
-    document.querySelector('.hero-actions .button').firstChild.textContent=t('获取 Pi Bot')+' ';
-    document.querySelector('#faq details p').textContent=t('Pi Bot 已开放部分或全部平台下载。请在上方下载区选择操作系统，查看安装包和对应平台状态。');
-  }
-  if (releaseDialog.open) renderReleaseDialog();
-}
-let dialogPlatform='';
-function renderReleaseDialog() {
-  document.querySelector('#dialog-description').textContent=t('Pi Bot 的 {platform} 版本尚未开放下载。我们正在打磨体验，正式发布后，你可以直接在这里获取安装包。',{platform:t(dialogPlatform)});
-}
-function downloadURL(value) {
-  if (typeof value !== 'string' || !value.trim()) return null;
-  try {
-    const url = new URL(value, document.baseURI);
-    if (url.protocol === 'https:' || url.href.startsWith(new URL('downloads/', document.baseURI).href)) return url.href;
-  } catch { return null; }
-  return null;
-}
-document.querySelectorAll('[data-platform]').forEach(button => button.addEventListener('click', async () => {
-  await configReady;
-  const platform = releaseConfig?.platforms?.[button.dataset.platform];
-  const url = downloadURL(platform?.url);
-  if (url) { location.assign(url); return; }
-  dialogPlatform = platform?.label || button.querySelector('b').textContent;
-  renderReleaseDialog();
-  releaseDialog.showModal();
-}));
-document.querySelector('.dialog-close').addEventListener('click', () => releaseDialog.close());
-document.querySelector('#dialog-roadmap').addEventListener('click', () => releaseDialog.close());
-releaseDialog.addEventListener('click', event => {
-  const rect = releaseDialog.getBoundingClientRect();
-  if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) releaseDialog.close();
-});
+// ---- Downloads: releases.json decides (downloads.js); re-render text that scripts own ----
 document.addEventListener('pi-display-change',()=>{ syncShots(); showScene(flowScene); renderRelease(); });

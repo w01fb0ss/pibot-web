@@ -5,22 +5,50 @@
     "mac-arm64": {
       "url": null,
       "label": "macOS · Apple 芯片",
-      "detail": "首发时提供"
+      "detail": "首发时提供",
+      "status": "untested"
     },
     "mac-x64": {
       "url": null,
       "label": "macOS · Intel 芯片",
-      "detail": "首发时提供"
+      "detail": "首发时提供",
+      "status": "testing"
     },
     "windows": {
       "url": null,
       "label": "Windows",
-      "detail": "首发时提供"
+      "detail": "首发时提供",
+      "status": "testing"
+    },
+    "linux": {
+      "url": null,
+      "label": "Linux",
+      "detail": "首发时提供",
+      "status": "testing"
     },
     "android": {
       "url": null,
       "label": "Android",
-      "detail": "首发时提供"
+      "detail": "首发时提供",
+      "status": "testing"
+    },
+    "runner-windows": {
+      "url": null,
+      "label": "执行端 · Windows",
+      "detail": "首发时提供",
+      "status": "testing"
+    },
+    "runner-mac": {
+      "url": null,
+      "label": "执行端 · macOS",
+      "detail": "首发时提供",
+      "status": "testing"
+    },
+    "runner-linux": {
+      "url": null,
+      "label": "执行端 · Linux",
+      "detail": "首发时提供",
+      "status": "testing"
     }
   }
 }
