@@ -7,7 +7,7 @@ Pi Bot 的中英文官网：https://pibot.leen-zhou-cn.workers.dev
 - `public/downloads.js`：下载区三张卡（桌面 / 手机 / 执行端），各一个「下载」菜单；平台、链接和测试状态都读 `public/releases.json`。
 - `public/product/`：编译自 `../PiBot` 的 App 前端（演示数据，`demo/`），只用来截首页截图，不部署（负责人 2026-11-12 去掉了产品导览页，`/tour` 301 回首页）。
 - `public/assets/shots/`：首页用的 App 实际界面截图（演示数据），每张分中英文、浅深色，webp + jpg。
-- `public/assets/flow/`：数据流转视频与四个场景的静态图。
+- 「三台设备」里的数据流转图：四个场景各一张，直接写在 `index.html` 里（泳道 手机 / 电脑 · 大脑 / 电脑 · 文件与记录 / 模型服务商 / 执行端，编号步骤和箭头），是真实文字，中英文和深浅色跟着全站走；窄屏变成编号列表。负责人 2026-11-13 去掉了原来的视频和静态图。
 
 ```sh
 npm run dev            # 本地预览 http://127.0.0.1:4173
@@ -37,5 +37,4 @@ App 更新后的顺序：`npm run sync:product` → `npm run capture:shots` → 
 ## 待处理
 
 - 主项目欢迎页 `welcome.apps.body` 的文案已过时，改完后运行 `npm run sync:product`。
-- 数据流转视频和场景图里的文字只有中文；英文页面在说明里标注了「labels in Chinese」。
 - `og:image` 用正式域名 pibot.space 的绝对地址。
