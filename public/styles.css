@@ -117,7 +117,6 @@ figcaption{margin-top:14px;font-size:12.5px;color:var(--text2);text-align:center
 .flow-tabs::-webkit-scrollbar{display:none}
 .flow-tabs button{flex:none;display:inline-flex;align-items:center;gap:6px;border:0;border-radius:var(--radius-pill);padding:7px 16px;background:transparent;font-size:13.5px;line-height:1.5;font-weight:600;white-space:nowrap;color:var(--text2)}
 .flow-tabs button[aria-selected=true]{background:var(--card);color:var(--ink-violet);box-shadow:var(--shadow)}
-.planned-badge{font-style:normal;font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:var(--radius-pill);background:var(--warnBg);color:var(--warn)}
 .flow-panel{margin-top:20px}
 .flow-caption{margin-top:12px;font-size:12.5px;text-align:center}
 .flow-text{max-width:780px;min-height:84px;margin:16px auto 0;text-align:center}
@@ -155,6 +154,8 @@ figcaption{margin-top:14px;font-size:12.5px;color:var(--text2);text-align:center
 .self .step-n{margin-left:calc(10% - 30px)}
 .step-box{grid-column:1;grid-row:2;margin:2px 10%;padding:6px 10px;border-radius:10px;border:1.5px solid var(--lane-ink);background:color-mix(in srgb,var(--lane) 10%,var(--card));color:var(--text);font-size:13px;font-weight:600;line-height:1.4;text-align:center}
 .step-note{grid-column:1;grid-row:3;justify-self:center;max-width:calc(100% - 2 * var(--inset));padding:0 8px;background:var(--card);color:var(--text2);font-size:11.5px;line-height:1.4;text-align:center}
+/* A box sits on one lane, so its note may use that lane's whole width. */
+@media(min-width:761px){.self .step-note{max-width:100%;margin-inline:6px}}
 .flow-panel.in-view .flow-diagram:not([hidden]) .step{animation:step-in .45s var(--ease-out) var(--d,0s) both}
 .step:nth-child(2){--d:.07s}.step:nth-child(3){--d:.14s}.step:nth-child(4){--d:.21s}.step:nth-child(5){--d:.28s}.step:nth-child(6){--d:.35s}.step:nth-child(7){--d:.42s}.step:nth-child(8){--d:.49s}.step:nth-child(9){--d:.56s}.step:nth-child(10){--d:.63s}
 @keyframes step-in{from{opacity:0;transform:translateY(6px)}}
