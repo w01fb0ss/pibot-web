@@ -1,6 +1,54 @@
-# Pi Bot 官网
+# Pi Bot website
 
-Pi Bot 的中英文官网：https://pibot.leen-zhou-cn.workers.dev
+[English](#english) · [中文](#中文)
+
+## English
+
+The bilingual (Chinese / English) website of Pi Bot: https://pibot.space
+
+- `public/index.html`: the homepage, six sections (hero · three devices · what it can do · you stay in control · three steps and downloads · FAQ). Redesigned on 2026-11-13 in the app's lively style: the hero is the Bot cast, each section has one colour (`tone-*` in `styles.css`), soft cards and coloured icon tiles, and the capabilities section is a seven-card bento. Colours come only from `product-tokens.css` and the site tokens at the top of `styles.css`.
+- Language and appearance: `display-init.js` (sets `lang` / `data-theme` before first paint) + `display.js` (switching, remembering, `?lang=&theme=`). Chinese is the source copy; English lives in `translations.js`, which replaces text nodes. Add the English entry in the same change whenever Chinese copy is added or changed.
+- `public/downloads.js`: the three download cards (desktop / phone / runner), each with one Download menu; platforms, links and test status are read from `public/releases.json`.
+- `public/product/`: the app front end compiled from `../PiBot` (demo data in `demo/`). Used only as the screenshot source and not deployed (the owner removed the product tour page on 2026-11-12; `/tour` redirects to the homepage with a 301).
+- `public/assets/shots/`: real app screenshots used on the homepage (demo data), each in Chinese and English, light and dark, as webp + jpg.
+- The data-flow diagrams in "three devices": one per scenario, written directly in `index.html` (lanes: phone / computer · brain / computer · files and records / model provider / runner, with numbered steps and arrows). They are real text, so language and theme follow the rest of the site; on narrow screens they become numbered lists. The owner replaced the earlier video and stills on 2026-11-13.
+
+```sh
+npm run dev            # local preview at http://127.0.0.1:4173
+npm run sync:product   # regenerate the screenshot source after the app front end changes (also syncs theme and icons)
+npm run capture:shots  # re-capture public/assets/shots with local headless Chrome (starts npm run dev on 4173 if it is not running)
+npm run build          # build dist/
+npm run deploy         # build and deploy to Cloudflare (first time: npx wrangler login)
+```
+
+Homepage screenshots come from `public/product/` (local preview): `product/index.html?scene=<scene>&lang=<zh|en>&theme=<light|dark>`. `scripts/capture-shots.mjs` drives the installed Chrome over the DevTools protocol (`/Applications/Google Chrome.app`; change the path with `--chrome` or `CHROME`; no npm dependency) and captures one full app window per scene (1280×800 at 1.5×, i.e. 1920×1200), Chinese and English × light and dark, as webp and jpg: `<scene>-<zh|en>-<light|dark>.{webp,jpg}`. Scenes: `team` (hero), `plan`, `browser`, `preview`, `connectors`, `routine`, `computer`, `memory`, `audit`; re-capture only some with `--scenes plan,memory`. Card crops are not baked into the images but set by `.crop-<scene>` in `styles.css` (`--zoom` magnification, `--focus` anchor point); check the cards after replacing images.
+
+After an app update: `npm run sync:product` → `npm run capture:shots` → check in the local preview → commit.
+
+### Downloads and test status (`public/releases.json`)
+
+Each key in `platforms` is one download option: `mac-x64`, `mac-arm64`, `windows`, `linux` (desktop), `android` (phone), `runner-windows`, `runner-mac`, `runner-linux` (runner). Each entry:
+
+```json
+{ "url": null, "label": "macOS · Intel 芯片", "detail": "首发时提供", "status": "testing", "version": "0.0.4" }
+```
+
+- `status`: `tested` / `testing` / `untested` (not tested on real hardware); missing or invalid values show as `untested`. "Tested" means this version was actually installed and run through on that platform.
+- `version` (optional): the version `status` refers to. If `status` is `tested` but `version` differs from the top-level `version`, the page shows "testing"; re-test after a version change before updating it.
+- `url`: when absent, choosing the option opens the "coming soon" dialog; with an https address or an on-site `downloads/` path it downloads directly, and `detail` is shown under the option.
+- `../PiBot/tools/release/publish.mjs --launch` changes only `url`, `detail` and the top-level `status` / `version` (runner entries included) and keeps `status` and every other field.
+
+### Update feed (`public/updates/`)
+
+`stable.json` and `latest*.yml` are the desktop app's update feed, written by `publish.mjs`; the installers themselves are served from the R2 bucket under `https://pibot.space/downloads/<version>/`.
+
+### To do
+
+- The main project's welcome copy `welcome.apps.body` is outdated; run `npm run sync:product` after it changes.
+
+## 中文
+
+Pi Bot 的中英文官网：https://pibot.space
 
 - `public/index.html`：首页，六段（首屏 · 三台设备 · 能做什么 · 你说了算 · 三步上手与下载 · 常见问题）。2026-11-13 按 App 的活泼风格改版：首屏是 Bot 阵容，每段一个颜色（`styles.css` 的 `tone-*`），软卡片、彩色图标块，能力区是七张卡的 bento。颜色只用 `product-tokens.css` 和 `styles.css` 顶部的站点 token。
 - 语言和外观：`display-init.js`（首屏前定好 `lang` / `data-theme`）+ `display.js`（切换、记住、`?lang=&theme=`）；中文是源文案，英文在 `translations.js` 按文本节点替换，新增或改动中文时同一次加英文。
@@ -21,7 +69,7 @@ npm run deploy         # 构建并部署到 Cloudflare（首次需 npx wrangler 
 
 App 更新后的顺序：`npm run sync:product` → `npm run capture:shots` → 本地预览检查 → 提交。
 
-## 下载与测试状态（`public/releases.json`）
+### 下载与测试状态（`public/releases.json`）
 
 `platforms` 的每个键是一个下载选项：`mac-x64`、`mac-arm64`、`windows`、`linux`（桌面），`android`（手机），`runner-windows`、`runner-mac`、`runner-linux`（执行端）。每项：
 
@@ -32,9 +80,12 @@ App 更新后的顺序：`npm run sync:product` → `npm run capture:shots` → 
 - `status`：`tested`（已测试）/ `testing`（测试中）/ `untested`（未实机测试），缺省或写错按 `untested` 显示。「已测试」= 这个版本已在该平台实际安装并跑通。
 - `version`（可选）：`status` 针对的版本。`tested` 且 `version` 和顶层 `version` 不一致时，页面显示「测试中」，换版本后需要重新测过再改。
 - `url`：没有时点选项弹「即将发布」对话框；有 https 地址或站内 `downloads/` 时直接下载，`detail` 显示在选项下面。
-- `../PiBot/tools/release/publish.mjs --launch` 只改 `url`、`detail` 和顶层 `status` / `version`，保留 `status` 等其他字段；执行端还没有发布流程，地址手动填。
+- `../PiBot/tools/release/publish.mjs --launch` 只改 `url`、`detail` 和顶层 `status` / `version`（包括执行端），保留 `status` 等其他字段。
 
-## 待处理
+### 更新源（`public/updates/`）
+
+`stable.json` 和 `latest*.yml` 是桌面 App 的更新源，由 `publish.mjs` 写入；安装包本身放在 R2，经 `https://pibot.space/downloads/<版本>/` 提供。
+
+### 待处理
 
 - 主项目欢迎页 `welcome.apps.body` 的文案已过时，改完后运行 `npm run sync:product`。
-- `og:image` 用正式域名 pibot.space 的绝对地址。
