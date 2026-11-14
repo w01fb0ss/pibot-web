@@ -1,6 +1,6 @@
 {
-  "status": "coming_soon",
-  "version": "0.0.4",
+  "status": "available",
+  "version": "0.0.2",
   "platforms": {
     "mac-arm64": {
       "url": null,
@@ -9,46 +9,52 @@
       "status": "untested"
     },
     "mac-x64": {
-      "url": null,
+      "url": "https://pibot.space/downloads/0.0.2/PiBot-0.0.2-mac-x64.dmg",
       "label": "macOS · Intel 芯片",
-      "detail": "首发时提供",
-      "status": "testing"
+      "detail": "v0.0.2",
+      "status": "tested",
+      "version": "0.0.2"
     },
     "windows": {
-      "url": null,
+      "url": "https://pibot.space/downloads/0.0.2/PiBot-0.0.2-win-x64.exe",
       "label": "Windows",
-      "detail": "首发时提供",
-      "status": "testing"
+      "detail": "v0.0.2",
+      "status": "tested",
+      "version": "0.0.2"
     },
     "linux": {
-      "url": null,
+      "url": "https://pibot.space/downloads/0.0.2/PiBot-0.0.2-linux-x86_64.AppImage",
       "label": "Linux",
-      "detail": "首发时提供",
-      "status": "testing"
+      "detail": "v0.0.2",
+      "status": "tested",
+      "version": "0.0.2"
     },
     "android": {
-      "url": null,
+      "url": "https://pibot.space/downloads/0.0.2/PiBot-0.0.2-android.apk",
       "label": "Android",
-      "detail": "首发时提供",
+      "detail": "v0.0.2",
       "status": "testing"
     },
     "runner-windows": {
-      "url": null,
+      "url": "https://pibot.space/downloads/0.0.2/PiBot-Runner-0.0.2-win-x64.exe",
       "label": "执行端 · Windows",
-      "detail": "首发时提供",
-      "status": "testing"
+      "detail": "v0.0.2",
+      "status": "tested",
+      "version": "0.0.2"
     },
     "runner-mac": {
-      "url": null,
+      "url": "https://pibot.space/downloads/0.0.2/PiBot-Runner-0.0.2-mac-x64.zip",
       "label": "执行端 · macOS",
-      "detail": "首发时提供",
-      "status": "testing"
+      "detail": "v0.0.2",
+      "status": "tested",
+      "version": "0.0.2"
     },
     "runner-linux": {
-      "url": null,
+      "url": "https://pibot.space/downloads/0.0.2/PiBot-Runner-0.0.2-linux-x64.deb",
       "label": "执行端 · Linux",
-      "detail": "首发时提供",
-      "status": "testing"
+      "detail": "v0.0.2",
+      "status": "tested",
+      "version": "0.0.2"
     }
   }
 }

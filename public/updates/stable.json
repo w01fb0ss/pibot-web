@@ -1,4 +1,8 @@
 {
-  "version": "0.0.1",
-  "downloads": {}
+  "version": "0.0.2",
+  "downloads": {
+    "darwin-x64": "https://pibot.space/downloads/0.0.2/PiBot-0.0.2-mac-x64.dmg",
+    "win32-x64": "https://pibot.space/downloads/0.0.2/PiBot-0.0.2-win-x64.exe",
+    "linux-x64": "https://pibot.space/downloads/0.0.2/PiBot-0.0.2-linux-x86_64.AppImage"
+  }
 }

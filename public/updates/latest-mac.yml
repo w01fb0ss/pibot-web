@@ -1,0 +1,12 @@
+version: 0.0.2
+files:
+  - url: https://pibot.space/downloads/0.0.2/PiBot-0.0.2-mac-x64.zip
+    sha512: LvhsA5TSwHvAc8KbWPni1+dUJgDmQOCNMQuXqIrsWgJ8RpHn9/gSDo8yTph/nTE5O7sEc/w83+mKfu9eGqL06Q==
+    size: 284385660
+  - url: https://pibot.space/downloads/0.0.2/PiBot-0.0.2-mac-x64.dmg
+    sha512: Dkyl7JGyHseGVuAOeJJmza5o8TwZAwDINq+0giHZdr5VCl8KgTG4zNPh23BMJmfVr4TRh6MCGlk99LCecKMXZg==
+    size: 283806518
+path: https://pibot.space/downloads/0.0.2/PiBot-0.0.2-mac-x64.zip
+sha512: LvhsA5TSwHvAc8KbWPni1+dUJgDmQOCNMQuXqIrsWgJ8RpHn9/gSDo8yTph/nTE5O7sEc/w83+mKfu9eGqL06Q==
+releaseDate: '2026-11-14T06:44:17.346Z'
+releaseNotes: '{"zh":["可以用 ChatGPT 计划登录了：模型与密钥 › OpenAI › 「通过 ChatGPT 继续」，用你的 Go / Plus / Pro / Business 额度运行 OpenAI 模型，不需要 API Key","开发任务做出网页、本地 HTML 或 Web 服务后，Bot 会自动在内置浏览器里打开；画面类结果会先截图自查、有明显错位先修好再交给你","模型单次输出有上限时，Bot 会把大文件拆成几段写，不再反复失败","Bot 可以在配对的执行端（另一台电脑或服务器）上工作：提议换到执行端文件夹、在那台机器上跑命令；修复了配对后一直离线、Windows 执行端启动失败、macOS 托盘不显示等问题","新话题统一显示问候页，建议跟着界面语言走；「执行 / 只规划」和工作文件夹放在同一行","连接 › 技能：写技能统一从右上角「添加」进入；时间统一 24 小时制；侧栏标签不再被截断","Anthropic 里说明了 Claude 订阅怎么用：Max / Team 等计划附带的 API 额度可以用 Console 的 API Key 接入","更新改为增量下载：只下载变化的部分，更新页显示这一版的更新内容"],"en":["Sign in with your ChatGPT plan: Models & keys › OpenAI › Continue with ChatGPT runs OpenAI models on your Go / Plus / Pro / Business allowance, no API key needed","When a development task produces a web page, local HTML or a web service, the Bot opens it in its built-in browser; visual results get a screenshot self-check, and obvious layout errors are fixed before hand-off","When a model can only output so much at once, Bots write large files in parts instead of failing repeatedly","Bots can work on a paired runner (another computer or server): they propose moving to a runner folder and run commands there. Fixed runners staying offline after pairing, the Windows runner failing to start and the macOS tray not appearing","Every new topic opens on the greeting page with suggestions in the interface language; Execute / Plan only and the working folder share one row","Connections › Skills: writing a skill starts from the top-right Add menu; times use the 24-hour clock; sidebar tabs are no longer cut off","Anthropic explains how to use a Claude plan: the API credit included with plans such as Max or Team works through a Console API key","Updates download only what changed, and the update page shows what each version changes"]}'
