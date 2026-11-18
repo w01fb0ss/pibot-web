@@ -13,7 +13,10 @@ const server = http.createServer(async (request, response) => {
   if (!['GET', 'HEAD'].includes(request.method)) { response.writeHead(405, { Allow: 'GET, HEAD' }).end(); return; }
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
-    const file = await realpath(path.join(root, pathname === '/' ? 'index.html' : pathname));
+    let file = await realpath(path.join(root, pathname === '/' ? 'index.html' : pathname));
+    // Match the static host's directory-index behavior so legal pages can be checked locally
+    // using their public URLs (/privacy and /terms), not only with an index.html suffix.
+    if ((await stat(file)).isDirectory()) file = await realpath(path.join(file, 'index.html'));
     if (!file.startsWith(root)) { response.writeHead(403).end('Forbidden'); return; }
     const info = await stat(file);
     if (!info.isFile()) { response.writeHead(404).end('Not found'); return; }

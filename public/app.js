@@ -7,7 +7,7 @@ function syncShots() {
   const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
   const variant = `${display.language === 'en' ? 'en' : 'zh'}-${theme}`;
   document.querySelectorAll('picture[data-shot]').forEach(picture => {
-    const base = `assets/shots/${picture.dataset.shot}-${variant}`;
+    const base = `/assets/shots/${picture.dataset.shot}-${variant}`;
     picture.querySelector('source').srcset = `${base}.webp`;
     const img = picture.querySelector('img');
     if (!img.src.endsWith(`${base}.jpg`)) img.src = `${base}.jpg`;

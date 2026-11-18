@@ -1,12 +1,14 @@
 // Download cards (桌面 / 手机 / 执行端): one button per device opens a small platform menu.
 // releases.json decides every link and status chip; an unavailable config never enables a download.
-import {t} from './display.js';
+import {display, t} from './display.js';
 
 const releaseDialog = document.querySelector('#release-dialog');
+const macFirstOpen = document.querySelector('.mac-first-open');
 const picks = [...document.querySelectorAll('.download-pick')];
 const STATUS_TEXT = { tested: '已测试', testing: '测试中', untested: '未实机测试' };
 let releaseConfig;
-const configReady = fetch('releases.json', { cache: 'no-store', signal: AbortSignal.timeout(5000) })
+const downloadBase = new URL('/', location.origin);
+const configReady = fetch('/releases.json', { cache: 'no-store', signal: AbortSignal.timeout(5000) })
   .then(response => { if (!response.ok) throw new Error('Release configuration unavailable'); return response.json(); })
   .then(config => { releaseConfig = config; renderRelease(); })
   .catch(() => { /* Fail closed: no config, no links and no status claims. */ });
@@ -14,8 +16,8 @@ const configReady = fetch('releases.json', { cache: 'no-store', signal: AbortSig
 function downloadURL(value) {
   if (typeof value !== 'string' || !value.trim()) return null;
   try {
-    const url = new URL(value, document.baseURI);
-    if (url.protocol === 'https:' || url.href.startsWith(new URL('downloads/', document.baseURI).href)) return url.href;
+    const url = new URL(value, downloadBase);
+    if (url.protocol === 'https:' || url.href.startsWith(new URL('downloads/', downloadBase).href)) return url.href;
   } catch { return null; }
   return null;
 }
@@ -30,6 +32,10 @@ function platformStatus(platform) {
 
 export function renderRelease() {
   if (!releaseConfig) return;
+  macFirstOpen.hidden = releaseConfig.version !== macFirstOpen.dataset.releaseVersion ||
+    !['mac-x64', 'mac-arm64'].some(key => downloadURL(releaseConfig.platforms?.[key]?.url));
+  const appleSupportLocale = display.language === 'en' ? 'en-us' : 'zh-cn';
+  macFirstOpen.querySelector('a').href = `https://support.apple.com/${appleSupportLocale}/102445`;
   document.querySelectorAll('.download-option').forEach(option => {
     const platform = releaseConfig.platforms?.[option.dataset.platform];
     const status = platformStatus(platform);
@@ -42,10 +48,8 @@ export function renderRelease() {
     document.querySelector('#release-summary').textContent = t('Pi Bot {version} 已发布。选择你的平台，认识新队友。', { version: releaseConfig.version || '' });
     document.querySelector('.download-status').replaceChildren(Object.assign(document.createElement('span'), { className: 'status-dot' }), document.createTextNode(t('安装前请查看对应平台的系统要求')));
     const pill = document.querySelector('.release-pill');
-    pill.replaceChildren(Object.assign(document.createElement('span'), { className: 'status-dot' }), document.createTextNode(' ' + t('你的 AI 新队友') + ' '), Object.assign(document.createElement('span'), { className: 'pill-divider' }), document.createTextNode(' ' + t('现已登场') + ' ↗'));
+    pill.replaceChildren(Object.assign(document.createElement('span'), { className: 'status-dot' }), document.createTextNode(' ' + t('Pi Bot {version} 正式上线', {version: releaseConfig.version ? 'v' + releaseConfig.version : ''})), Object.assign(document.createElement('span'), { ariaHidden: 'true', textContent: '↗' }));
     document.querySelector('.platform-note').lastChild.textContent = t('现已发布');
-    document.querySelector('.hero-actions .button').firstChild.textContent = t('获取 Pi Bot') + ' ';
-    document.querySelector('#faq details p').textContent = t('Pi Bot 已开放部分或全部平台下载。请在上方下载区选择操作系统，查看安装包和对应平台状态。');
   }
   if (releaseDialog.open) renderReleaseDialog();
 }
@@ -118,7 +122,13 @@ picks.forEach(pick => {
     await configReady;
     const platform = releaseConfig?.platforms?.[option.dataset.platform];
     const url = downloadURL(platform?.url);
-    if (url) { location.assign(url); return; }
+    if (url) {
+      const target = new URL(url);
+      if (target.origin === location.origin && target.pathname.startsWith('/downloads/'))
+        target.pathname = target.pathname.replace('/downloads/', '/download-click/');
+      location.assign(target.href);
+      return;
+    }
     dialogPlatform = platform?.label || option.querySelector('b').textContent;
     renderReleaseDialog();
     releaseDialog.showModal();

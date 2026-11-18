@@ -26,9 +26,11 @@
   --logo-mask-cutout: #000000;
   --switch-knob: #fcfcfc;
   --shadow: 0 1px 3px #0000001f;
+  /* Linux has none of the first five, so without its own Latin faces the CJK font drew English
+     too, with full-width curly quotes ("I’ m"). Latin faces go before the CJK fallback. */
   --font-sans:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei",
-    "Noto Sans CJK SC", sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans",
+    Ubuntu, Cantarell, "DejaVu Sans", "Noto Sans CJK SC", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --radius-row: 12px;
   --radius-card: 16px;
@@ -43,6 +45,14 @@
 
 :root,
 :root[data-theme="light"] {
+  --todo-coral: #ffd9d6;
+  --todo-apricot: #ffe7c2;
+  --todo-lemon: #fff3b0;
+  --todo-mint: #d7f2d9;
+  --todo-sky: #d3ecfb;
+  --todo-lavender: #e3dcfd;
+  --todo-blossom: #fbdcef;
+  --todo-stone: #e7e3de;
   color-scheme: light;
   --bg: #fcfcfc;
   --overlay: #14141466;
@@ -116,6 +126,14 @@
 }
 
 [data-theme="dark"] {
+  --todo-coral: #562e2e;
+  --todo-apricot: #503a23;
+  --todo-lemon: #494018;
+  --todo-mint: #24432f;
+  --todo-sky: #203e53;
+  --todo-lavender: #3b3257;
+  --todo-blossom: #502e46;
+  --todo-stone: #413d39;
   color-scheme: dark;
   --bg: #141414;
   --overlay: #00000099;

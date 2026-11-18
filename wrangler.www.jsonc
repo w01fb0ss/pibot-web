@@ -1,0 +1,9 @@
+{
+  "name": "pibot-www-redirect",
+  "main": "./worker/www-redirect.js",
+  "compatibility_date": "2026-10-19",
+  "workers_dev": false,
+  "preview_urls": false,
+  "send_metrics": false,
+  "routes": [{ "pattern": "www.pibot.space", "custom_domain": true }]
+}

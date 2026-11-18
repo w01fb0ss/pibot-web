@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /download-click/
+
+Sitemap: https://pibot.space/sitemap.xml

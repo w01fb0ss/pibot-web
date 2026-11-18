@@ -1,0 +1,28 @@
+.legal-page{min-height:100vh;background:var(--bg)}
+.legal-main{width:min(900px,calc(100% - 48px));margin:0 auto;padding:76px 0 100px}
+.legal-main h1{font-size:clamp(36px,6vw,58px);line-height:1.1}
+.legal-intro{max-width:720px;margin-top:22px;font-size:18px}
+.legal-main .legal-index{margin-top:28px;padding:16px 20px;border:1px solid var(--b1);border-radius:var(--radius-card);background:var(--card)}
+.legal-main .legal-index[aria-label]{display:none}
+html[data-language="zh"] .legal-main .legal-index.legal-lang-zh,
+html[data-language="en"] .legal-main .legal-index.legal-lang-en{display:block}
+.legal-index p{font-weight:650;color:var(--text)}
+.legal-index ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 18px;margin:8px 0 0;padding:0;list-style:none}
+.legal-index a{color:var(--ink-violet);text-decoration:underline;text-underline-offset:3px}
+.legal-updated{margin-top:14px;font-size:13px;color:var(--text2)}
+.legal-card{margin-top:42px;padding:32px;border-radius:24px;background:var(--card);box-shadow:var(--site-shadow-card)}
+.legal-card h2{font-size:25px;margin:34px 0 10px;color:var(--text)}
+.legal-card h2:first-child{margin-top:0}
+.legal-card p{margin-top:10px}
+.legal-card ul{margin:12px 0 0;padding-left:24px;color:var(--text2)}
+.legal-card li{margin:7px 0;line-height:1.7}
+.legal-card a{color:var(--ink-violet);text-decoration:underline;text-underline-offset:3px}
+.legal-back{display:inline-flex;margin-top:28px;color:var(--ink-violet);font-weight:650}
+.legal-lang{display:none}
+html[data-language="zh"] .legal-lang-zh{display:inline}
+html[data-language="en"] .legal-lang-en{display:inline}
+.legal-card .legal-lang{display:none}
+html[data-language="zh"] .legal-card .legal-lang-zh,html[data-language="en"] .legal-card .legal-lang-en{display:block}
+.legal-card .legal-lang.inline{display:none}
+html[data-language="zh"] .legal-card .legal-lang-zh.inline,html[data-language="en"] .legal-card .legal-lang-en.inline{display:inline}
+@media(max-width:600px){.legal-main{width:min(100% - 32px,900px);padding:50px 0 72px}.legal-card{padding:23px 20px;border-radius:20px}.legal-card h2{font-size:22px}.legal-index ul{grid-template-columns:1fr}}

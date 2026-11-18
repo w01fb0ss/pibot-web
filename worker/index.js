@@ -3,6 +3,19 @@
 import { DurableObject } from 'cloudflare:workers';
 
 const PREFIX = '/downloads/';
+const CLICK_PREFIX = '/download-click/';
+const RETIRED_VERSION = '0.0.2';
+const RELEASE_FILE = /^(\d{1,4}\.\d{1,4}\.\d{1,4})\/([A-Za-z0-9._-]+)$/;
+const DOWNLOAD_TARGETS = [
+  ['desktop', 'mac-arm64.dmg', 'darwin', 'arm64'],
+  ['desktop', 'mac-x64.dmg', 'darwin', 'x64'],
+  ['desktop', 'win-x64.exe', 'win32', 'x64'],
+  ['desktop', 'linux-x86_64.AppImage', 'linux', 'x64'],
+  ['mobile', 'android.apk', 'android', 'arm64'],
+  ['runner', 'mac-x64.zip', 'darwin', 'x64'],
+  ['runner', 'win-x64.exe', 'win32', 'x64'],
+  ['runner', 'linux-x64.deb', 'linux', 'x64'],
+];
 
 // A66 (owner 2026-11-12): update checks are counted per day × source × version × platform × arch,
 // nothing else. No IP, no request log, no identifier; only these aggregate rows are stored.
@@ -15,6 +28,14 @@ const FEEDS = {
 const AGENT = /^PiBot\/(\d{1,4}\.\d{1,4}\.\d{1,4}|unknown) \((darwin|win32|linux|unknown); (x64|arm64|unknown)\)$/;
 const KEEP_DAYS = 400;
 const MAX_KEYS_PER_DAY = 300;
+const GMAIL_CALLBACK = 'https://auth.pibot.space/gmail/callback';
+const GMAIL_SCOPES = new Set([
+  'https://www.googleapis.com/auth/gmail.readonly',
+  'https://www.googleapis.com/auth/gmail.compose',
+  'https://www.googleapis.com/auth/gmail.send',
+  'https://www.googleapis.com/auth/gmail.modify',
+  'https://www.googleapis.com/auth/gmail.labels',
+]);
 
 /** Only Pi Bot's own checks count: its User-Agent, or the agents older versions sent. */
 export function updateKey(pathname, agent) {
@@ -55,8 +76,118 @@ export class Counter extends DurableObject {
   }
 }
 
-function counter(env) {
-  return env.COUNTER.get(env.COUNTER.idFromName('updates'));
+// Gmail OAuth state contains no Gmail token. The code verifier and local callback
+// are kept for at most five minutes so the callback can complete the confidential
+// Google exchange; the resulting refresh token is encrypted and returned directly
+// to the loopback browser form, never written to Durable Object storage.
+export class GmailAuth extends DurableObject {
+  constructor(ctx, env) { super(ctx, env); this.sql = ctx.storage.sql; this.sql.exec('CREATE TABLE IF NOT EXISTS states (id TEXT PRIMARY KEY, value TEXT NOT NULL, expires INTEGER NOT NULL)'); }
+  async put(id, value) { const expires = Date.now() + 5 * 60 * 1000; this.sql.exec('DELETE FROM states WHERE expires < ?', Date.now()); const existing = this.sql.exec('SELECT id FROM states WHERE id = ?', id).toArray()[0]; if (existing) throw new Error('gmail_state_exists'); this.sql.exec('INSERT INTO states (id, value, expires) VALUES (?, ?, ?)', id, JSON.stringify(value), expires); await this.ctx.storage.setAlarm(expires); }
+  async take(id) { this.sql.exec('DELETE FROM states WHERE expires < ?', Date.now()); const row = this.sql.exec('SELECT value FROM states WHERE id = ?', id).toArray()[0]; if (!row) return undefined; this.sql.exec('DELETE FROM states WHERE id = ?', id); return JSON.parse(row.value); }
+  async alarm() {
+    const now = Date.now();
+    this.sql.exec('DELETE FROM states WHERE expires < ?', now);
+    const next = this.sql.exec('SELECT MIN(expires) AS expires FROM states').toArray()[0]?.expires;
+    if (typeof next === 'number') await this.ctx.storage.setAlarm(next);
+  }
+}
+
+function counter(env, kind = 'updates') {
+  return env.COUNTER.get(env.COUNTER.idFromName(kind));
+}
+
+function downloadClickKey(version, file) {
+  for (const [product, suffix, platform, arch] of DOWNLOAD_TARGETS) {
+    const brand = product === 'runner' ? 'PiBot-Runner' : 'PiBot';
+    if (file === brand + '-' + version + '-' + suffix) return [product, version, platform, arch].join('|');
+  }
+}
+
+async function downloadClick(request, url, env, ctx) {
+  if (request.method !== 'GET') return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET' } });
+  const key = url.pathname.slice(CLICK_PREFIX.length);
+  const match = RELEASE_FILE.exec(key);
+  const countKey = match && downloadClickKey(match[1], match[2]);
+  if (!countKey) return new Response('Not found', { status: 404 });
+  if (match[1] === RETIRED_VERSION) return retiredDownload();
+  if (!await env.RELEASES.head(key)) return new Response('Not found', { status: 404 });
+  if (env.COUNTER) ctx.waitUntil(counter(env, 'downloads').add(new Date().toISOString().slice(0, 10), countKey).catch(() => {}));
+  return new Response(null, { status: 302, headers: { Location: PREFIX + key, 'Cache-Control': 'no-store' } });
+}
+
+function retiredDownload() {
+  return new Response('Not found', {
+    status: 404,
+    headers: { 'Cache-Control': 'no-store' },
+  });
+}
+
+function gmailAuth(env, state) { return env.GMAIL_AUTH.get(env.GMAIL_AUTH.idFromName(state)); }
+function b64(bytes) { return btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, ''); }
+function jsonError(message, status = 400) { return Response.json({ error: message }, { status, headers: { 'Cache-Control': 'no-store' } }); }
+function validRedirect(value) { const match = typeof value === 'string' && /^http:\/\/127\.0\.0\.1:(\d{1,5})\/oauth\/callback$/.exec(value); return !!match && Number(match[1]) >= 1024 && Number(match[1]) <= 65535; }
+function validToken(value) { return typeof value === 'string' && /^\S{20,4096}$/.test(value); }
+async function gmailInput(request) {
+  if (!request.body || !request.headers.get('content-type')?.toLowerCase().startsWith('application/json')) throw new Error('invalid_request');
+  const reader = request.body.getReader(); const chunks = []; let size = 0;
+  try {
+    for (;;) { const { done, value } = await reader.read(); if (done) break; size += value.byteLength; if (size > 16384) { await reader.cancel(); throw new Error('invalid_request'); } chunks.push(value); }
+  } finally { reader.releaseLock(); }
+  const bytes = new Uint8Array(size); let offset = 0; for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  const value = JSON.parse(new TextDecoder().decode(bytes));
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid_request');
+  return value;
+}
+function googleFetch(url, options) { return fetch(url, { ...options, signal: AbortSignal.timeout(20000), redirect: 'error' }); }
+async function gmailStart(request, env) {
+  if (request.method !== 'POST' || !env.GMAIL_OAUTH_CLIENT_ID || !env.GMAIL_OAUTH_CLIENT_SECRET) return jsonError('gmail_oauth_not_configured', 503);
+  let input; try { input = await gmailInput(request); } catch { return jsonError('invalid_request'); }
+  const { redirect_uri: redirectUri, state, code_challenge: challenge, code_verifier: verifier, scope } = input ?? {};
+  const scopes = typeof scope === 'string' ? [...new Set(scope.split(/\s+/).filter(Boolean))] : [];
+  if (!validRedirect(redirectUri) || !/^[A-Za-z0-9_-]{32,128}$/.test(state ?? '') || !/^[A-Za-z0-9_-]{32,128}$/.test(challenge ?? '') || !/^[A-Za-z0-9_-]{32,128}$/.test(verifier ?? '') || !scopes.length || scopes.length > 5 || scopes.some((item) => !GMAIL_SCOPES.has(item))) return jsonError('invalid_request');
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+  if (b64(digest) !== challenge) return jsonError('invalid_pkce');
+  try { await gmailAuth(env, state).put(state, { redirectUri, challenge, verifier, scope: scopes.join(' ') }); } catch (error) { if (error instanceof Error && error.message === 'gmail_state_exists') return jsonError('state_exists', 409); throw error; }
+  const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+  url.search = new URLSearchParams({ client_id: env.GMAIL_OAUTH_CLIENT_ID, redirect_uri: GMAIL_CALLBACK, response_type: 'code', access_type: 'offline', prompt: 'consent select_account', state, code_challenge: challenge, code_challenge_method: 'S256', scope: [...scopes, 'openid', 'email'].join(' ') }).toString();
+  return Response.json({ authorizationUrl: url.toString(), clientId: env.GMAIL_OAUTH_CLIENT_ID }, { headers: { 'Cache-Control': 'no-store' } });
+}
+async function gmailRefresh(request, env) {
+  if (request.method !== 'POST' || !env.GMAIL_OAUTH_CLIENT_ID || !env.GMAIL_OAUTH_CLIENT_SECRET) return jsonError('gmail_oauth_not_configured', 503);
+  let input; try { input = await gmailInput(request); } catch { return jsonError('invalid_request'); }
+  const refresh = input?.refresh_token; const clientId = input?.client_id;
+  if (!validToken(refresh) || clientId !== env.GMAIL_OAUTH_CLIENT_ID) return jsonError('invalid_request');
+  const response = await googleFetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_id: env.GMAIL_OAUTH_CLIENT_ID, client_secret: env.GMAIL_OAUTH_CLIENT_SECRET, refresh_token: refresh, grant_type: 'refresh_token' }) });
+  if (!response.ok) return new Response('Google token refresh failed.', { status: 502, headers: { 'cache-control': 'no-store' } });
+  const token = await response.json();
+  if (!validToken(token?.access_token)) return new Response('Google did not return an access token.', { status: 502, headers: { 'cache-control': 'no-store' } });
+  return Response.json({ access_token: token.access_token, expires_in: Number(token.expires_in ?? 3600) }, { headers: { 'cache-control': 'no-store' } });
+}
+function htmlForm(redirectUri, state, ticket) {
+  const safe = (value) => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return `<!doctype html><meta charset="utf-8"><title>Pi Bot Gmail</title><p>授权完成，正在返回 Pi Bot… / Authorization complete, returning to Pi Bot…</p><form id="f" method="post" action="${safe(redirectUri)}"><input name="state" value="${safe(state)}"><input name="code" value="${safe(ticket)}"></form><script>document.getElementById('f').submit()</script>`;
+}
+async function gmailCallback(request, env) {
+  if (request.method !== 'GET') return new Response('Method not allowed', { status: 405 });
+  const url = new URL(request.url); const state = url.searchParams.get('state') ?? ''; const code = url.searchParams.get('code') ?? '';
+  if (!/^[A-Za-z0-9_-]{32,128}$/.test(state) || (!code && !url.searchParams.has('error')) || code.length > 4096) return new Response('Invalid callback.', { status: 400 });
+  const session = await gmailAuth(env, state).take(state);
+  if (!session) return new Response('Authorization expired. Return to Pi Bot and try again.', { status: 400 });
+  if (url.searchParams.has('error')) return new Response('Authorization cancelled. Return to Pi Bot to try again. / 授权已取消，请返回 Pi Bot 重试。', { status: 400 });
+  const tokenResponse = await googleFetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ code, client_id: env.GMAIL_OAUTH_CLIENT_ID ?? '', client_secret: env.GMAIL_OAUTH_CLIENT_SECRET ?? '', redirect_uri: GMAIL_CALLBACK, grant_type: 'authorization_code', code_verifier: session.verifier }) });
+  if (!tokenResponse.ok) return new Response('Google authorization failed.', { status: 502 });
+  const token = await tokenResponse.json(); const refresh = token?.refresh_token;
+  if (!validToken(refresh)) return new Response('Google did not return a refresh token. Try again.', { status: 502 });
+  if (!validToken(token?.access_token)) return new Response('Google did not return an access token.', { status: 502 });
+  // Identity scopes avoid requesting mailbox read access for send-only / labels-only connections.
+  const profileResponse = await googleFetch('https://openidconnect.googleapis.com/v1/userinfo', { headers: { authorization: `Bearer ${token.access_token}` } });
+  if (!profileResponse.ok) return new Response('Unable to read the authorized Gmail account.', { status: 502 });
+  const profile = await profileResponse.json(); const email = profile?.email;
+  if (profile?.email_verified !== true || typeof email !== 'string' || email.length > 320 || !/^[^\s@]+@[^\s@]+$/.test(email)) return new Response('Google did not return a Gmail address.', { status: 502 });
+  const keyBytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`Pi Bot Gmail ticket v1\0${session.verifier}`)); const key = await crypto.subtle.importKey('raw', keyBytes, 'AES-GCM', false, ['encrypt']); const iv = crypto.getRandomValues(new Uint8Array(12)); const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify({ refresh, email })));
+  const ticket = `v1.${b64(iv)}.${b64(cipher)}`;
+  const callbackPort = new URL(session.redirectUri).port;
+  return new Response(htmlForm(session.redirectUri, state, ticket), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'referrer-policy': 'no-referrer', 'content-security-policy': `default-src 'none'; script-src 'unsafe-inline'; form-action http://127.0.0.1:${callbackPort}` } });
 }
 
 async function sameSecret(given, expected) {
@@ -72,8 +203,20 @@ async function stats(request, env) {
   if (!env.STATS_TOKEN || request.method !== 'GET') return new Response('Not found', { status: 404 });
   const given = /^Bearer (.{16,200})$/.exec(request.headers.get('authorization') ?? '')?.[1] ?? '';
   if (!(await sameSecret(given, env.STATS_TOKEN))) return new Response('Not found', { status: 404 });
-  const from = new URL(request.url).searchParams.get('from') ?? '';
-  const day = /^\d{4}-\d{2}-\d{2}$/.test(from) ? from : new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+  const params = new URL(request.url).searchParams;
+  const from = params.get('from') ?? '';
+  const downloads = params.get('kind') === 'downloads';
+  const day = /^\d{4}-\d{2}-\d{2}$/.test(from) ? from : new Date(Date.now() - (downloads ? KEEP_DAYS : 30) * 86400000).toISOString().slice(0, 10);
+  if (downloads) {
+    const totals = new Map();
+    const rows = (await counter(env, 'downloads').read(day)).map(({ day, key, n }) => {
+      const [product, version, platform, arch] = key.split('|');
+      const bucket = version ?? 'other';
+      totals.set(bucket, (totals.get(bucket) ?? 0) + n);
+      return { day, product, version, platform, arch, count: n };
+    });
+    return Response.json({ kind: 'downloads', from: day, byVersion: Object.fromEntries(totals), rows }, { headers: { 'Cache-Control': 'no-store' } });
+  }
   const rows = (await counter(env).read(day)).map(({ day: d, key, n }) => {
     const [source, version, platform, arch] = key.split('|');
     return { day: d, source, version, platform, arch, count: n };
@@ -84,6 +227,19 @@ async function stats(request, env) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    if (url.pathname.startsWith(CLICK_PREFIX)) return downloadClick(request, url, env, ctx);
+    if (url.pathname.startsWith('/gmail/')) {
+      let response;
+      try {
+        if (url.pathname === '/gmail/start') response = await gmailStart(request, env);
+        else if (url.pathname === '/gmail/refresh') response = await gmailRefresh(request, env);
+        else if (url.pathname === '/gmail/callback') response = await gmailCallback(request, env);
+        else response = jsonError('not_found', 404);
+      } catch { response = jsonError('gmail_oauth_service_unavailable', 502); }
+      const headers = new Headers(response.headers);
+      headers.set('cache-control', 'no-store'); headers.set('referrer-policy', 'no-referrer'); headers.set('x-content-type-options', 'nosniff');
+      return new Response(response.body, { status: response.status, headers });
+    }
     if (url.pathname === '/_stats') return stats(request, env);
     if (url.pathname.startsWith('/updates/')) {
       const response = await env.ASSETS.fetch(request);
@@ -95,10 +251,12 @@ export default {
     if (!url.pathname.startsWith(PREFIX)) return env.ASSETS.fetch(request);
     if (request.method !== 'GET' && request.method !== 'HEAD')
       return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET, HEAD' } });
-    const key = decodeURIComponent(url.pathname.slice(PREFIX.length));
+    const key = url.pathname.slice(PREFIX.length);
     // Release files only: version folder + file name, no traversal or hidden names.
-    if (!/^[0-9]+\.[0-9]+\.[0-9]+\/[A-Za-z0-9._-]+$/.test(key) || key.includes('..'))
+    const release = RELEASE_FILE.exec(key);
+    if (!release || key.includes('..'))
       return new Response('Not found', { status: 404 });
+    if (release[1] === RETIRED_VERSION) return retiredDownload();
     const object =
       request.method === 'HEAD'
         ? await env.RELEASES.head(key)

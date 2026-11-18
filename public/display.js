@@ -42,15 +42,40 @@ export function setDisplay(patch, persist = true) {
   if (persist) try {localStorage.setItem('pibot.website.display',JSON.stringify(display));} catch {}
   if (persist) {
     const url=new URL(location.href);url.searchParams.set('lang',display.language);url.searchParams.set('theme',display.theme);
+    if(root.dataset.languageMode==='inline')url.hash=url.hash.replace(/-\w{2}-(\d+)$/, `-${display.language}-$1`);
     history.replaceState(null,'',url);
   }
   translatePage();
+  if(root.dataset.languageMode==='inline') {
+    for(const link of document.querySelectorAll('.site-header a, .site-footer a, .legal-back')) {
+      const url=new URL(link.href);
+      const path=url.pathname.replace(/^\/en(?=\/)/,'');
+      if(url.origin!==location.origin)continue;
+      if(/^\/(?:privacy|terms)\/?$/.test(path)) {
+        if(display.language==='en')url.searchParams.set('lang','en');
+        else url.searchParams.delete('lang');
+      } else {
+        url.pathname=display.language==='en'?'/en'+path:path;
+      }
+      link.setAttribute('href',url.pathname+url.search+url.hash);
+    }
+  }
   document.querySelectorAll('[data-site-language]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.siteLanguage===display.language)));
   document.querySelector('#theme-select').value=display.theme;
   document.querySelector('meta[name="theme-color"]').content=root.dataset.theme==='dark'?'#141414':'#fcfcfc';
   document.dispatchEvent(new CustomEvent('pi-display-change',{detail:{...display,resolvedTheme:root.dataset.theme}}));
 }
-document.querySelectorAll('[data-site-language]').forEach(button=>button.addEventListener('click',()=>setDisplay({language:button.dataset.siteLanguage})));
+document.querySelectorAll('[data-site-language]').forEach(button=>button.addEventListener('click',()=>{
+  const language=button.dataset.siteLanguage;
+  if(root.dataset.languageMode==='inline'){
+    setDisplay({language});
+    return;
+  }
+  const url=new URL(location.href);
+  url.pathname=button.dataset.languageUrl || (language==='en'?'/en/':'/');
+  url.searchParams.delete('lang');
+  if(url.href!==location.href)location.assign(url.href);
+}));
 document.querySelector('#theme-select').addEventListener('change',event=>setDisplay({theme:event.target.value}));
 media.addEventListener('change',()=>{if(display.theme==='system')setDisplay({},false);});
 setDisplay({},false);

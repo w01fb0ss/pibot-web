@@ -86,7 +86,7 @@ button:active:not(:disabled),.button:active{transform:translateY(1px)}
 .hero h1{font-size:clamp(40px,6.4vw,76px);line-height:1.12;letter-spacing:-.03em;font-weight:750}
 .gradient-text{background:linear-gradient(90deg,var(--avatar-violet),var(--avatar-pink) 55%,var(--avatar-orange));-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero-description{font-size:18px;margin:22px auto 0;max-width:660px}
-.hero-actions{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:30px}
+.hero-actions{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px 16px;margin-top:30px}
 .hero-actions .button{min-width:148px}
 .platform-note{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:16px;font-size:12.5px}
 .platform-note span{padding:3px 11px;border-radius:var(--radius-pill);background:var(--card);box-shadow:var(--site-shadow-card)}
@@ -217,6 +217,12 @@ figcaption{margin-top:14px;font-size:12.5px;color:var(--text2);text-align:center
 .download-text{flex:1;min-width:0}
 .download-text h3{font-size:16px}
 .download-text p{font-size:12.5px;line-height:1.5}
+.download-card-desktop{flex-wrap:wrap}
+.download-card-desktop .download-text{flex-basis:0}
+.mac-first-open{flex:0 0 100%;padding-top:10px;border-top:1px solid var(--b1);font-size:13px;line-height:1.55;color:var(--text2)}
+.mac-first-open summary{cursor:pointer;color:var(--text);font-weight:600}
+.mac-first-open p,.mac-first-open a{margin-top:6px}
+.mac-first-open a{display:inline-block;color:inherit;text-decoration:underline}
 .download-pick{position:relative;flex:none}
 .download-button{display:inline-flex;align-items:center;gap:6px;border:0;padding:9px 14px 9px 16px;border-radius:var(--radius-pill);background:var(--tone-deep);color:var(--on-tone);font-size:14px;font-weight:600;white-space:nowrap;box-shadow:0 8px 18px -10px var(--tone)}
 .download-button svg{width:14px;height:14px;transition:transform .2s var(--ease-out)}
@@ -235,10 +241,15 @@ figcaption{margin-top:14px;font-size:12.5px;color:var(--text2);text-align:center
 .status-testing{background:var(--warnBg);color:var(--warn)}
 .status-untested{background:var(--tert);color:var(--text2)}
 .download-note{margin:2px 6px 0;font-size:12.5px;color:var(--site-on-panel-soft)}
+.download-resources{display:flex;flex-wrap:wrap;gap:6px 16px;margin-inline:6px;font-size:13px}
+.download-resources a{text-decoration:underline;text-underline-offset:3px}
 
 /* FAQ: soft accordion cards */
 .faq-section{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr);gap:40px;align-items:start}
 .faq-section .section-heading{margin:0}
+.section-link{display:inline-block;margin-top:14px;color:var(--ink-violet);font-weight:650;text-decoration:underline;text-underline-offset:4px}
+.feature-guide-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:20px;font-size:14px;color:var(--ink-violet)}
+.feature-guide-links a{text-decoration:underline;text-underline-offset:3px}
 .faq-list details{border-radius:18px;background:var(--card);box-shadow:var(--site-shadow-card);margin-bottom:12px;padding:0 22px}
 .faq-list details[open]{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--brand) 45%,transparent),var(--site-shadow-card)}
 .faq-list summary{display:flex;align-items:center;justify-content:space-between;gap:16px;list-style:none;cursor:pointer;padding:18px 0;font-size:15px;font-weight:600}
