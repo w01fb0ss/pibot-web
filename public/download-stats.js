@@ -2,9 +2,13 @@ import { display } from './display.js';
 import { downloadStatsCopy, downloadStatsMarkup } from './download-stats-view.js';
 
 const sections = [...document.querySelectorAll('[data-download-stats]')];
+const refreshInterval = 5 * 60 * 1000;
 let data;
 let failed = false;
 let language;
+let activeRequest;
+let refreshTimer;
+let suspended = false;
 const platformNames = { darwin: 'macOS', win32: 'Windows', linux: 'Linux', android: 'Android' };
 const products = ['desktop', 'mobile', 'runner'];
 
@@ -39,27 +43,65 @@ function render() {
       node.textContent = format.format(key === 'total' ? data.total : data.products[key]);
     });
     const body = section.querySelector('[data-stats-platforms]');
-    if (body && !body.children.length) for (const row of data.platforms) {
-      const tr = document.createElement('tr');
-      for (const value of [copy[row.product], `${platformNames[row.platform]} · ${row.arch === 'arm64' ? 'ARM64' : 'x64'}`, format.format(row.count)]) {
-        const td = document.createElement('td'); td.textContent = value; tr.append(td);
+    if (body) {
+      const rows = [];
+      for (const row of data.platforms) {
+        const tr = document.createElement('tr');
+        for (const value of [copy[row.product], `${platformNames[row.platform]} · ${row.arch === 'arm64' ? 'ARM64' : 'x64'}`, format.format(row.count)]) {
+          const td = document.createElement('td'); td.textContent = value; tr.append(td);
+        }
+        rows.push(tr);
       }
-      body.append(tr);
+      body.replaceChildren(...rows);
     }
   }
   language = lang;
 }
 
+function scheduleRefresh() {
+  clearTimeout(refreshTimer);
+  refreshTimer = undefined;
+  if (!suspended && document.visibilityState === 'visible')
+    refreshTimer = setTimeout(refresh, refreshInterval);
+}
+
+async function refresh() {
+  if (suspended || activeRequest || document.visibilityState !== 'visible') return;
+  const controller = new AbortController();
+  activeRequest = controller;
+  try {
+    // Cloudflare already caches the aggregate for five minutes; avoid a second browser cache.
+    const response = await fetch('/api/download-stats', {
+      cache: 'no-store', signal: AbortSignal.any([controller.signal, AbortSignal.timeout(5000)]),
+    });
+    if (!response.ok) throw new Error('download_stats_unavailable');
+    const value = await response.json();
+    if (!valid(value)) throw new Error('invalid_download_stats');
+    data = value;
+    failed = false;
+  } catch {
+    if (!controller.signal.aborted) failed = true;
+  } finally {
+    activeRequest = undefined;
+    render();
+    if (controller.signal.aborted && !suspended) refresh();
+    else scheduleRefresh();
+  }
+}
+
 if (sections.length) {
   render();
   document.addEventListener('pi-display-change', render);
-  fetch('/api/download-stats', { signal: AbortSignal.timeout(5000) })
-    .then(async response => {
-      if (!response.ok) throw new Error('download_stats_unavailable');
-      const value = await response.json();
-      if (!valid(value)) throw new Error('invalid_download_stats');
-      data = value;
-    })
-    .catch(() => { failed = true; })
-    .finally(render);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') refresh();
+    else { clearTimeout(refreshTimer); refreshTimer = undefined; }
+  });
+  window.addEventListener('pagehide', () => {
+    suspended = true;
+    clearTimeout(refreshTimer);
+    refreshTimer = undefined;
+    activeRequest?.abort();
+  });
+  window.addEventListener('pageshow', () => { suspended = false; refresh(); });
+  refresh();
 }
