@@ -245,7 +245,7 @@ export async function buildSearchPages(output, config) {
     }));
     const download = copy.downloadPage;
     await write(localized('/download/', lang), render({
-      route: '/download/', title: download.title, description: download.intro, heading: download.heading,
+      route: '/download/', title: download.title(config.version), description: download.intro(config.version), heading: download.heading,
       body: downloadSections(config, lang),
       schema: config.version && {
         '@type': 'SoftwareApplication', '@id': origin + '/#desktop-app', name: 'Pi Bot',

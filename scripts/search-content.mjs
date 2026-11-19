@@ -29,9 +29,9 @@ const zh = {
     'runner-windows': 'Windows', 'runner-mac': 'macOS', 'runner-linux': 'Linux',
   },
   downloadPage: {
-    title: 'Pi Bot 官方下载｜macOS、Windows、Linux 和 Android',
+    title: version => `Pi Bot v${version} 桌面版官方下载｜macOS、Windows、Linux`,
     heading: '下载 Pi Bot',
-    intro: '从 pibot.space 下载 Pi Bot。安装桌面版并配置模型，一台电脑就能让多个 Bot 分工处理任务。需要在手机上发任务或审批时，配对 Android 版。需要在另一台电脑上执行命令时，安装执行端。',
+    intro: version => `下载 Pi Bot 桌面版 v${version}，支持 macOS（Apple 芯片与 Intel）、Windows 和 Linux。应用内更新失败时，可以下载完整安装包。本站也提供 Android 版和执行端。`,
     installation: '安装与首次打开',
     mac: '当前 macOS 版本的 Intel 和 Apple 芯片版均未经过 Apple 公证。如果首次打开时收到无法验证的提示，请先确认安装包来自本站。若决定继续，尝试打开后可在「系统设置 → 隐私与安全性」中对 Pi Bot 点「仍要打开」。',
     apple: 'Apple 官方说明',
@@ -93,9 +93,9 @@ const en = {
     'runner-windows': 'Windows', 'runner-mac': 'macOS', 'runner-linux': 'Linux',
   },
   downloadPage: {
-    title: 'Official Pi Bot Downloads for macOS, Windows, Linux, and Android',
+    title: version => `Download Pi Bot v${version} | macOS, Windows & Linux`,
     heading: 'Download Pi Bot',
-    intro: 'Download Pi Bot from pibot.space. Install the desktop app and configure a model to run a team of Bots on one computer. Pair the Android app to start or approve tasks from your phone. Install a Runner to execute commands on another computer.',
+    intro: version => `Get Pi Bot desktop v${version} for macOS, Windows, and Linux. Download the full installer if the in-app update fails. Android and Runner downloads are also available.`,
     installation: 'Installation and first launch',
     mac: 'The current Intel and Apple silicon builds for macOS have not been notarized by Apple. If macOS says it cannot verify Pi Bot, check that you downloaded it from this site. If you choose to proceed, try opening it first, then find Pi Bot in System Settings → Privacy & Security and click Open Anyway.',
     apple: 'Apple Support instructions',

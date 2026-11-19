@@ -278,7 +278,9 @@ figcaption{margin-top:14px;font-size:12.5px;color:var(--text2);text-align:center
 .faq-section .section-heading{margin:0}
 .section-link{display:inline-block;margin-top:14px;color:var(--ink-violet);font-weight:650;text-decoration:underline;text-underline-offset:4px}
 .feature-guide-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:20px;font-size:14px;color:var(--ink-violet)}
-.feature-guide-links a{text-decoration:underline;text-underline-offset:3px}
+.feature-guide-links a,.inline-guide-link{text-decoration:underline;text-underline-offset:3px}
+.inline-guide-link{display:inline-block;margin-top:8px;font-size:14px;color:var(--ink-violet)}
+.steps .inline-guide-link{color:var(--on-tone)}
 .faq-list details{border-radius:18px;background:var(--card);box-shadow:var(--site-shadow-card);margin-bottom:12px;padding:0 22px}
 .faq-list details[open]{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--brand) 45%,transparent),var(--site-shadow-card)}
 .faq-list summary{display:flex;align-items:center;justify-content:space-between;gap:16px;list-style:none;cursor:pointer;padding:18px 0;font-size:15px;font-weight:600}
