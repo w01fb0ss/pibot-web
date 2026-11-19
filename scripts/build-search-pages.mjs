@@ -165,14 +165,6 @@ function chapterLayout(article, example, lang, articles) {
   </div>`;
 }
 
-function downloadHref(value) {
-  const url = new URL(value, origin + '/');
-  if (url.origin === origin && url.pathname.startsWith('/downloads/')) {
-    return url.pathname.replace('/downloads/', '/download-click/') + url.search;
-  }
-  return url.href;
-}
-
 function downloadSections(config, lang) {
   const copy = searchContent[lang];
   const page = copy.downloadPage;
@@ -185,7 +177,9 @@ function downloadSections(config, lang) {
       // Runner beside a newer desktop) keeps the status it was tested with.
       const currentStatus = status;
       const platform = escape(copy.platformNames[key]);
-      return `<li><div><strong>${platform}</strong><span class="option-status status-${currentStatus}">${copy.status[currentStatus]}</span></div><a class="button" href="${escape(downloadHref(item.url))}" rel="nofollow" aria-label="${escape(copy.downloadButtons + ' · ' + copy.groups[index] + ' · ' + copy.platformNames[key])}">${copy.downloadButtons}</a></li>`;
+      const url = new URL(item.url, origin + '/');
+      const href = url.origin === origin ? url.pathname + url.search + url.hash : url.href;
+      return `<li><div><strong>${platform}</strong><span class="option-status status-${currentStatus}">${copy.status[currentStatus]}</span></div><a class="button" href="${escape(href)}" data-download-link rel="nofollow" aria-label="${escape(copy.downloadButtons + ' · ' + copy.groups[index] + ' · ' + copy.platformNames[key])}">${copy.downloadButtons}</a></li>`;
     });
     return rows.length ? `<section class="reading-section"><h2>${copy.groups[index]}</h2><ul class="installer-list">${rows.join('\n')}</ul></section>` : '';
   }).filter(Boolean);

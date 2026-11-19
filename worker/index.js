@@ -34,6 +34,8 @@ const FEEDS = {
 const AGENT = /^PiBot\/(\d{1,4}\.\d{1,4}\.\d{1,4}|unknown) \((darwin|win32|linux|unknown); (x64|arm64|unknown)\)$/;
 const KEEP_DAYS = 400;
 const MAX_KEYS_PER_DAY = 300;
+const DOWNLOAD_CLICK_ID = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
+const DOWNLOAD_CLICK_RETRY_MS = 60 * 60 * 1000;
 const GMAIL_CALLBACK = 'https://auth.pibot.space/gmail/callback';
 const GMAIL_SCOPES = new Set([
   'https://www.googleapis.com/auth/gmail.readonly',
@@ -63,6 +65,8 @@ export class Counter extends DurableObject {
     super(ctx, env);
     this.sql = ctx.storage.sql;
     this.sql.exec('CREATE TABLE IF NOT EXISTS counts (day TEXT NOT NULL, key TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (day, key))');
+    this.sql.exec('CREATE TABLE IF NOT EXISTS download_click_ids (id TEXT PRIMARY KEY, seen_at INTEGER NOT NULL)');
+    this.sql.exec('CREATE INDEX IF NOT EXISTS download_click_ids_seen_at ON download_click_ids (seen_at)');
     this.pruned = '';
   }
   add(day, key) {
@@ -91,10 +95,15 @@ export class Counter extends DurableObject {
     const first = this.sql.exec('SELECT MIN(day) AS day FROM counts').one().day;
     this.sql.exec('INSERT INTO download_totals_meta (id, first_day) VALUES (1, ?)', first);
   }
-  addDownload(day, key) {
+  addDownload(key, clickId) {
+    const now = Date.now();
+    const day = new Date(now).toISOString().slice(0, 10);
     const pruned = this.pruned;
     try {
       this.ctx.storage.transactionSync(() => {
+        this.sql.exec('DELETE FROM download_click_ids WHERE seen_at <= ?', now - DOWNLOAD_CLICK_RETRY_MS);
+        const click = this.sql.exec('INSERT OR IGNORE INTO download_click_ids (id, seen_at) VALUES (?, ?)', clickId, now);
+        if (!click.rowsWritten) return;
         this.initializeDownloadTotals();
         const stored = downloadBucket(this.add(day, key), DOWNLOAD_TARGETS);
         this.sql.exec('INSERT INTO download_totals (key, n) VALUES (?, 1) ON CONFLICT (key) DO UPDATE SET n = n + 1', stored);
@@ -141,15 +150,22 @@ function downloadClickKey(version, file) {
 }
 
 async function downloadClick(request, url, env, ctx) {
-  if (request.method !== 'GET') return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET' } });
+  const { method } = request;
+  if (method !== 'GET' && method !== 'POST') return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET, POST' } });
+  const headers = { 'Cache-Control': 'no-store' };
+  const clickId = request.headers.get('X-PiBot-Download-Click');
+  if (method === 'POST' && (request.headers.get('Origin') !== url.origin || !DOWNLOAD_CLICK_ID.test(clickId ?? '')))
+    return new Response('Invalid download click', { status: 400, headers });
   const key = url.pathname.slice(CLICK_PREFIX.length);
   const match = RELEASE_FILE.exec(key);
   const countKey = match && downloadClickKey(match[1], match[2]);
   if (!countKey) return new Response('Not found', { status: 404 });
   if (match[1] === RETIRED_VERSION && !RELEASED_0_0_2.test(match[2])) return retiredDownload();
   if (!await env.RELEASES.head(key)) return new Response('Not found', { status: 404 });
-  if (env.COUNTER) ctx.waitUntil(counter(env, 'downloads').addDownload(new Date().toISOString().slice(0, 10), countKey).catch(() => {}));
-  return new Response(null, { status: 302, headers: { Location: PREFIX + key, 'Cache-Control': 'no-store' } });
+  // Old links continue to redirect, including download managers that retry this URL.
+  if (method === 'GET') return new Response(null, { status: 302, headers: { ...headers, Location: PREFIX + key } });
+  if (env.COUNTER) ctx.waitUntil(counter(env, 'downloads').addDownload(countKey, clickId).catch(() => { /* Measurement is best-effort. */ }));
+  return new Response(null, { status: 204, headers });
 }
 
 const MAX_RANGES = 400;

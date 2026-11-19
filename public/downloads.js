@@ -1,6 +1,7 @@
 // Download cards (桌面 / 手机 / 执行端): one button per device opens a small platform menu.
 // releases.json decides every link and status chip; an unavailable config never enables a download.
 import {display, t} from './display.js';
+import {recordDownloadClick} from './download-click.js';
 
 const releaseDialog = document.querySelector('#release-dialog');
 const macFirstOpen = document.querySelector('.mac-first-open');
@@ -117,17 +118,15 @@ picks.forEach(pick => {
     else if (event.key === 'Tab') closeMenu(pick);
   });
   pick.addEventListener('focusout', event => { if (!pick.contains(event.relatedTarget)) closeMenu(pick); });
-  options.forEach(option => option.addEventListener('click', async () => {
+  options.forEach(option => option.addEventListener('click', async event => {
     // Focus goes back to the button first, so closing the dialog lands there and not on a hidden item.
     closeMenu(pick, true);
     await configReady;
     const platform = releaseConfig?.platforms?.[option.dataset.platform];
     const url = downloadURL(platform?.url);
     if (url) {
-      const target = new URL(url);
-      if (target.origin === location.origin && target.pathname.startsWith('/downloads/'))
-        target.pathname = target.pathname.replace('/downloads/', '/download-click/');
-      location.assign(target.href);
+      if (event.isTrusted) recordDownloadClick(url);
+      location.assign(url);
       return;
     }
     dialogPlatform = platform?.label || option.querySelector('b').textContent;
