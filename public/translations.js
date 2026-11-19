@@ -84,6 +84,7 @@ export const english = {
 "另一台电脑上动手：跑命令、改项目":"Does the work on another computer: runs commands, edits projects",
 "下载":"Download",
 "版本记录":"Releases",
+"角色库":"Roles",
 "查看版本记录：更新路径与每个版本的更新内容 →":"Release history: update path and what changed in each version →",
 "下载桌面版":"Download the desktop app",
 "下载手机版":"Download the phone app",
