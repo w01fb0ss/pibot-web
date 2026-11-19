@@ -3,9 +3,15 @@ files:
   - url: https://pibot.space/downloads/0.0.2/PiBot-0.0.2-mac-arm64.zip
     sha512: msBbJioKy08YabDj3LqUWSZ5PH9rWe+Fzy8Rno/E0+a7yMyrAREZf/jrWgs7Qqgs+IVIacK2yvtNM/KoSd44iw==
     size: 319286517
+  - url: https://pibot.space/downloads/0.0.2/PiBot-0.0.2-mac-arm64.dmg
+    sha512: jUjMUGxIg3fiwnbbBfuxh7kuOKPSZcN3Rg/8uGgaHFGnUOUErh1di9NT3KLXwzqkc2La85uN6dPhkzm7IAjc5A==
+    size: 317668908
   - url: https://pibot.space/downloads/0.0.2/PiBot-0.0.2-mac-x64.zip
     sha512: nlXKrmB4bAfhuXfKp0y6x/p0IThKeIpxq711NcNaqG0lsxC1UH/JBaKkvu9VqgsSqx25LMGOY1tH/k9GHfOD+g==
     size: 328862234
+  - url: https://pibot.space/downloads/0.0.2/PiBot-0.0.2-mac-x64.dmg
+    sha512: 6NqpGra8cQeOuWOkapBNqWmLjKcTleojlOyDKexU7yNk3BH9Ld8uvsaPHFCtuVbBh/9WyqvGBEqdG9SmnzGJdw==
+    size: 327235505
 path: https://pibot.space/downloads/0.0.2/PiBot-0.0.2-mac-arm64.zip
 sha512: msBbJioKy08YabDj3LqUWSZ5PH9rWe+Fzy8Rno/E0+a7yMyrAREZf/jrWgs7Qqgs+IVIacK2yvtNM/KoSd44iw==
 releaseDate: '2026-11-19T05:07:47.764Z'

@@ -401,3 +401,4 @@ dialog .dialog-footnote{font-size:12px;margin-top:20px}
   *,*::before,*::after{animation:none!important;transition:none!important}
   .cap-card:hover,.button-brand:hover{transform:none}
 }
+.release-history-link{margin-top:10px}.release-history-link a{color:var(--ink-violet);font-weight:600;text-decoration:underline;text-underline-offset:3px}

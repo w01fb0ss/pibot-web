@@ -181,15 +181,18 @@ function downloadSections(config, lang) {
     const rows = keys.filter(key => availablePlatforms[key]?.url).map(key => {
       const item = availablePlatforms[key];
       const status = Object.hasOwn(copy.status, item.status) ? item.status : 'untested';
-      const currentStatus = status === 'tested' && item.version && config.version && item.version !== config.version ? 'testing' : status;
+      // Each row carries its own version and status: an unchanged component (an older Android or
+      // Runner beside a newer desktop) keeps the status it was tested with.
+      const currentStatus = status;
       const platform = escape(copy.platformNames[key]);
       return `<li><div><strong>${platform}</strong><span class="option-status status-${currentStatus}">${copy.status[currentStatus]}</span></div><a class="button" href="${escape(downloadHref(item.url))}" rel="nofollow" aria-label="${escape(copy.downloadButtons + ' · ' + copy.groups[index] + ' · ' + copy.platformNames[key])}">${copy.downloadButtons}</a></li>`;
     });
     return rows.length ? `<section class="reading-section"><h2>${copy.groups[index]}</h2><ul class="installer-list">${rows.join('\n')}</ul></section>` : '';
   }).filter(Boolean);
   if (!groups.length) return `<p class="reading-section">${copy.unavailable}</p>`;
-  const current = config.version ? `<p><strong>${copy.available} · v${escape(config.version)}</strong></p>` : '';
-  const mac = config.version === '0.0.1' && (availablePlatforms['mac-x64']?.url || availablePlatforms['mac-arm64']?.url)
+  const releasesLabel = lang === 'en' ? 'Update path and what changed in each version' : '更新路径与每个版本的更新内容';
+  const current = config.version ? `<p><strong>${copy.available} · v${escape(config.version)}</strong> · <a href="/releases/#v${escape(config.version)}">${releasesLabel}</a></p>` : '';
+  const mac = (availablePlatforms['mac-x64']?.url || availablePlatforms['mac-arm64']?.url)
     ? `<p>${escape(page.mac)} <a href="https://support.apple.com/${lang === 'en' ? 'en-us' : 'zh-cn'}/102445">${page.apple}</a></p>` : '';
   return `<div class="reading-section">${current}<p>${escape(page.versions)}</p></div>
   <section id="download-statistics" class="download-statistics" data-download-stats="detailed" data-no-translate aria-label="${lang === 'en' ? 'Website download click statistics' : '官网下载点击统计'}" aria-busy="true">${downloadStatsMarkup(lang, true)}</section>

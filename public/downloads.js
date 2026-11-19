@@ -26,7 +26,6 @@ function downloadURL(value) {
 // reads 测试中 until someone re-tests and updates the entry's version.
 function platformStatus(platform) {
   const status = Object.hasOwn(STATUS_TEXT, platform?.status) ? platform.status : 'untested';
-  if (status === 'tested' && platform.version && releaseConfig.version && platform.version !== releaseConfig.version) return 'testing';
   return status;
 }
 
@@ -48,6 +47,8 @@ export function renderRelease() {
     document.querySelector('#release-summary').textContent = t('Pi Bot {version} 已发布。选择你的平台，认识新队友。', { version: releaseConfig.version || '' });
     document.querySelector('.download-status').replaceChildren(Object.assign(document.createElement('span'), { className: 'status-dot' }), document.createTextNode(t('安装前请查看对应平台的系统要求')));
     const pill = document.querySelector('.release-pill');
+    // The pill opens this version's notes on the release history page.
+    if (releaseConfig.version) pill.hash = 'v' + releaseConfig.version;
     pill.replaceChildren(Object.assign(document.createElement('span'), { className: 'status-dot' }), document.createTextNode(' ' + t('Pi Bot {version} 正式上线', {version: releaseConfig.version ? 'v' + releaseConfig.version : ''})), Object.assign(document.createElement('span'), { ariaHidden: 'true', textContent: '↗' }));
     document.querySelector('.platform-note').lastChild.textContent = t('现已发布');
   }

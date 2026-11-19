@@ -7,9 +7,10 @@ import { languageRedirect } from './language-routing.js';
 const PREFIX = '/downloads/';
 const CLICK_PREFIX = '/download-click/';
 const RETIRED_VERSION = '0.0.2';
-// The withdrawn 2026-11-16 v0.0.2 stays gone. The 2026-11-19 urgent 0.0.2 ships only as an in-app
-// update, so exactly its update files are served (the files latest*.yml name); nothing else of 0.0.2.
-const UPDATE_ONLY_0_0_2 = /^PiBot-0\.0\.2-(mac-(arm64|x64)\.zip|win-x64\.exe|linux-x86_64\.AppImage)(\.blockmap)?$/;
+// The withdrawn 2026-11-16 v0.0.2 stays gone. The 2026-11-19 urgent 0.0.2 reuses the number, so
+// exactly its desktop files are served (installers, update zips, blockmaps); the withdrawn APK and
+// runner builds of that number stay 404.
+const RELEASED_0_0_2 = /^PiBot-0\.0\.2-(mac-(arm64|x64)\.(zip|dmg)|win-x64\.exe|linux-x86_64\.AppImage)(\.blockmap)?$/;
 const RELEASE_FILE = /^(\d{1,4}\.\d{1,4}\.\d{1,4})\/([A-Za-z0-9._-]+)$/;
 const DOWNLOAD_TARGETS = [
   ['desktop', 'mac-arm64.dmg', 'darwin', 'arm64'],
@@ -145,7 +146,7 @@ async function downloadClick(request, url, env, ctx) {
   const match = RELEASE_FILE.exec(key);
   const countKey = match && downloadClickKey(match[1], match[2]);
   if (!countKey) return new Response('Not found', { status: 404 });
-  if (match[1] === RETIRED_VERSION) return retiredDownload();
+  if (match[1] === RETIRED_VERSION && !RELEASED_0_0_2.test(match[2])) return retiredDownload();
   if (!await env.RELEASES.head(key)) return new Response('Not found', { status: 404 });
   if (env.COUNTER) ctx.waitUntil(counter(env, 'downloads').addDownload(new Date().toISOString().slice(0, 10), countKey).catch(() => {}));
   return new Response(null, { status: 302, headers: { Location: PREFIX + key, 'Cache-Control': 'no-store' } });
@@ -381,7 +382,7 @@ export default {
     const release = RELEASE_FILE.exec(key);
     if (!release || key.includes('..'))
       return new Response('Not found', { status: 404 });
-    if (release[1] === RETIRED_VERSION && !UPDATE_ONLY_0_0_2.test(release[2])) return retiredDownload();
+    if (release[1] === RETIRED_VERSION && !RELEASED_0_0_2.test(release[2])) return retiredDownload();
     // electron-updater's differential download asks for many ranges at once and needs a
     // multipart/byteranges answer; R2 serves one range per read (2026-11-19: Windows updates fell
     // back to the full 216 MB download and failed on a slow line).

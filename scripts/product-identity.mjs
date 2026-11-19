@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 export function productIdentity(config, lang, escape) {
   if (!/^\d{1,4}\.\d{1,4}\.\d{1,4}$/.test(config.version)) throw new Error('Invalid public release version');
   const version = escape(config.version);
@@ -25,19 +26,67 @@ export function productIdentity(config, lang, escape) {
     ].join(''),
     schema: { '@type': 'SoftwareApplication', '@id': 'https://pibot.space/#desktop-app', name: 'Pi Bot', alternateName: 'PiBot', url: `https://pibot.space${prefix}/`, operatingSystem: 'macOS, Windows, Linux', applicationCategory: 'ProductivityApplication', softwareVersion: config.version, installUrl: `https://pibot.space${prefix}/download/` },
   };
-  const releases = {
-    route: '/releases/', title: en ? 'Pi Bot public releases | Current version and platform status' : 'Pi Bot 公开版本｜当前版本与平台状态',
-    heading: en ? 'Pi Bot public releases' : 'Pi Bot 公开版本',
-    description: en ? `The current public Pi Bot release is v${version}. Check desktop, Android, and Runner download links and platform test status.` : `Pi Bot 当前公开版本为 v${version}。核对桌面版、Android 手机版和执行端的下载入口、平台测试状态与功能说明。`,
-    body: en ? [
-      section(`Current public release: v${version}`, `<p>This page shows the release currently offered on the official website. Installers and platform-specific test status are maintained on the ${link('/download/', 'download page')}.</p>`),
-      section('What you can use', `<ul><li>Desktop: named Bots, private and group chats, model configuration, permissions, approvals, routines, and app connections.</li><li>Android: pair with the desktop app to view conversations, start tasks, and handle supported approvals.</li><li>Runner: connect another computer or server to run commands in its chosen working folder.</li></ul><p>${link('/guides/', 'Read the user manual')} for steps, screenshots, and limitations.</p>`),
-      section('Before installing or updating', `<p>Choose the installer matching your operating system and processor. “Tested” applies to the platform and version shown on the download page. Read the macOS first-launch notice and keep your existing data before changing installations.</p><p>${link('/guides/getting-started/', 'Installation guide')} · ${link('/guides/updates-and-data/', 'Update and local data guide')}</p>`),
-    ].join('') : [
-      section(`当前公开版本：v${version}`, `<p>本页展示官网当前提供的公开版本。安装包和各平台的测试状态统一维护在${link('/download/', '下载页')}。</p>`),
-      section('可以使用哪些内容？', `<ul><li>桌面版：创建有名字的 Bot，私聊与群聊、模型配置、权限与审批、例行任务和应用连接。</li><li>Android 手机版：与桌面应用配对，查看对话、发起任务、处理支持在手机上完成的审批。</li><li>执行端：连接另一台电脑或服务器，在选定的工作目录中运行命令。</li></ul><p>${link('/guides/', '查看使用手册')}，核对各功能的步骤、截图和使用限制。</p>`),
-      section('安装或更新前', `<p>请选择与操作系统、处理器匹配的安装包。「已测试」只针对下载页标注的平台和版本。macOS 用户请先阅读首次打开提示，更换安装前请保留已有数据。</p><p>${link('/guides/getting-started/', '安装与首次使用')} · ${link('/guides/updates-and-data/', '更新与本地数据说明')}</p>`),
-    ].join(''),
-  };
+  const releases = releaseHistoryPage(config, lang, escape, link);
   return [about, releases];
+}
+
+const history = JSON.parse(readFileSync(new URL('../public/release-history.json', import.meta.url), 'utf8')).releases;
+
+/** /releases/: the current version, the update path between versions and every version's notes. */
+function releaseHistoryPage(config, lang, escape, link) {
+  const en = lang === 'en';
+  const t = en ? {
+    title: 'Pi Bot releases | Update path and what changed', heading: 'Pi Bot releases',
+    description: 'What each Pi Bot version changed and how to update from the one before. The notes match what the app shows when it updates.',
+    released: 'released', kinds: { fix: 'Urgent fix', feature: 'Feature release', first: 'First public release' },
+    parts: { desktop: 'Desktop', android: 'Android', runner: 'Runner' },
+    platforms: 'macOS / Windows / Linux', updatedHere: 'Updated in this version', unchanged: (v) => `Unchanged · works with desktop ${v}`,
+    installed: 'Already installed: <b>menu › Check for updates</b> updates in the app', fresh: 'First install:', download: 'Go to downloads',
+    notesLink: 'What changed ↓', path: 'Update path', updates: 'Updated: ', unchangedRest: (xs) => `${xs} unchanged.`, firstOf: (xs) => `First public release: ${xs}.`,
+    edge: (r) => `<b>From v${r.from.version}: in-app update, one step.</b> ${r.from.downloadMB?.windows ? `Windows downloads only the changed parts (about ${r.from.downloadMB.windows} MB of ${r.from.fullMB.windows} MB); ` : ''}macOS downloads the full update once (about ${r.from.downloadMB?.mac ?? '—'} MB) and only changed parts after that. Your data stays.`,
+    footnote: 'This history is generated at each release; per-platform test status is on the download page.',
+  } : {
+    title: 'Pi Bot 版本记录｜更新路径与每个版本的更新内容', heading: 'Pi Bot 版本记录',
+    description: '每个版本更新了什么、从哪个版本怎么升级上来。应用内更新时看到的内容和这里一致。',
+    released: '发布', kinds: { fix: '紧急修复', feature: '功能版本', first: '首个公开版本' },
+    parts: { desktop: '桌面版', android: 'Android 手机版', runner: '执行端' },
+    platforms: 'macOS / Windows / Linux', updatedHere: '本次更新', unchanged: (v) => `未变 · 与桌面 ${v} 兼容`,
+    installed: '已安装 Pi Bot：<b>菜单 › 检查更新</b>，应用内直接升级', fresh: '第一次安装：', download: '前往下载页',
+    notesLink: '查看本次更新内容 ↓', path: '更新路径', updates: '更新：', unchangedRest: (xs) => `${xs}不变。`, firstOf: (xs) => `首次公开：${xs}。`,
+    edge: (r) => `<b>从 v${r.from.version} 升级：应用内更新，一步到达。</b>${r.from.downloadMB?.windows ? `Windows 只下载变化的部分（约 ${r.from.downloadMB.windows} MB / 完整 ${r.from.fullMB.windows} MB）；` : ''}macOS 首次应用内更新下载完整包（约 ${r.from.downloadMB?.mac ?? '—'} MB），之后只下载变化部分。数据保留。`,
+    footnote: '版本记录在每次发布时生成；各平台的测试状态见下载页。',
+  };
+  const list = history.filter((r) => /^\d{1,4}\.\d{1,4}\.\d{1,4}$/.test(r.version));
+  const current = list.find((r) => r.version === config.version) ?? list[0];
+  const sep = en ? ', ' : '、';
+  const badge = (r) => `<span class="rh-badge rh-${escape(r.kind)}">${escape(t.kinds[r.kind] ?? r.kind)}</span>`;
+  const partNames = (keys) => keys.map((k) => t.parts[k]).join(sep);
+  const parts = Object.entries(current.components).map(([key, version]) => {
+    const updated = current.updated.includes(key);
+    return `<div class="rh-part${updated ? ' rh-new' : ''}"><b>${t.parts[key]} ${escape(version)}</b><span>${updated ? `${t.updatedHere}${key === 'desktop' ? ` · ${t.platforms}` : ''}` : escape(t.unchanged(current.components.desktop))}</span></div>`;
+  }).join('');
+  const nodes = list.map((r, index) => `<li class="rh-node${index ? ' rh-old' : ''}"><a href="#v${escape(r.version)}">v${escape(r.version)}</a> ${badge(r)} <span class="rh-meta">${escape(r.date)} · ${escape(partNames(r.updated))}</span>${r.from ? `<p class="rh-edge">${t.edge(r)}</p>` : ''}</li>`).join('');
+  const notes = (r) => `<ul>${(r.notes[en ? 'en' : 'zh'] ?? []).map((line) => `<li>${escape(line)}</li>`).join('')}</ul>`;
+  const scope = (r) => {
+    const rest = Object.keys(r.components).filter((k) => !r.updated.includes(k));
+    return r.kind === 'first' ? t.firstOf(partNames(r.updated)) : `${t.updates}${partNames(r.updated)}${rest.length ? (en ? '. ' : '。') + t.unchangedRest(partNames(rest)) : ''}`;
+  };
+  const versions = list.map((r, index) => {
+    const head = `<h2>v${escape(r.version)} ${badge(r)} <span class="rh-meta">${escape(r.date)}</span></h2>`;
+    const body = `<p class="rh-updated">${escape(scope(r))}</p>${notes(r)}`;
+    return index === 0
+      ? `<section class="rh-version" id="v${escape(r.version)}">${head}${body}</section>`
+      : `<details class="rh-version" id="v${escape(r.version)}"><summary>${head}</summary>${body}</details>`;
+  }).join('');
+  return {
+    route: '/releases/', title: t.title, heading: t.heading, description: t.description,
+    body: `<section class="rh-current" aria-label="${escape(t.heading)}">
+      <div class="rh-top"><span class="rh-ver">v${escape(current.version)}</span>${badge(current)}<span class="rh-meta">${escape(current.date)} ${t.released}</span></div>
+      <div class="rh-parts">${parts}</div>
+      <div class="rh-get"><span>${t.installed}</span><span>${t.fresh} ${link('/download/', t.download)}</span><a href="#v${escape(current.version)}">${t.notesLink}</a></div>
+    </section>
+    <section class="reading-section"><h2>${t.path}</h2><ol class="rh-path">${nodes}</ol></section>
+    ${versions}
+    <p class="rh-note">${t.footnote}</p>`,
+  };
 }

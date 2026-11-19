@@ -1,0 +1,120 @@
+{
+  "releases": [
+    {
+      "version": "0.0.2",
+      "date": "2026-11-19",
+      "kind": "fix",
+      "components": {
+        "desktop": "0.0.2",
+        "android": "0.0.1",
+        "runner": "0.0.1"
+      },
+      "updated": [
+        "desktop"
+      ],
+      "from": {
+        "version": "0.0.1",
+        "inApp": true,
+        "downloadMB": {
+          "windows": 55,
+          "mac": 320,
+          "linux": null
+        },
+        "fullMB": {
+          "windows": 217
+        }
+      },
+      "notes": {
+        "zh": [
+          "修复：添加执行端时配对码显示为 [REDACTED]，无法配对",
+          "修复：Bot 浏览器打开大型网站（如 X）时窗口会卡住好几秒；截图和读页面也不再卡住界面",
+          "修复：窗口连接中断会取消 Bot 正在做的事",
+          "Bot 说「已导出 / 已生成某文件」却没发给你时，回复里提到的、这一轮做出来的文件会自动作为文件卡片附上；说「已附上」却没发时会注明",
+          "Bot 不再把 Pi Bot 的运行状态当成回复发出；偶尔一轮什么都没说时会自动再问一次",
+          "运行中补充消息：可在「立即补充」和「等这轮结束」之间切换；整理上下文时先等着不丢；停止时没发出的补充退回输入框；会显示正在等什么",
+          "侧栏搜索覆盖全部消息（不再只搜最近 1000 条），可以继续搜索更早的消息",
+          "外部 Agent 失败时说明原因（登录失效、额度用尽、限流、模型不可用）；运行中发给它的消息会在这一轮结束后按顺序发出",
+          "群聊模板合并为 5 个，卡片上写明各自适合做什么",
+          "「从这里重来」在文件夹无法管理时也能用；转发多条带附件的消息不再失败",
+          "图片 Bot 和模型暂时不可用的 Bot 也能正常整理记忆（改用默认模型）",
+          "很长的命令参数不再让审批失败；触控板轻滑向上不再弹回底部",
+          "提示缓存更稳定，长对话更快、更省",
+          "群成员权限里错误的「即将支持」标记已去掉"
+        ],
+        "en": [
+          "Fixed: Add runner showed the pairing code as [REDACTED], so runners could not be paired",
+          "Fixed: the window froze for seconds while a Bot browsed large sites such as X; screenshots and page reads no longer block the window either",
+          "Fixed: a dropped window connection cancelled what Bots were doing",
+          "When a Bot says it exported or created a file but never sent it, files its reply names that this turn produced are attached as file cards; a reply claiming an attachment that was not sent gets a note",
+          "Bots no longer reply with Pi Bot's runtime state; a turn that says nothing is asked once more automatically",
+          "Messages sent mid-run can switch between \"add now\" and \"after this turn\", wait during context compaction instead of being lost, return to the box if never sent, and show what they wait for",
+          "Sidebar search covers every message (no longer only the latest 1,000) and can continue into older ones",
+          "External agents say why they failed (sign-in expired, quota, rate limit, model unavailable); messages sent to them mid-turn go out in order after the turn",
+          "Group templates are merged into five, each card saying what it is for",
+          "Retry from here works when the folder cannot be managed; forwarding many messages with attachments no longer fails",
+          "Image Bots and Bots whose model is unavailable organize memories with the default model",
+          "Very long command arguments no longer break approval; a light trackpad scroll up no longer snaps back",
+          "Prompt caching is steadier, so long conversations are faster and cheaper",
+          "The wrong \"coming soon\" labels on group member permissions are gone"
+        ]
+      }
+    },
+    {
+      "version": "0.0.1",
+      "date": "2026-11-17",
+      "kind": "first",
+      "components": {
+        "desktop": "0.0.1",
+        "android": "0.0.1",
+        "runner": "0.0.1"
+      },
+      "updated": [
+        "desktop",
+        "android",
+        "runner"
+      ],
+      "notes": {
+        "zh": [
+          "命令被联网设置拦截时，可直接选择当前 Bot、当前群或全局默认，将网站加入允许名单。",
+          "保存网站权限后仍需用户发起重试，命令审批、私网访问和沙箱隔离规则保持生效。",
+          "可以用 ChatGPT 计划登录了：设置 › 模型与密钥 › OpenAI › 「通过 ChatGPT 继续」（官方登录或 Codex 登录二选一），用你的 Go / Plus / Pro / Business 额度运行 OpenAI 模型，不需要 API Key",
+          "Bot 可以在配对的执行端（另一台电脑或服务器）上工作：提议换到执行端文件夹、在那台机器上跑命令；修复了配对后一直离线、Windows 执行端启动失败、macOS 托盘不显示等问题",
+          "外部 Agent（Codex、Claude Code、Cursor、OpenCode）可以作为 Bot 加入：在 Pi Bot 的沙箱里运行，能用 Bot 浏览器、发文件、用连接和技能，审批卡和审计与 Pi Bot 的 Bot 一致；关于你的记忆默认不发，按 Bot 打开",
+          "例行任务可以交给外部 Agent 跑，Bot 也可以把一步工作委派给 Agent Bot 并拿回结果（新权限「交给外部 Agent」，默认询问）",
+          "手机连电脑默认允许打洞直连，不在同一网络也能直连；电脑关着时手机能用自己的模型继续聊，回来后自动同步",
+          "MCP 和插件可以「从来源更新」并逐项对比改了什么；启动失败时说明原因（缺依赖、沙箱拦截等）",
+          "编辑器通过 ACP 连接时，可以切换 Bot 的模型、思考强度和全局默认模型",
+          "全新界面：欢迎页、新对话、选角色、设置、侧栏和聊天统一成更清爽的卡片风格",
+          "所有设置改了就生效，不用再点保存（API Key、密码等仍需确认保存）",
+          "Bot 的回复按真实顺序显示：先说要做什么，再显示做了哪些步骤；一轮结束只出现一张结尾卡（交付文件、改动文件和工作收据）",
+          "工作收据显示改了几个文件、跑了几条命令、审批几次和用时；预算用完可以直接加预算继续",
+          "代码审查可以选别的 Bot 来审，也能打开写完代码后自动审查",
+          "Mac 欢迎页检查屏幕录制、辅助功能和自动化三个权限，没开的会引导你去开；关掉权限后状态会立刻更新",
+          "小译收到任何文字默认直接翻译",
+          "更新页会显示每个版本的更新内容",
+          "公开版暂不提供 Gmail 连接。内置 Gmail 需要通过 Google 对受限邮件权限的验证和可能要求的安全评估。"
+        ],
+        "en": [
+          "When network settings block a command, add the website directly for this Bot, this group, or the global default.",
+          "Saving a website permission waits for an explicit retry and preserves command approval, private-network consent, and sandbox isolation.",
+          "Sign in with your ChatGPT plan: Models & keys › OpenAI › Continue with ChatGPT (official or Codex sign-in) runs OpenAI models on your Go / Plus / Pro / Business allowance, no API key needed",
+          "Bots can work on a paired runner (another computer or server): they propose moving to a runner folder and run commands there. Fixed runners staying offline after pairing, the Windows runner failing to start and the macOS tray not appearing",
+          "External agents (Codex, Claude Code, Cursor, OpenCode) can join as Bots: they run in Pi Bot's sandbox and use the Bot browser, file sending, connections and skills under the same approval cards and audit; memories about you are off by default, per Bot",
+          "Routines can run on an external agent, and a Bot can hand a step to an agent Bot and get the result back (new permission \"Hand work to external agents\", Ask by default)",
+          "The phone connects to your computer through NAT by default, so it connects directly even on another network; when the computer is off the phone keeps chatting on its own model and syncs back later",
+          "MCP servers and plugins can be updated from their source with a per-item comparison; a failed start says why (missing dependency, sandbox block, ...)",
+          "Editors connected through ACP can switch the Bot's model, its thinking level and the app's default model",
+          "A refreshed look across welcome, new chat, role picker, settings, sidebar and chat",
+          "Every setting takes effect as you change it, with no Save button (API keys and passwords still save explicitly)",
+          "Bot replies read in order: what it is about to do, then the steps it ran; each turn ends with one card for delivered files, changed files and the work receipt",
+          "Work receipts show files changed, commands run, approvals and time taken; a run stopped by its budget can continue right there",
+          "Choose which Bot reviews code, and optionally review automatically after code changes",
+          "On Mac, the welcome checks Screen Recording, Accessibility and Automation and guides you to turn on what is off; turning one off updates at once",
+          "Lingo translates whatever you send by default",
+          "The update page shows what each version changes",
+          "The public build omits Gmail. A built-in Gmail connection requires Google verification for restricted email scopes and may require a security assessment."
+        ]
+      }
+    }
+  ]
+}
