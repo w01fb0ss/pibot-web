@@ -7,6 +7,9 @@ import { languageRedirect } from './language-routing.js';
 const PREFIX = '/downloads/';
 const CLICK_PREFIX = '/download-click/';
 const RETIRED_VERSION = '0.0.2';
+// The withdrawn 2026-11-16 v0.0.2 stays gone. The 2026-11-19 urgent 0.0.2 ships only as an in-app
+// update, so exactly its update files are served (the files latest*.yml name); nothing else of 0.0.2.
+const UPDATE_ONLY_0_0_2 = /^PiBot-0\.0\.2-(mac-(arm64|x64)\.zip|win-x64\.exe|linux-x86_64\.AppImage)(\.blockmap)?$/;
 const RELEASE_FILE = /^(\d{1,4}\.\d{1,4}\.\d{1,4})\/([A-Za-z0-9._-]+)$/;
 const DOWNLOAD_TARGETS = [
   ['desktop', 'mac-arm64.dmg', 'darwin', 'arm64'],
@@ -314,7 +317,7 @@ export default {
     const release = RELEASE_FILE.exec(key);
     if (!release || key.includes('..'))
       return new Response('Not found', { status: 404 });
-    if (release[1] === RETIRED_VERSION) return retiredDownload();
+    if (release[1] === RETIRED_VERSION && !UPDATE_ONLY_0_0_2.test(release[2])) return retiredDownload();
     const object =
       request.method === 'HEAD'
         ? await env.RELEASES.head(key)
