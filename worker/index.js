@@ -151,6 +151,70 @@ async function downloadClick(request, url, env, ctx) {
   return new Response(null, { status: 302, headers: { Location: PREFIX + key, 'Cache-Control': 'no-store' } });
 }
 
+const MAX_RANGES = 400;
+/** `bytes=a-b,c-d,...` with two or more closed ranges; anything else is left to R2. */
+function multipleRanges(header) {
+  const match = /^bytes=(.+)$/.exec(header ?? '');
+  if (!match) return undefined;
+  const parts = match[1].split(',').map((part) => part.trim());
+  if (parts.length < 2 || parts.length > MAX_RANGES) return undefined;
+  const ranges = [];
+  for (const part of parts) {
+    const range = /^(\d+)-(\d+)$/.exec(part);
+    if (!range || Number(range[2]) < Number(range[1])) return undefined;
+    ranges.push([Number(range[1]), Number(range[2])]);
+  }
+  return ranges;
+}
+
+async function multipartRanges(env, key, ranges) {
+  const head = await env.RELEASES.head(key);
+  if (!head) return new Response('Not found', { status: 404 });
+  const size = head.size;
+  const valid = ranges.filter(([start]) => start < size).map(([start, end]) => [start, Math.min(end, size - 1)]);
+  if (!valid.length) return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${size}` } });
+  const boundary = 'pibot' + crypto.randomUUID().replaceAll('-', '');
+  const type = head.httpMetadata?.contentType ?? 'application/octet-stream';
+  const encoder = new TextEncoder();
+  const partHead = ([start, end], first) =>
+    encoder.encode(`${first ? '' : '\r\n'}--${boundary}\r\nContent-Type: ${type}\r\nContent-Range: bytes ${start}-${end}/${size}\r\n\r\n`);
+  const tail = encoder.encode(`\r\n--${boundary}--\r\n`);
+  let length = tail.byteLength;
+  valid.forEach((range, index) => { length += partHead(range, index === 0).byteLength + range[1] - range[0] + 1; });
+  const { readable, writable } = new FixedLengthStream(length);
+  (async () => {
+    const writer = writable.getWriter();
+    try {
+      for (const [index, range] of valid.entries()) {
+        await writer.write(partHead(range, index === 0));
+        const part = await env.RELEASES.get(key, { range: { offset: range[0], length: range[1] - range[0] + 1 } });
+        if (!part?.body) throw new Error('range_unavailable');
+        const reader = part.body.getReader();
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          await writer.write(value);
+        }
+      }
+      await writer.write(tail);
+      await writer.close();
+    } catch (error) {
+      await writer.abort(error);
+    }
+  })();
+  return new Response(readable, {
+    status: 206,
+    headers: {
+      'Content-Type': `multipart/byteranges; boundary=${boundary}`,
+      'Content-Length': String(length),
+      'Accept-Ranges': 'bytes',
+      'ETag': head.httpEtag,
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  });
+}
+
 function retiredDownload() {
   return new Response('Not found', {
     status: 404,
@@ -318,6 +382,11 @@ export default {
     if (!release || key.includes('..'))
       return new Response('Not found', { status: 404 });
     if (release[1] === RETIRED_VERSION && !UPDATE_ONLY_0_0_2.test(release[2])) return retiredDownload();
+    // electron-updater's differential download asks for many ranges at once and needs a
+    // multipart/byteranges answer; R2 serves one range per read (2026-11-19: Windows updates fell
+    // back to the full 216 MB download and failed on a slow line).
+    const ranges = request.method === 'GET' ? multipleRanges(request.headers.get('range')) : undefined;
+    if (ranges) return multipartRanges(env, key, ranges);
     const object =
       request.method === 'HEAD'
         ? await env.RELEASES.head(key)
