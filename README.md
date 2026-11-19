@@ -2,6 +2,10 @@
 
 [English](#english) · [中文](#中文)
 
+Website source and issue tracker: https://github.com/w01fb0ss/pibot-web. Cloudflare Workers Builds deploys this repository's `main` branch to the existing `pibot` Worker using `pnpm run build` and `pnpm exec wrangler deploy`. Preview builds are disabled. This repository contains the website, not the Pi Bot desktop application's source code.
+
+官网源码与问题反馈：https://github.com/w01fb0ss/pibot-web。Cloudflare Workers Builds 从此仓库的 `main` 分支自动构建并发布到现有 `pibot` Worker，命令分别为 `pnpm run build` 和 `pnpm exec wrangler deploy`，预览构建关闭。此仓库是官网项目，不是 Pi Bot 桌面应用源码仓库。
+
 ## English
 
 The bilingual (Chinese / English) website of Pi Bot: https://pibot.space
