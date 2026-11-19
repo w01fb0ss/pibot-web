@@ -6,7 +6,7 @@
       "url": "https://pibot.space/downloads/0.0.1/PiBot-0.0.1-mac-arm64.dmg",
       "label": "macOS · Apple 芯片",
       "detail": "v0.0.1",
-      "status": "untested",
+      "status": "tested",
       "version": "0.0.1"
     },
     "mac-x64": {

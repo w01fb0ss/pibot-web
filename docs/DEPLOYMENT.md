@@ -7,7 +7,7 @@
 - 官网源码与问题反馈：[w01fb0ss/pibot-web](https://github.com/w01fb0ss/pibot-web)，**公开仓库**，生产分支 `main`。
 - 本地官网仓库的 `origin` 指向新仓库；旧 `it-works-123/pibot-web` 远端保留为 `suspended-origin`，仅作历史参考，不再用它发布。旧账号已被暂停，申诉结果未确认。
 - 这里只公开官网项目，**Pi Bot 桌面应用源码尚未公开，正在准备开源**。不能将官网仓库标成应用源码仓库。
-- 当前官网提供的应用版本仍为 **v0.0.1**，以 `public/releases.json` 为准；v0.0.2 尚未公开发布。macOS Apple 芯片下载项保持未实机测试的标记。本次变更没有重打或替换安装包。
+- 当前官网提供的应用版本仍为 **v0.0.1**，以 `public/releases.json` 为准。2026-11-19 负责人确认朋友在 M 系列芯片 Mac 上成功打开，macOS Apple 芯片下载项由 `untested` 改为 `tested`，中英文分别显示“已测试” / “Tested”；此反馈只证明实机启动，不代表所有功能或所有 M 系列机型已完整验收。本次变更没有重打或替换安装包；应用热更新另按发布流程维护。
 
 ## Cloudflare 生产配置
 
