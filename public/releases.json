@@ -27,7 +27,7 @@
       "url": "https://pibot.space/downloads/0.0.2/PiBot-0.0.2-linux-x86_64.AppImage",
       "label": "Linux",
       "detail": "v0.0.2",
-      "status": "testing",
+      "status": "tested",
       "version": "0.0.2"
     },
     "android": {
