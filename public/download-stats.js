@@ -2,7 +2,7 @@ import { display } from './display.js';
 import { downloadStatsCopy, downloadStatsMarkup } from './download-stats-view.js';
 
 const sections = [...document.querySelectorAll('[data-download-stats]')];
-const refreshInterval = 5 * 60 * 1000;
+const refreshInterval = 5000;
 let data;
 let failed = false;
 let language;
@@ -70,7 +70,7 @@ async function refresh() {
   const controller = new AbortController();
   activeRequest = controller;
   try {
-    // Cloudflare already caches the aggregate for five minutes; avoid a second browser cache.
+    // Each read must reach the live counter rather than a browser or edge-cache snapshot.
     const response = await fetch('/api/download-stats', {
       cache: 'no-store', signal: AbortSignal.any([controller.signal, AbortSignal.timeout(5000)]),
     });

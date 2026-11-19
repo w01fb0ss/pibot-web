@@ -325,26 +325,18 @@ async function stats(request, env) {
   return Response.json({ kind: 'updates', from: day, rows }, { headers: { 'Cache-Control': 'no-store' } });
 }
 
-async function publicDownloadStats(request, url, env, ctx) {
+async function publicDownloadStats(request, env) {
   if (!['GET', 'HEAD'].includes(request.method))
     return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET, HEAD' } });
   const unavailable = () => Response.json({ error: 'download_stats_unavailable' }, { status: 503, headers: { 'Cache-Control': 'no-store' } });
   if (!env.COUNTER) return unavailable();
-  // A single bounded cache entry, independent of caller-supplied query strings.
-  const key = new Request(`${url.origin}/api/download-stats?scope=all-versions-v1`);
-  const cache = caches.default;
-  let response = await cache.match(key);
-  if (!response) {
-    try {
-      const through = new Date().toISOString().slice(0, 10);
-      const { from, rows } = await counter(env, 'downloads').downloadTotals();
-      response = Response.json(downloadSummary(rows, DOWNLOAD_TARGETS, from, through), {
-        headers: { 'Cache-Control': 'public, max-age=300', 'X-Content-Type-Options': 'nosniff' },
-      });
-      ctx.waitUntil(cache.put(key, response.clone()).catch(() => {}));
-    } catch { return unavailable(); }
-  }
-  return request.method === 'HEAD' ? new Response(null, { status: response.status, headers: response.headers }) : response;
+  try {
+    const through = new Date().toISOString().slice(0, 10);
+    const { from, rows } = await counter(env, 'downloads').downloadTotals();
+    const headers = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
+    const summary = downloadSummary(rows, DOWNLOAD_TARGETS, from, through);
+    return request.method === 'HEAD' ? new Response(null, { headers }) : Response.json(summary, { headers });
+  } catch { return unavailable(); }
 }
 
 export default {
@@ -366,7 +358,7 @@ export default {
       return new Response(response.body, { status: response.status, headers });
     }
     if (url.pathname === '/_stats') return stats(request, env);
-    if (url.pathname === '/api/download-stats') return publicDownloadStats(request, url, env, ctx);
+    if (url.pathname === '/api/download-stats') return publicDownloadStats(request, env);
     if (url.pathname.startsWith('/updates/')) {
       const response = await env.ASSETS.fetch(request);
       const key = request.method === 'GET' && (response.ok || response.status === 304) ? updateKey(url.pathname, request.headers.get('user-agent')) : undefined;

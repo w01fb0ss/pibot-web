@@ -2,14 +2,14 @@ export const downloadStatsCopy = {
   zh: {
     title: '官网下载点击', total: '全部版本累计点击', desktop: '桌面版', mobile: 'Android', runner: '执行端',
     version: '全部版本', loading: '正在读取统计…', unavailable: '统计暂不可用，下载不受影响。',
-    note: '累计所有版本的下载按钮点击，约每 5 分钟更新。重复点击分别计数，不代表安装人数。',
+    note: '累计所有版本的下载按钮点击，页面在前台时每 5 秒同步。重复点击分别计数，不代表安装人数。',
     details: '查看平台明细', product: '产品', platform: '平台与架构', count: '点击次数',
     more: '查看平台明细 ↗', period: '统计区间（UTC）', until: '至', empty: '暂无下载点击', unclassified: '未分类点击',
   },
   en: {
     title: 'Website download clicks', total: 'All-version clicks', desktop: 'Desktop', mobile: 'Android', runner: 'Runner',
     version: 'All versions', loading: 'Loading statistics…', unavailable: 'Statistics unavailable. Downloads still work.',
-    note: 'Download-button clicks across all versions, refreshed about every 5 minutes. Repeat clicks count separately; these are not installation or user counts.',
+    note: 'Download-button clicks across all versions, refreshed every 5 seconds while this page is visible. Repeat clicks count separately; these are not installation or user counts.',
     details: 'View platform breakdown', product: 'Product', platform: 'Platform and architecture', count: 'Clicks',
     more: 'View platform breakdown ↗', period: 'Reporting period (UTC)', until: 'to', empty: 'No download clicks yet', unclassified: 'Unclassified clicks',
   },
