@@ -6,9 +6,9 @@ Website source and issue tracker: https://github.com/w01fb0ss/pibot-web. Cloudfl
 
 官网源码与问题反馈：https://github.com/w01fb0ss/pibot-web。Cloudflare Workers Builds 从此仓库的 `main` 分支自动构建并发布到现有 `pibot` Worker，命令分别为 `pnpm run build` 和 `pnpm exec wrangler deploy`，预览构建关闭。此仓库是官网项目，不是 Pi Bot 桌面应用源码仓库。
 
-Deployment, language routing, preserved service bindings, verification receipts, and pending Google Search Console work: [Deployment and handoff guide](docs/DEPLOYMENT.md).
+Deployment, language routing, preserved service bindings, verification receipts, and Google Search Console status: [Deployment and handoff guide](docs/DEPLOYMENT.md).
 
-部署、语言路由、服务绑定、验收记录和 Google Search Console 待办，统一见 [官网部署与接力说明](docs/DEPLOYMENT.md)。Claude 接手官网时先读这份文档。
+部署、语言路由、服务绑定、验收记录和 Google Search Console 状态，统一见 [官网部署与接力说明](docs/DEPLOYMENT.md)。Claude 接手官网时先读这份文档。
 
 ## English
 
@@ -152,6 +152,6 @@ Guide search summaries live in `scripts/guide-discovery.mjs`: each chapter must 
 
 ### Git-backed Cloudflare deployment / Git 仓库自动部署
 
-The website repository has migrated to `w01fb0ss/pibot-web`; Git-triggered deployment was verified successfully. The existing Worker `pibot` tracks production branch `main`, root directory `/`, build command `pnpm run build`, and deploy command `pnpm exec wrangler deploy`. Use Node 22 or newer and pnpm 12.14.0. Keep the existing Worker, R2 bucket, Durable Object bindings and production secrets; creating a replacement Worker would disconnect the existing counters. The build does not require the Pi Bot application checkout or local screenshot-source files. See [the handoff guide](docs/DEPLOYMENT.md) for build-script approvals, the verification receipt and pending search-console work.
+The website repository has migrated to `w01fb0ss/pibot-web`; Git-triggered deployment was verified successfully. The existing Worker `pibot` tracks production branch `main`, root directory `/`, build command `pnpm run build`, and deploy command `pnpm exec wrangler deploy`. Use Node 22 or newer and pnpm 12.14.0. Keep the existing Worker, R2 bucket, Durable Object bindings and production secrets; creating a replacement Worker would disconnect the existing counters. The build does not require the Pi Bot application checkout or local screenshot-source files. See [the handoff guide](docs/DEPLOYMENT.md) for build-script approvals, the verification receipt and search-console status.
 
-官网仓库已迁到 `w01fb0ss/pibot-web`，Git 推送触发的自动部署已验收成功。现有 Worker `pibot` 跟踪生产分支 `main`，根目录 `/`、构建命令 `pnpm run build`、发布命令 `pnpm exec wrangler deploy`。使用 Node 22 或更新版本及 pnpm 12.14.0，保留现有 Worker、R2、Durable Object 绑定和生产密钥；不要新建替代 Worker，以免统计与已有数据断开。云端构建不需要 Pi Bot 应用仓库或本机截图源文件。依赖脚本许可、验收收据及搜索后台待办见[接力说明](docs/DEPLOYMENT.md)。
+官网仓库已迁到 `w01fb0ss/pibot-web`，Git 推送触发的自动部署已验收成功。现有 Worker `pibot` 跟踪生产分支 `main`，根目录 `/`、构建命令 `pnpm run build`、发布命令 `pnpm exec wrangler deploy`。使用 Node 22 或更新版本及 pnpm 12.14.0，保留现有 Worker、R2、Durable Object 绑定和生产密钥；不要新建替代 Worker，以免统计与已有数据断开。云端构建不需要 Pi Bot 应用仓库或本机截图源文件。依赖脚本许可、验收收据及搜索后台状态见[接力说明](docs/DEPLOYMENT.md)。
