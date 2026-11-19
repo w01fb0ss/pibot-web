@@ -6,6 +6,10 @@ Website source and issue tracker: https://github.com/w01fb0ss/pibot-web. Cloudfl
 
 官网源码与问题反馈：https://github.com/w01fb0ss/pibot-web。Cloudflare Workers Builds 从此仓库的 `main` 分支自动构建并发布到现有 `pibot` Worker，命令分别为 `pnpm run build` 和 `pnpm exec wrangler deploy`，预览构建关闭。此仓库是官网项目，不是 Pi Bot 桌面应用源码仓库。
 
+Deployment, language routing, preserved service bindings, verification receipts, and pending Google Search Console work: [Deployment and handoff guide](docs/DEPLOYMENT.md).
+
+部署、语言路由、服务绑定、验收记录和 Google Search Console 待办，统一见 [官网部署与接力说明](docs/DEPLOYMENT.md)。Claude 接手官网时先读这份文档。
+
 ## English
 
 The bilingual (Chinese / English) website of Pi Bot: https://pibot.space
@@ -137,17 +141,17 @@ Guide search summaries live in `scripts/guide-discovery.mjs`: each chapter must 
 
 ### Search discovery / 搜索发现
 
-- `/about/` and `/en/about/` identify the product by its official domain, release and documentation links; `/releases/` and `/en/releases/` use the current public `releases.json` version. No release dates or desktop source repository URLs are invented.
+- `/cn/about/` and `/en/about/` identify the product by its official domain, release and documentation links; `/cn/releases/` and `/en/releases/` use the current public `releases.json` version. No release dates or desktop source repository URLs are invented.
 - Bing ownership is verified with the public `msvalidate.01` homepage tag. Keep this tag after verification.
 - `pnpm deploy` builds, deploys, then sends added/changed/deleted sitemap URLs to IndexNow. The notification only includes public page URLs and domain ownership proof; it sends no visitor, app, chat or download-count data. IndexNow receipt does not mean indexing or ranking success.
 - On a fresh checkout, run the build and `node scripts/indexnow.mjs --initialize` **before editing** to establish `.review/indexnow-state.json`. It is local deployment state, ignored by Git. Existing state is never overwritten by initialization. `pnpm search:preview` lists changes without a network request; `pnpm search:notify` retries a failed notification. A failed submission preserves the baseline for retry; ordinary builds/previews never submit URLs.
-- `/about/`、`/en/about/` 用官方域名、公开版本和文档链接说明产品身份；`/releases/`、`/en/releases/` 与 `releases.json` 保持一致，不虚构发布日期或桌面应用源码仓库。
+- `/cn/about/`、`/en/about/` 用官方域名、公开版本和文档链接说明产品身份；`/cn/releases/`、`/en/releases/` 与 `releases.json` 保持一致，不虚构发布日期或桌面应用源码仓库。
 - Bing 通过首页公开的 `msvalidate.01` 标记验证所有权，验证后不要移除。
 - `pnpm deploy` 构建并部署成功后，向 IndexNow 通知 sitemap 中新增、修改或删除的公开网址。只发送网址与域名验证信息，不发送访客、应用、聊天或下载统计数据；收到通知不等于收录或排名提升。
 - 新检出工作区应在修改前先构建并执行 `node scripts/indexnow.mjs --initialize`，建立 Git 忽略的本地基线；`pnpm search:preview` 只预览变化，`pnpm search:notify` 可重试失败通知。失败不推进基线，普通构建和预览不发通知。
 
 ### Git-backed Cloudflare deployment / Git 仓库自动部署
 
-The website repository is migrating to `w01fb0ss/pibot-web`. Connect the existing Cloudflare Worker `pibot` to that repository, production branch `main`, root directory `/`, build command `pnpm build`, and deploy command `pnpm exec wrangler deploy`. Use Node 22 or newer and pnpm 12.14.0. Keep the existing Worker, R2 bucket, Durable Object bindings and production secrets; creating a replacement Worker would disconnect the existing counters. The build does not require the Pi Bot application checkout or local screenshot-source files.
+The website repository has migrated to `w01fb0ss/pibot-web`; Git-triggered deployment was verified successfully. The existing Worker `pibot` tracks production branch `main`, root directory `/`, build command `pnpm run build`, and deploy command `pnpm exec wrangler deploy`. Use Node 22 or newer and pnpm 12.14.0. Keep the existing Worker, R2 bucket, Durable Object bindings and production secrets; creating a replacement Worker would disconnect the existing counters. The build does not require the Pi Bot application checkout or local screenshot-source files. See [the handoff guide](docs/DEPLOYMENT.md) for build-script approvals, the verification receipt and pending search-console work.
 
-官网仓库迁到 `w01fb0ss/pibot-web`。在现有 Cloudflare Worker `pibot` 的 Builds 中连接该仓库：生产分支 `main`、根目录 `/`、构建命令 `pnpm build`、发布命令 `pnpm exec wrangler deploy`。使用 Node 22 或更新版本及 pnpm 12.14.0，保留现有 Worker、R2、Durable Object 绑定和生产密钥；不要新建替代 Worker，以免统计与已有数据断开。云端构建不需要 Pi Bot 应用仓库或本机截图源文件。
+官网仓库已迁到 `w01fb0ss/pibot-web`，Git 推送触发的自动部署已验收成功。现有 Worker `pibot` 跟踪生产分支 `main`，根目录 `/`、构建命令 `pnpm run build`、发布命令 `pnpm exec wrangler deploy`。使用 Node 22 或更新版本及 pnpm 12.14.0，保留现有 Worker、R2、Durable Object 绑定和生产密钥；不要新建替代 Worker，以免统计与已有数据断开。云端构建不需要 Pi Bot 应用仓库或本机截图源文件。依赖脚本许可、验收收据及搜索后台待办见[接力说明](docs/DEPLOYMENT.md)。
