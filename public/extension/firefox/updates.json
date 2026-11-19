@@ -1,7 +1,13 @@
 {
   "addons": {
     "extension@pibot.space": {
-      "updates": []
+      "updates": [
+        {
+          "version": "0.0.3.1",
+          "update_link": "https://pibot.space/extension/firefox/pibot-browser-firefox-0.0.3.1.xpi",
+          "update_hash": "sha256:0029700b927c959827ef75d1f564651c7c5c4fd76b7613596afe50a2f312b3f8"
+        }
+      ]
     }
   }
 }
