@@ -1,0 +1,4 @@
+# Wrangler needs these native tool installers; other dependency scripts stay unapproved.
+allowBuilds:
+  esbuild@0.28.2: true
+  workerd@1.20261019.1: true
