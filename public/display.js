@@ -72,7 +72,7 @@ document.querySelectorAll('[data-site-language]').forEach(button=>button.addEven
     return;
   }
   const url=new URL(location.href);
-  url.pathname=button.dataset.languageUrl || (language==='en'?'/en/':'/');
+  url.pathname=button.dataset.languageUrl || (language==='en'?'/en/':'/cn/');
   url.searchParams.delete('lang');
   if(url.href!==location.href)location.assign(url.href);
 }));

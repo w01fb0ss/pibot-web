@@ -77,7 +77,7 @@ function renderFaq(body, md, env) {
 }
 
 export async function buildManual(output, locale) {
-  const prefix = locale === 'en' ? '/en' : '';
+  const prefix = locale === 'en' ? '/en' : '/cn';
   const screenshotDir = path.join(output, 'assets', 'guides');
   const pngDimensions = new Map();
   for (const name of await readdir(screenshotDir)) {

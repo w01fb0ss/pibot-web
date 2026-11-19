@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@12.14.0",
   "scripts": {
     "dev": "node scripts/serve.mjs",
     "build": "node scripts/build.mjs",
@@ -10,7 +11,9 @@
     "sync:product": "node scripts/sync-product.mjs ../PiBot",
     "sync:theme": "node scripts/sync-theme.mjs ../PiBot",
     "capture:shots": "node scripts/capture-shots.mjs",
-    "deploy": "node scripts/build.mjs && wrangler deploy"
+    "deploy": "node scripts/deploy.mjs",
+    "search:notify": "node scripts/indexnow.mjs --submit",
+    "search:preview": "node scripts/indexnow.mjs --dry-run"
   },
   "engines": {
     "node": ">=22"

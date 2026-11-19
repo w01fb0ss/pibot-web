@@ -4,6 +4,7 @@ import { stat, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pipeline } from 'node:stream/promises';
+import { languageRedirect } from '../worker/language-routing.js';
 
 const directory = process.argv.includes('--dist') ? 'dist' : 'public';
 const root = fileURLToPath(new URL(`../${directory}/`, import.meta.url));
@@ -12,6 +13,10 @@ const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=u
 const server = http.createServer(async (request, response) => {
   if (!['GET', 'HEAD'].includes(request.method)) { response.writeHead(405, { Allow: 'GET, HEAD' }).end(); return; }
   try {
+    if (directory === 'dist') {
+      const redirect = languageRedirect(new Request(new URL(request.url, 'http://localhost'), { method: request.method, headers: request.headers }));
+      if (redirect) { response.writeHead(redirect.status, Object.fromEntries(redirect.headers)).end(); return; }
+    }
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     let file = await realpath(path.join(root, pathname === '/' ? 'index.html' : pathname));
     // Match the static host's directory-index behavior so legal pages can be checked locally

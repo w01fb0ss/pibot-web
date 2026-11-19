@@ -1,6 +1,8 @@
 // Source copy is Chinese. Keeping text-node translations preserves links, icons and markup.
 // A trailing space keeps English sentences apart where a <br class="desktop-br"> is hidden on phones.
 export const english = {
+"关于 Pi Bot":"About Pi Bot",
+"公开版本与发布说明":"Public releases and release notes",
 "跨设备使用指南":"Cross-device guides",
 "Android 手机配对与远程审批":"Pair an Android phone and handle remote approvals",
 "在另一台电脑上配置执行端":"Set up a Runner on another computer",

@@ -1,5 +1,6 @@
 // Home page header menu and footer year.
 import {setLabel} from './display.js';
+import './download-stats.js';
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('#mobile-nav');
 function closeMenu() {

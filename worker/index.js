@@ -1,6 +1,8 @@
 // Static site from ASSETS; installers under /downloads/ come from the R2 bucket (owner
 // 2026-10-22: packages live in R2, served on the website's own domain).
 import { DurableObject } from 'cloudflare:workers';
+import { downloadBucket, downloadSummary } from './download-stats.js';
+import { languageRedirect } from './language-routing.js';
 
 const PREFIX = '/downloads/';
 const CLICK_PREFIX = '/download-click/';
@@ -65,14 +67,45 @@ export class Counter extends DurableObject {
       this.sql.exec('DELETE FROM counts WHERE day < ?', cutoff);
       this.pruned = day;
     }
-    if (this.sql.exec('UPDATE counts SET n = n + 1 WHERE day = ? AND key = ?', day, key).rowsWritten) return;
+    if (this.sql.exec('UPDATE counts SET n = n + 1 WHERE day = ? AND key = ?', day, key).rowsWritten) return key;
     // Bounded per day, so made-up versions cannot grow the table without limit.
     const known = this.sql.exec('SELECT COUNT(*) AS c FROM counts WHERE day = ?', day).one().c;
     const stored = known >= MAX_KEYS_PER_DAY ? 'other' : key;
     this.sql.exec('INSERT INTO counts (day, key, n) VALUES (?, ?, 1) ON CONFLICT (day, key) DO UPDATE SET n = n + 1', day, stored);
+    return stored;
   }
   read(from) {
     return this.sql.exec('SELECT day, key, n FROM counts WHERE day >= ? ORDER BY day, key', from).toArray();
+  }
+  initializeDownloadTotals() {
+    this.sql.exec('CREATE TABLE IF NOT EXISTS download_totals (key TEXT PRIMARY KEY, n INTEGER NOT NULL)');
+    this.sql.exec('CREATE TABLE IF NOT EXISTS download_totals_meta (id INTEGER PRIMARY KEY, first_day TEXT)');
+    if (this.sql.exec('SELECT id FROM download_totals_meta WHERE id = 1').toArray().length) return;
+    // Seed before daily retention can remove history; later releases share these nine buckets.
+    const rows = this.sql.exec('SELECT key, SUM(n) AS n FROM counts GROUP BY key').toArray();
+    for (const { key, n } of rows) this.sql.exec('INSERT INTO download_totals (key, n) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET n = n + excluded.n', downloadBucket(key, DOWNLOAD_TARGETS), n);
+    const first = this.sql.exec('SELECT MIN(day) AS day FROM counts').one().day;
+    this.sql.exec('INSERT INTO download_totals_meta (id, first_day) VALUES (1, ?)', first);
+  }
+  addDownload(day, key) {
+    const pruned = this.pruned;
+    try {
+      this.ctx.storage.transactionSync(() => {
+        this.initializeDownloadTotals();
+        const stored = downloadBucket(this.add(day, key), DOWNLOAD_TARGETS);
+        this.sql.exec('INSERT INTO download_totals (key, n) VALUES (?, 1) ON CONFLICT (key) DO UPDATE SET n = n + 1', stored);
+        this.sql.exec('UPDATE download_totals_meta SET first_day = ? WHERE id = 1 AND (first_day IS NULL OR first_day > ?)', day, day);
+      });
+    } catch (error) { this.pruned = pruned; throw error; }
+  }
+  downloadTotals() {
+    return this.ctx.storage.transactionSync(() => {
+      this.initializeDownloadTotals();
+      return {
+        from: this.sql.exec('SELECT first_day FROM download_totals_meta WHERE id = 1').one().first_day,
+        rows: this.sql.exec('SELECT key, n FROM download_totals ORDER BY key').toArray(),
+      };
+    });
   }
 }
 
@@ -111,7 +144,7 @@ async function downloadClick(request, url, env, ctx) {
   if (!countKey) return new Response('Not found', { status: 404 });
   if (match[1] === RETIRED_VERSION) return retiredDownload();
   if (!await env.RELEASES.head(key)) return new Response('Not found', { status: 404 });
-  if (env.COUNTER) ctx.waitUntil(counter(env, 'downloads').add(new Date().toISOString().slice(0, 10), countKey).catch(() => {}));
+  if (env.COUNTER) ctx.waitUntil(counter(env, 'downloads').addDownload(new Date().toISOString().slice(0, 10), countKey).catch(() => {}));
   return new Response(null, { status: 302, headers: { Location: PREFIX + key, 'Cache-Control': 'no-store' } });
 }
 
@@ -224,9 +257,33 @@ async function stats(request, env) {
   return Response.json({ kind: 'updates', from: day, rows }, { headers: { 'Cache-Control': 'no-store' } });
 }
 
+async function publicDownloadStats(request, url, env, ctx) {
+  if (!['GET', 'HEAD'].includes(request.method))
+    return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET, HEAD' } });
+  const unavailable = () => Response.json({ error: 'download_stats_unavailable' }, { status: 503, headers: { 'Cache-Control': 'no-store' } });
+  if (!env.COUNTER) return unavailable();
+  // A single bounded cache entry, independent of caller-supplied query strings.
+  const key = new Request(`${url.origin}/api/download-stats?scope=all-versions-v1`);
+  const cache = caches.default;
+  let response = await cache.match(key);
+  if (!response) {
+    try {
+      const through = new Date().toISOString().slice(0, 10);
+      const { from, rows } = await counter(env, 'downloads').downloadTotals();
+      response = Response.json(downloadSummary(rows, DOWNLOAD_TARGETS, from, through), {
+        headers: { 'Cache-Control': 'public, max-age=300', 'X-Content-Type-Options': 'nosniff' },
+      });
+      ctx.waitUntil(cache.put(key, response.clone()).catch(() => {}));
+    } catch { return unavailable(); }
+  }
+  return request.method === 'HEAD' ? new Response(null, { status: response.status, headers: response.headers }) : response;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const redirect = languageRedirect(request);
+    if (redirect) return redirect;
     if (url.pathname.startsWith(CLICK_PREFIX)) return downloadClick(request, url, env, ctx);
     if (url.pathname.startsWith('/gmail/')) {
       let response;
@@ -241,6 +298,7 @@ export default {
       return new Response(response.body, { status: response.status, headers });
     }
     if (url.pathname === '/_stats') return stats(request, env);
+    if (url.pathname === '/api/download-stats') return publicDownloadStats(request, url, env, ctx);
     if (url.pathname.startsWith('/updates/')) {
       const response = await env.ASSETS.fetch(request);
       const key = request.method === 'GET' && (response.ok || response.status === 304) ? updateKey(url.pathname, request.headers.get('user-agent')) : undefined;

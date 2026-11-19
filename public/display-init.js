@@ -4,7 +4,7 @@
   try { const value=JSON.parse(localStorage.getItem('pibot.website.display')||'{}');if(value&&typeof value==='object')saved=value; } catch {}
   const query = new URLSearchParams(location.search);
   const root = document.documentElement;
-  const language = root.dataset.staticLanguage || query.get('lang') || root.dataset.defaultLanguage || saved.language || (navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en');
+  const language = root.dataset.staticLanguage || query.get('lang') || root.dataset.defaultLanguage || saved.language || (/^zh-(?:cn|sg|hans)(?:-|$)/i.test(navigator.language) ? 'zh' : 'en');
   const theme = query.get('theme') || saved.theme || 'system';
   root.lang = language === 'en' ? 'en' : 'zh-CN';
   root.dataset.language = language === 'en' ? 'en' : 'zh';

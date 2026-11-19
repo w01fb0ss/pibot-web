@@ -5,8 +5,6 @@ import { buildSearchPages } from './build-search-pages.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const config = JSON.parse(await readFile(path.join(root, 'public/releases.json'), 'utf8'));
-await stat(path.join(root, 'public/product/index.html'));
-await stat(path.join(root, 'public/product/source-manifest.json'));
 for (const platform of Object.values(config.platforms)) {
   if (!platform.url) continue;
   if (platform.url.startsWith('downloads/')) {

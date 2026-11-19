@@ -1,12 +1,15 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { searchContent } from './search-content.mjs';
-import { englishHomepage, sharedChrome, applyLegalChrome } from './build-homepage.mjs';
+import { localizedHomepage, sharedChrome, applyLegalChrome } from './build-homepage.mjs';
 import { buildManual } from './build-manual.mjs';
+import { downloadStatsMarkup } from '../public/download-stats-view.js';
+import { guideDescriptions } from './guide-discovery.mjs';
+import { productIdentity } from './product-identity.mjs';
+import { sitePath, alternateLinks, localizePageLinks } from './site-locales.mjs';
 
 const origin = 'https://pibot.space';
-const home = { zh: '/', en: '/en/' };
-const bases = { zh: '', en: '/en' };
+const home = { zh: '/cn/', en: '/en/' };
 const languages = { zh: 'zh-CN', en: 'en' };
 const downloads = [
   ['mac-arm64', 'mac-x64', 'windows', 'linux'],
@@ -27,13 +30,11 @@ function escape(value) {
 }
 
 function localized(route, lang) {
-  return route === '/' ? home[lang] : bases[lang] + route;
+  return sitePath(route, lang);
 }
 
 function alternates(route) {
-  return Object.entries(languages)
-    .map(([key, lang]) => `<link rel="alternate" hreflang="${lang}" href="${origin}${localized(route, key)}">`)
-    .join('\n  ');
+  return alternateLinks(route);
 }
 
 function frame({ route, lang, title, description, heading, body, homepage, schema, showLead = true }) {
@@ -53,7 +54,12 @@ function frame({ route, lang, title, description, heading, body, homepage, schem
   };
   const graph = JSON.stringify({
     '@context': 'https://schema.org',
-    '@graph': schema ? [breadcrumb, schema] : [breadcrumb],
+    '@graph': [breadcrumb, {
+      '@type': chapter ? 'TechArticle' : route === '/guides/' ? 'CollectionPage' : route === '/about/' ? 'AboutPage' : 'WebPage',
+      '@id': canonical + '#page', url: canonical, name: heading, headline: title,
+      description, inLanguage: languages[lang], mainEntityOfPage: canonical,
+      isPartOf: { '@id': origin + '/#website' }, about: { '@id': origin + '/#desktop-app' },
+    }, ...(schema ? [schema] : [])],
   }).replaceAll('<', '\\u003c');
   return `<!doctype html>
 <html lang="${languages[lang]}" data-static-language="${lang}">
@@ -139,7 +145,7 @@ function guideIndex(articles, lang) {
   return `<nav class="reading-links" aria-label="${escape(copy.contents)}">${shortcuts}</nav>${groups}`;
 }
 
-function chapterLayout(article, example, lang) {
+function chapterLayout(article, example, lang, articles) {
   const copy = searchContent[lang];
   const isFaq = article.slug === 'faq';
   const links = article.sections.map(({ id, label }) =>
@@ -149,9 +155,13 @@ function chapterLayout(article, example, lang) {
     <input type="search" id="faq-query" placeholder="${escape(copy.searchExample)}">
     <p id="faq-no-results" role="status" hidden>${escape(copy.noResults)}</p>
   </div>` : '';
+  const group = guideGroups.find(({ slugs }) => slugs.includes(article.slug));
+  const related = group.slugs.filter(slug => slug !== article.slug).map(slug => articles.find(item => item.slug === slug));
+  const relatedTitle = lang === 'en' ? 'Related guides' : '相关教程';
+  const relatedLinks = `<nav class="guide-related" aria-label="${relatedTitle}"><h2>${relatedTitle}</h2><ul>${related.map(item => `<li><a href="${localized('/guides/' + item.slug + '/', lang)}">${escape(item.heading)}</a></li>`).join('')}</ul><a href="${localized('/guides/', lang)}">${escape(copy.guides)} ↗</a></nav>`;
   return `<div class="guide-layout">
     <aside><nav class="guide-toc" aria-label="${escape(copy.contents)}"><p>${escape(copy.contents)}</p><ul>${links}</ul></nav></aside>
-    <article class="guide-content">${search}${article.html}${example}</article>
+    <article class="guide-content">${search}${article.html}${example}${relatedLinks}</article>
   </div>`;
 }
 
@@ -182,32 +192,49 @@ function downloadSections(config, lang) {
   const mac = config.version === '0.0.1' && (availablePlatforms['mac-x64']?.url || availablePlatforms['mac-arm64']?.url)
     ? `<p>${escape(page.mac)} <a href="https://support.apple.com/${lang === 'en' ? 'en-us' : 'zh-cn'}/102445">${page.apple}</a></p>` : '';
   return `<div class="reading-section">${current}<p>${escape(page.versions)}</p></div>
+  <section id="download-statistics" class="download-statistics" data-download-stats="detailed" data-no-translate aria-label="${lang === 'en' ? 'Website download click statistics' : '官网下载点击统计'}" aria-busy="true">${downloadStatsMarkup(lang, true)}</section>
   ${groups.join('\n')}
   <section class="reading-section"><h2>${page.installation}</h2>${mac}<p>${escape(page.other)}</p></section>`;
 }
 
 export async function buildSearchPages(output, config) {
-  const routes = ['/'];
+  const routes = [];
   const write = async (url, html) => {
     const directory = path.join(output, url.slice(1));
     await mkdir(directory, { recursive: true });
-    await writeFile(path.join(directory, 'index.html'), html);
+    const lang = url.startsWith('/en/') ? 'en' : 'zh';
+    await writeFile(path.join(directory, 'index.html'), localizePageLinks(html, lang));
     routes.push(url);
   };
 
   const sourceHomepage = path.join(output, 'index.html');
-  const homepage = { zh: await readFile(sourceHomepage, 'utf8'), en: await englishHomepage(sourceHomepage) };
+  const source = await readFile(sourceHomepage, 'utf8');
+  await writeFile(sourceHomepage, source.replace(/(<section class="download-statistics"[^>]*>)(<\/section>)/, `$1${downloadStatsMarkup('zh')}$2`));
+  const homepage = { zh: await localizedHomepage(sourceHomepage, 'zh'), en: await localizedHomepage(sourceHomepage, 'en') };
+  // The shared component owns its bilingual text, so the homepage's generic translator skips it.
+  homepage.en = homepage.en.replace(/(<section class="download-statistics"[^>]*>)[\s\S]*?(<\/section>)/, `$1${downloadStatsMarkup('en')}$2`).replace('aria-label="官网下载点击统计"', 'aria-label="Website download click statistics"');
+  await write(home.zh, homepage.zh);
   await write(home.en, homepage.en);
+  // A static-host fallback stays English; the Worker negotiates the root URL.
+  await writeFile(sourceHomepage, localizePageLinks(homepage.en, 'en'));
   for (const page of ['privacy', 'terms']) {
     const file = path.join(output, page, 'index.html');
-    const html = applyLegalChrome(await readFile(file, 'utf8'), sharedChrome(homepage.zh, 'zh'));
-    await writeFile(file, html);
-    routes.push(`/${page}/`);
+    const source = await readFile(file, 'utf8');
+    for (const lang of ['zh', 'en']) {
+      const route = `/${page}/`;
+      await write(localized(route, lang), applyLegalChrome(source, sharedChrome(homepage[lang], lang, route), lang, route));
+    }
+    await rm(path.dirname(file), { recursive: true });
   }
 
   for (const [lang, copy] of Object.entries(searchContent)) {
     const render = options => frame({ ...options, lang, homepage: homepage[lang] });
-    const articles = await buildManual(output, lang);
+    const articles = (await buildManual(output, lang)).map(article => {
+      const description = guideDescriptions[lang][article.slug];
+      if (!description) throw new Error(`Missing guide description: ${lang}/${article.slug}`);
+      return { ...article, description };
+    });
+    for (const page of productIdentity(config, lang, escape)) await write(localized(page.route, lang), render(page));
     const guides = copy.guidesPage;
     await write(localized('/guides/', lang), render({
       route: '/guides/', title: guides.title, description: guides.intro, heading: guides.heading,
@@ -229,9 +256,9 @@ export async function buildSearchPages(output, config) {
         ? `<h2 class="guide-example-title">${escape(copy.workflowExample)}</h2>${await workflowSections(output, lang, walkthrough.sections)}`
         : '';
       await write(localized(route, lang), render({
-        route, title: `${article.heading} | Pi Bot`, description: walkthrough?.intro ?? article.description,
-        heading: article.heading, showLead: article.slug === 'faq',
-        body: chapterLayout(article, example, lang),
+        route, title: `${article.heading} | Pi Bot`, description: article.description,
+        heading: article.heading, showLead: true,
+        body: chapterLayout(article, example, lang, articles),
       }));
     }
   }

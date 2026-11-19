@@ -7,7 +7,7 @@
 The bilingual (Chinese / English) website of Pi Bot: https://pibot.space
 
 - `public/index.html`: the homepage, six sections (hero · three devices · what it can do · you stay in control · three steps and downloads · FAQ). Redesigned on 2026-11-13 in the app's lively style: the hero is the Bot cast, each section has one colour (`tone-*` in `styles.css`), soft cards and coloured icon tiles, and the capabilities section is a seven-card bento. Colours come only from `product-tokens.css` and the site tokens at the top of `styles.css`.
-- The homepages share `public/index.html`. At build time, `scripts/build-homepage.mjs` uses `public/translations.js` to generate the full English homepage at `/en/`. The language buttons open the corresponding URL. `display-init.js` and `display.js` apply appearance preferences.
+- The homepages share `public/index.html`. The build generates complete static pages under `/cn/` and `/en/`, including guides, downloads, privacy, and terms. The root URL redirects using the primary `Accept-Language` preference: explicitly Simplified Chinese (`zh-CN`, `zh-SG`, or `zh-Hans`) selects `/cn/`; every other preference, including Traditional Chinese or an absent header, selects `/en/`. Explicit locale URLs keep their language. Language buttons preserve the current page. Preference redirects are not cached; old Chinese page URLs permanently redirect to `/cn/` and legacy `?lang=en` legal links redirect to `/en/`.
 - `public/downloads.js`: the three download cards (desktop / phone / runner), each with one Download menu; platforms, links and test status are read from `public/releases.json`.
 - `content/guides/`: the public manual, adapted from the app's `docs/guide/`. `scripts/build-manual.mjs` resolves chapter links and uses the reviewed screenshots in `public/assets/guides/`. The build generates the bilingual pages and `sitemap.xml`. Run `npm run build` then `npm run preview` to check the output locally.
 - `public/product/`: the app front end compiled from `../PiBot` (demo data in `demo/`). Used only as the screenshot source and not deployed (the owner removed the product tour page on 2026-11-12; `/tour` redirects to the homepage with a 301).
@@ -46,6 +46,8 @@ Each key in `platforms` is one download option: `mac-x64`, `mac-arm64`, `windows
 
 Website download clicks go through `/download-click/<version>/<file>`. The Worker records a daily count for the product, version, platform and architecture before redirecting to the R2 download. Use an existing stats token to read `GET /_stats?kind=downloads` for totals by version and daily details. The optional `from=YYYY-MM-DD` parameter narrows the retained 400-day window. Direct file requests and app updates do not count as website clicks.
 
+The home page and download page show cumulative website download-button clicks across all versions. `GET /api/download-stats` (also `HEAD`) returns the UTC reporting period, total, product and platform/architecture totals, and any unclassified count. The download counter seeds a bounded lifetime aggregate from existing daily records once, then updates it atomically with each click; daily retention cannot reduce this cumulative total. History already deleted before this migration cannot be recovered. Responses are cached for 5 minutes. No token, daily rows, update checks or historical release identifiers are exposed. Unavailable statistics show a message rather than a misleading zero; download links remain usable. The authenticated `/_stats` interface and its retained daily records are unchanged.
+
 ### To do
 
 - The main project's welcome copy `welcome.apps.body` is outdated; run `npm run sync:product` after it changes.
@@ -55,7 +57,7 @@ Website download clicks go through `/download-click/<version>/<file>`. The Worke
 Pi Bot 的中英文官网：https://pibot.space
 
 - `public/index.html`：首页，六段（首屏 · 跨设备 · 能做什么 · 权限与隐私 · 三步上手与下载 · 常见问题）。2026-11-13 按 App 的活泼风格改版：首屏是 Bot 阵容，每段一个颜色（`styles.css` 的 `tone-*`），软卡片、彩色图标块，能力区是七张卡的 bento。颜色只用 `product-tokens.css` 和 `styles.css` 顶部的站点 token。
-- 中英文首页共用 `public/index.html`。构建时由 `scripts/build-homepage.mjs` 读取 `public/translations.js` 生成完整的英文首页 `/en/`，语言按钮打开对应网址。外观设置由 `display-init.js` 和 `display.js` 处理。
+- 中英文首页共用 `public/index.html`。构建生成 `/cn/` 和 `/en/` 下的完整静态页面，包括指南、下载、隐私政策和服务条款。根地址根据浏览器 `Accept-Language` 首选语言跳转：只有明确的简体中文（`zh-CN`、`zh-SG`、`zh-Hans`）进入 `/cn/`，其他语言（含繁体中文）或没有语言请求头均默认 `/en/`。直接访问语言地址不会再自动切换；语言按钮保留当前页面。自动跳转不缓存，旧中文页面永久跳转到 `/cn/`，旧法律页面 `?lang=en` 链接转到 `/en/`。
 - `public/downloads.js`：下载区三张卡（桌面 / 手机 / 执行端），各一个「下载」菜单；平台、链接和测试状态都读 `public/releases.json`。
 - `content/guides/`：从 App 的 `docs/guide/` 整理出的官网手册。`scripts/build-manual.mjs` 转换章节链接，并使用 `public/assets/guides/` 中已检查的截图。构建时生成中英文页面与 `sitemap.xml`，本地可先运行 `npm run build`，再运行 `npm run preview` 检查。
 - `public/product/`：编译自 `../PiBot` 的 App 前端（演示数据，`demo/`），只用来截首页截图，不部署（负责人 2026-11-12 去掉了产品导览页，`/tour` 301 回首页）。
@@ -94,6 +96,8 @@ App 更新后的顺序：`npm run sync:product` → `npm run capture:shots` → 
 
 官网点击下载时先经过 `/download-click/<版本>/<文件>`。Worker 按日期记录产品、版本、平台和架构的汇总计数，再跳转到 R2 下载地址。使用现有统计令牌访问 `GET /_stats?kind=downloads`，可以查看各版本合计和每日明细。默认提供保留期内的 400 天数据，可用 `from=YYYY-MM-DD` 缩小范围。直接访问文件和应用内更新不计入官网点击。
 
+首页下载区和下载页公开展示全部版本累计下载按钮点击。`GET /api/download-stats`（支持 `HEAD`）返回 UTC 统计区间、总量、产品、平台/架构汇总与未分类计数。下载计数器首次从已有每日记录初始化独立累计表，此后每次点击与每日计数在同一事务内更新；每日明细过期清理不会减少累计值。迁移前已经删除的历史无法恢复。响应缓存 5 分钟，不公开令牌、每日记录、更新检查或历史版本标识。计数不可用时显示暂不可用，不显示假零，也不影响下载。原 `/_stats` 令牌鉴权及每日明细保持不变。
+
 ### 待处理
 
 - 主项目欢迎页 `welcome.apps.body` 的文案已过时，改完后运行 `npm run sync:product`。
@@ -120,3 +124,26 @@ npm run deploy
 `/gmail/start` accepts an app-generated PKCE/state and a bounded random-port loopback URL. Google returns only to the HTTPS callback above. A short-lived Durable Object record is consumed once; the callback exchanges the code and returns an AES-GCM ticket encrypted with a key derived from the private verifier. The service uses `openid email` to identify the account without adding mailbox read access for send-only connections. `/gmail/refresh` exchanges a locally stored refresh token for an access token; neither is persisted by the Worker.
 
 本服务同时承载官网和授权域名。Google OAuth 客户端必须是「Web 应用」，授权重定向 URI 必须逐字匹配上面的 HTTPS 地址（无尾斜杠）。Google 控制台的品牌页面分别填写官网首页、隐私政策和服务条款地址；启用 Gmail API，测试模式下将测试账号加入 Test users。凭据只存 Worker secrets，不写进仓库、桌面安装包、日志或浏览器。更新本网站不会上传新的桌面安装包。
+
+
+Guide search summaries live in `scripts/guide-discovery.mjs`: each chapter must have a reviewed Chinese and English summary. The same text appears in the visible lead, meta description, social preview and page structured data. The build also links related chapters in the same manual category. Keep these summaries aligned with the manual; do not invent release dates, reviews, or supported features for search markup. Existing www-to-apex redirects are managed outside this Worker; `/product/` remains an excluded screenshot source and returns 404 on the public site.
+
+教程搜索摘要维护在 `scripts/guide-discovery.mjs`，每章需同时提供中英文摘要；正文导读、meta description、分享预览和页面结构化数据使用同一份内容。构建时补齐同分类相关教程链接。摘要须与手册一致，不为搜索标记虚构发布日期、评价或功能。现有 www 到主域名跳转由 Worker 外的规则管理；`/product/` 仅作截图来源，不发布到官网，公开访问继续返回 404。
+
+
+### Search discovery / 搜索发现
+
+- `/about/` and `/en/about/` identify the product by its official domain, release and documentation links; `/releases/` and `/en/releases/` use the current public `releases.json` version. No release dates or desktop source repository URLs are invented.
+- Bing ownership is verified with the public `msvalidate.01` homepage tag. Keep this tag after verification.
+- `pnpm deploy` builds, deploys, then sends added/changed/deleted sitemap URLs to IndexNow. The notification only includes public page URLs and domain ownership proof; it sends no visitor, app, chat or download-count data. IndexNow receipt does not mean indexing or ranking success.
+- On a fresh checkout, run the build and `node scripts/indexnow.mjs --initialize` **before editing** to establish `.review/indexnow-state.json`. It is local deployment state, ignored by Git. Existing state is never overwritten by initialization. `pnpm search:preview` lists changes without a network request; `pnpm search:notify` retries a failed notification. A failed submission preserves the baseline for retry; ordinary builds/previews never submit URLs.
+- `/about/`、`/en/about/` 用官方域名、公开版本和文档链接说明产品身份；`/releases/`、`/en/releases/` 与 `releases.json` 保持一致，不虚构发布日期或桌面应用源码仓库。
+- Bing 通过首页公开的 `msvalidate.01` 标记验证所有权，验证后不要移除。
+- `pnpm deploy` 构建并部署成功后，向 IndexNow 通知 sitemap 中新增、修改或删除的公开网址。只发送网址与域名验证信息，不发送访客、应用、聊天或下载统计数据；收到通知不等于收录或排名提升。
+- 新检出工作区应在修改前先构建并执行 `node scripts/indexnow.mjs --initialize`，建立 Git 忽略的本地基线；`pnpm search:preview` 只预览变化，`pnpm search:notify` 可重试失败通知。失败不推进基线，普通构建和预览不发通知。
+
+### Git-backed Cloudflare deployment / Git 仓库自动部署
+
+The website repository is migrating to `w01fb0ss/pibot-web`. Connect the existing Cloudflare Worker `pibot` to that repository, production branch `main`, root directory `/`, build command `pnpm build`, and deploy command `pnpm exec wrangler deploy`. Use Node 22 or newer and pnpm 12.14.0. Keep the existing Worker, R2 bucket, Durable Object bindings and production secrets; creating a replacement Worker would disconnect the existing counters. The build does not require the Pi Bot application checkout or local screenshot-source files.
+
+官网仓库迁到 `w01fb0ss/pibot-web`。在现有 Cloudflare Worker `pibot` 的 Builds 中连接该仓库：生产分支 `main`、根目录 `/`、构建命令 `pnpm build`、发布命令 `pnpm exec wrangler deploy`。使用 Node 22 或更新版本及 pnpm 12.14.0，保留现有 Worker、R2、Durable Object 绑定和生产密钥；不要新建替代 Worker，以免统计与已有数据断开。云端构建不需要 Pi Bot 应用仓库或本机截图源文件。

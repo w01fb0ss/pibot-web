@@ -73,3 +73,8 @@
 }
 @media(max-width:680px){.guide-list{grid-template-columns:1fr}}
 @media(max-width:480px){.reading-main{width:calc(100% - 32px);padding-bottom:56px}}
+
+.guide-related{margin-top:40px;padding:24px;border:1px solid var(--b1);border-radius:var(--radius-row);background:var(--card)}
+.guide-related h2{margin-top:0;font-size:20px}
+.guide-related ul{padding-inline-start:20px;margin-block:14px}
+.guide-related li+li{margin-top:10px}

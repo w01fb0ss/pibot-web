@@ -7,7 +7,7 @@
   // Gmail OAuth is intentionally a separate host so browser consent URLs are distinguishable
   // from the public site; DNS/custom-domain setup is a deployment prerequisite.
   "routes": [{ "pattern": "pibot.space", "custom_domain": true }, { "pattern": "auth.pibot.space", "custom_domain": true }],
-  "assets": { "directory": "./dist", "binding": "ASSETS", "run_worker_first": ["/updates/*", "/gmail/*", "/downloads/*", "/download-click/*", "/_stats"] },
+  "assets": { "directory": "./dist", "binding": "ASSETS", "run_worker_first": ["/", "/index.html", "/cn", "/en", "/guides", "/guides/*", "/download", "/download/*", "/about", "/about/*", "/releases", "/releases/*", "/privacy", "/privacy/*", "/terms", "/terms/*", "/updates/*", "/gmail/*", "/downloads/*", "/download-click/*", "/_stats", "/api/download-stats"] },
   // Aggregate update checks and download clicks by day, version and platform, without identifiers.
   "durable_objects": { "bindings": [
     { "name": "COUNTER", "class_name": "Counter" },
