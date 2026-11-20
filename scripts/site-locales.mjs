@@ -10,7 +10,7 @@ export function siteLink(value, lang) {
   let url;
   try { url = new URL(value, origin); } catch { return value; }
   if (url.origin !== origin || /^\/(?:cn|en)(?:\/|$)/.test(url.pathname)) return value;
-  if (url.pathname !== '/' && !/^\/(?:guides|download|about|releases|privacy|terms)(?:\/|$)/.test(url.pathname)) return value;
+  if (url.pathname !== '/' && !/^\/(?:guides|download|about|releases|roles|privacy|terms)(?:\/|$)/.test(url.pathname)) return value;
   const selected = url.searchParams.get('lang') === 'en' ? 'en' : lang;
   url.pathname = sitePath(url.pathname, selected);
   if (!url.pathname.endsWith('/') && !/\.[^/]+$/.test(url.pathname)) url.pathname += '/';

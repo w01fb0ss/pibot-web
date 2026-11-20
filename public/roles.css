@@ -1,0 +1,272 @@
+/* roles.pibot.space on top of the website's own stylesheets (product-tokens, styles, reading). */
+.roles-main {
+  width: min(1160px, calc(100% - 48px));
+}
+.tone-ink { --tone: var(--avatar-ink); --tone-ink: var(--ink-ink); }
+.tone-gray { --tone: var(--avatar-gray); --tone-ink: var(--ink-gray); }
+.tone-brown { --tone: var(--avatar-brown); --tone-ink: var(--ink-brown); }
+.roles-intro h1 {
+  font-size: clamp(36px, 6vw, 64px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+.roles-intro .reading-lead {
+  margin-top: 16px;
+}
+.roles-tools {
+  position: sticky;
+  top: 72px;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: center;
+  margin: 32px 0 8px;
+  padding: 12px 0;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+}
+.roles-tools input {
+  flex: 1 1 260px;
+  min-width: 0;
+  font: inherit;
+  padding: 12px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--b2);
+  background: var(--card);
+  color: var(--text);
+  box-shadow: var(--site-shadow-card);
+}
+.roles-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.roles-filters button {
+  font: inherit;
+  font-size: 13.5px;
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--b2);
+  background: var(--card);
+  color: var(--text2);
+  cursor: pointer;
+}
+.roles-filters button[aria-pressed="true"] {
+  background: var(--text);
+  color: var(--bg);
+  border-color: transparent;
+}
+.roles-block {
+  margin-top: 40px;
+}
+.roles-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  margin-bottom: 18px;
+}
+.roles-heading h2 {
+  font-size: clamp(24px, 3vw, 32px);
+}
+.roles-heading p {
+  margin: 0;
+  color: var(--text2);
+}
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+  gap: 18px;
+}
+.role-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  border-radius: 22px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--tone) 16%, var(--card)), var(--card) 70%);
+  box-shadow: var(--site-shadow-card);
+  color: var(--text);
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.role-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--site-shadow-lg);
+}
+.role-card[hidden],
+.roles-block[hidden] {
+  display: none !important;
+}
+.role-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.role-card strong {
+  font-size: 19px;
+}
+.role-sub {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--tone-ink, var(--text2));
+}
+.role-desc {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text2);
+}
+.role-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+  font-size: 12.5px;
+  color: var(--text2);
+}
+.role-tags span {
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--tone) 12%, transparent);
+}
+.role-faces {
+  display: flex;
+}
+.role-faces img {
+  filter: drop-shadow(0 6px 10px color-mix(in srgb, var(--tone) 35%, transparent));
+}
+.role-faces.stack img + img {
+  margin-left: -12px;
+}
+.role-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+  margin-top: 8px;
+  padding: 32px;
+  border-radius: 28px;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--tone) 18%, var(--card)), var(--card) 75%);
+  box-shadow: var(--site-shadow-card);
+}
+.role-hero > div {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+.role-hero .eyebrow {
+  margin-bottom: 6px;
+}
+.role-hero h1 {
+  font-size: clamp(34px, 5vw, 54px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.role-hero .reading-lead {
+  margin-top: 10px;
+}
+.role-hero .role-faces.stack img + img {
+  margin-left: -18px;
+}
+.role-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.role-note {
+  margin-top: 10px;
+  font-size: 13.5px;
+  color: var(--text2);
+}
+.role-note a {
+  color: var(--ink-violet);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.reading-section .role-list,
+.reading-section .role-prompts,
+.reading-section .role-members {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.role-list li,
+.role-prompts li,
+.role-members li {
+  margin: 0 !important;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: var(--site-shadow-card);
+}
+.role-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.role-list li > span {
+  color: var(--text2);
+  font-size: 14.5px;
+}
+.role-perms li {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.role-perms li > span:first-child {
+  color: var(--text);
+}
+.level-always { color: var(--ink-green) !important; font-weight: 600; }
+.level-ask { color: var(--ink-blue) !important; font-weight: 600; }
+.level-never { color: var(--danger) !important; font-weight: 600; }
+.role-prompts li::before {
+  content: "“";
+  color: var(--ink-violet);
+  font-weight: 700;
+  margin-right: 4px;
+}
+.role-members a {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  color: inherit;
+  text-decoration: none;
+}
+.role-members a > span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.role-members em {
+  font-style: normal;
+  color: var(--ink-violet);
+}
+.role-pack {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 18px;
+  margin: 0;
+  font-size: 14.5px;
+}
+.role-pack dt {
+  color: var(--text2);
+}
+.role-pack dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.role-pack code {
+  font-size: 12.5px;
+}
+/* The ink avatar would vanish on a dark page; a faint rim keeps every face visible. */
+[data-theme="dark"] img[src*="avatars/"] {
+  filter: drop-shadow(0 0 1.5px var(--b3));
+}
+/* reading.css underlines links inside sections; member cards are whole-card links. */
+.reading-section .role-members li > a {
+  color: inherit;
+  text-decoration: none;
+}

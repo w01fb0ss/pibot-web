@@ -27,7 +27,7 @@ export function languageRedirect(request) {
   if (/^\/(?:cn|en)$/.test(url.pathname)) {
     return new Response(null, { status: 301, headers: { Location: url.pathname + '/' + url.search } });
   }
-  if (/^\/(?:guides|download|about|releases|privacy|terms)(?:\/|$)/.test(url.pathname)) {
+  if (/^\/(?:guides|download|about|releases|roles|privacy|terms)(?:\/|$)/.test(url.pathname)) {
     const language = url.searchParams.get('lang') === 'en' ? 'en' : 'cn';
     url.pathname = `/${language}${url.pathname.replace(/\/index\.html$/, '/')}`;
     if (!url.pathname.endsWith('/') && !/\.[^/]+$/.test(url.pathname)) url.pathname += '/';
