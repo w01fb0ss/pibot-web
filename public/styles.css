@@ -407,3 +407,10 @@ dialog .dialog-footnote{font-size:12px;margin-top:20px}
   .cap-card:hover,.button-brand:hover{transform:none}
 }
 .release-history-link{margin-top:10px}.release-history-link a{color:var(--ink-violet);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+/* Header link to the public repository (shown after the code went open source). */
+.github-link{display:inline-grid;place-items:center;flex:none;width:36px;height:36px;border-radius:999px;color:var(--text);opacity:.82;transition:opacity .15s,background .15s}
+.github-link:hover{opacity:1;background:var(--tert,rgba(0,0,0,.06))}
+.github-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (max-width:760px){.github-link{display:none}}
+/* Electron 44 runs on macOS 13 and later; say so before someone downloads. */
+.system-req{margin:10px 0 0;font-size:13px;color:var(--text2);line-height:1.5}

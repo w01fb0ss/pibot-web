@@ -130,7 +130,7 @@ export const english = {
 "现在可以下载 Pi Bot 吗？":"Can I download Pi Bot now?",
 "macOS · Apple 芯片":"macOS · Apple silicon",
 "macOS · Intel 芯片":"macOS · Intel",
-"macOS 首次打开说明":"Opening Pi Bot for the first time on macOS",
+"需要 macOS 13 Ventura 或更高版本 · Windows 10 / 11 · 64 位 Linux":"Requires macOS 13 Ventura or later · Windows 10 / 11 · 64-bit Linux","macOS 首次打开说明":"Opening Pi Bot for the first time on macOS",
 "Pi Bot v0.0.2 的 Intel 和 Apple 芯片版均未经过 Apple 公证。首次打开时，macOS 可能提示 Apple 无法验证「Pi Bot」是否包含恶意软件。":"The Intel and Apple silicon builds of Pi Bot v0.0.2 have not been notarized by Apple. On first launch, macOS may warn that Apple could not verify Pi Bot is free of malware.",
 "如果你确认安装包来自 Pi Bot 官网，并决定继续，可以在尝试打开后前往「系统设置 → 隐私与安全性」，找到 Pi Bot 的提示并点「仍要打开」。":"If you downloaded the installer from the official Pi Bot website and choose to proceed, try opening the app first. Then go to System Settings → Privacy & Security, find the Pi Bot notice, and click Open Anyway.",
 "Apple 官方说明":"Apple Support instructions",
