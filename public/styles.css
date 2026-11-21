@@ -96,7 +96,9 @@ button:active:not(:disabled),.button:active{transform:translateY(1px)}
 figcaption{margin-top:14px;font-size:12.5px;color:var(--text2);text-align:center}
 
 /* ---- Sections ---- */
-.flow-section,.capabilities-section,.control-section,.download-section,.faq-section{padding-top:112px}
+.video-section,.flow-section,.capabilities-section,.control-section,.download-section,.faq-section{padding-top:112px}
+.video-frame{margin:0 auto;max-width:1080px}
+.video-frame video{display:block;width:100%;height:auto;aspect-ratio:16/9;border-radius:24px;box-shadow:var(--site-shadow-lg);background:var(--card)}
 .section-heading{margin-bottom:40px}
 .section-heading>p{margin-top:16px;max-width:640px}
 .section-heading.split{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap}
@@ -364,7 +366,8 @@ dialog .dialog-footnote{font-size:12px;margin-top:20px}
   .hero-shot{margin-top:32px}
   .hero-shot img{border-radius:14px}
   .desktop-br{display:none}
-  .flow-section,.capabilities-section,.control-section,.download-section,.faq-section{padding-top:80px}
+  .video-section,.flow-section,.capabilities-section,.control-section,.download-section,.faq-section{padding-top:80px}
+  .video-frame video{border-radius:14px}
   .section-heading{margin-bottom:28px}
   .eyebrow{font-size:12px}
   h3{font-size:17px}

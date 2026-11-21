@@ -1,6 +1,10 @@
 // Source copy is Chinese. Keeping text-node translations preserves links, icons and markup.
 // A trailing space keeps English sentences apart where a <br class="desktop-br"> is hidden on phones.
 export const english = {
+"60 秒看 Pi Bot 怎么干活":"See Pi Bot at work in 60 seconds",
+"真实 App 录屏：群组自己推进，文件送到你手里，每一步都能核对，手机上也能看进度。":"A real screen recording: groups move on their own, files reach you, every step can be checked, and your phone follows along.",
+"App 实际界面录屏 · 示例数据 · 等待的部分已加速":"Real app recording · sample data · waiting parts sped up",
+"Pi Bot 60 秒介绍视频":"Pi Bot in 60 seconds (video)",
 "关于 Pi Bot":"About Pi Bot",
 "公开版本与发布说明":"Public releases and release notes",
 "跨设备使用指南":"Cross-device guides",
