@@ -1,6 +1,78 @@
 {
   "releases": [
     {
+      "version": "0.0.3",
+      "date": "2026-11-22",
+      "kind": "feature",
+      "components": {
+        "desktop": "0.0.3",
+        "android": "0.0.3",
+        "runner": "0.0.1"
+      },
+      "updated": [
+        "desktop",
+        "android"
+      ],
+      "from": {
+        "version": "0.0.2",
+        "inApp": true,
+        "downloadMB": {
+          "windows": 94,
+          "mac": 320,
+          "linux": null
+        },
+        "fullMB": {
+          "windows": 256
+        }
+      },
+      "notes": {
+        "zh": [
+          "开源：Pi Bot 代码以 Apache-2.0 公开",
+          "群组自己推进：统筹拆分任务，开发、测试、审查依次接力，没通过就由程序派回去修；所有群组都适用",
+          "Bot 做出来的文件一定送到对话里：不用 Bot 自己发，程序核对这一轮新建和改动的文件后附上；超过 10 个时注明其余在哪个文件夹；运行失败或停止也会附上已写的文件",
+          "群组可以随时暂停和继续：输入框上方的状态条显示正在做哪一步，点「暂停」停下、进度保留，点「继续」接着做，Bot 会知道暂停前做到哪、期间哪些文件被改过，被打断的命令会重新运行；也可以直接说「先停一下」「接着做吧」。暂停时照常聊天，手机上也能暂停和继续",
+          "脚本按内容判断：读过脚本没有危险操作就直接运行，有风险才弹审批；例行任务可以预先授权一个确定内容的脚本，内容改了会再问",
+          "Git 随时可用：Windows 安装包自带 Git；macOS、Linux 没装 Git 时，在用到的那一刻提示你，确认后装到系统里。没装 Git 时，以及在 Windows、Linux 上，群组的并行步骤改为轮流做，不会出错；群组改名也不再打断正在做的步骤",
+          "操作电脑更可靠：需要切到前台的操作会先弹确认卡（之前会被直接当成跳过）；能用 Finder 等系统应用的标识找到应用；参数写错时说清楚是哪一项；窗口在别的桌面或全屏应用后面时提示你切过去",
+          "欢迎页可以设置网络代理：所有在线模型方式都能就地配置，自动带出这台电脑正在用的代理；网络连不上时直接给出入口",
+          "测试 Google 等厂商的 Key 时，默认模型下线了会自动换下一个；已下线的模型不再出现在列表里；ChatGPT 登录和 OpenAI Key 新增 GPT-6.2 Astra、GPT-6.2 Sol",
+          "角色库：在官网 pibot.space/cn/roles/ 浏览全部角色和群组模板，一键在 Pi Bot 中打开；云端角色和本地角色同样展示；安装群组时自动带上成员，已有同角色的 Bot 会直接复用",
+          "安装包内置常用角色（含小媒、小演、小匠、研究小组），其余从角色库一键添加",
+          "任务面板改版：时间线展示每一步，审批命令清晰可读",
+          "外部 Agent（Codex、Claude Code 等）登录失效或额度不足会提前显示",
+          "手机：群聊里能看任务进度、重试卡住的步骤；群成员的审批直接出现在群聊里；新增「待办」日历，与电脑同步，离线也能改",
+          "例行任务卡片布局整齐；工作收据里附到对话的文件不再算作「对外发送」；退出不再卡住；语言和外观切换立即生效；新建例行任务不再把聊天切走",
+          "修复：权限检查超时不再显示为「拒绝」；慢模型不再被当成网络故障；电脑上没有 git 时改动列表不再显示「…」",
+          "Bot 浏览器默认使用内置浏览器（浏览器插件上架商店后可改用你自己的浏览器）；提示词放在代码旁的 Markdown 文件里，方便阅读和改进（内容和效果不变）",
+          "角色库新增「主动助理」小望：定时帮你看日程和待办，只有需要你处理的事才提醒（邮件连接在后续版本提供）",
+          "修复：中文标点结尾的粗体能正常显示；脚本删除子文件夹不再被误报为「删除整个工作位置」；测试失败后能自动派回修复，不再卡住；成员发的文件能出现在群任务结果里",
+          "自定义供应商兼容更多网关：系统提示词改用 system 角色发出，工具参数不再带部分网关不认的正则写法；硅基流动、AMD、书生等 OpenAI 兼容接口可以正常对话"
+        ],
+        "en": [
+          "Open source: Pi Bot's code is public under Apache-2.0",
+          "Groups move their own work forward: the coordinator splits the task, then implement, test and review hand off in turn, and a failed check is sent back to be fixed by the program; this applies to every group",
+          "Files a Bot makes always reach the chat: the program checks what this turn created or changed and attaches it, without relying on the Bot; past ten files a note says where the rest are; a run that fails or is stopped still delivers the files it wrote",
+          "Pause and continue a group any time: a bar above the input shows the running step. Continue picks up where it stopped; the Bot is told what it had done, which files changed meanwhile, and reruns a command the pause cut off. Or just say \"hold on\" / \"go on\". Works on the phone too",
+          "Scripts are judged by what they contain: a script that only reads runs without asking, a risky one asks; a routine can pre-authorize one exact script and asks again if it changes",
+          "Git is always there: the Windows installer includes it; on macOS and Linux, Pi Bot offers to install it system-wide when a feature needs it. Without Git, and on Windows and Linux, parallel group steps take turns instead of failing; renaming a group no longer interrupts a running step",
+          "Operating the computer is more reliable: a foreground step asks you first (it used to count as skipped); system apps like Finder are found by bundle ID; a wrong parameter is named; a window on another desktop or behind a full-screen app tells you to switch",
+          "Set up a network proxy from the welcome screen on every online model route, prefilled with the proxy this computer uses; a network failure offers it right there",
+          "Testing a Google (or other) key moves on when the default model has been retired; retired models are no longer listed; GPT-6.2 Astra and GPT-6.2 Sol are available with ChatGPT sign-in and OpenAI keys",
+          "Role library: browse every role and group template at pibot.space/en/roles/ and open one in Pi Bot; cloud roles look like local ones; installing a group brings its members and reuses Bots you already have from the same roles",
+          "The installer ships the common roles (including Social media, Presentations, Plugin Builder and the research group); the rest are one click away in the role library",
+          "Redesigned task panel: a timeline of each step and readable approval commands",
+          "External agents (Codex, Claude Code and others) show sign-in or plan problems before they fail",
+          "Phone: see a group's task progress and retry a stuck step; group members' approvals appear in the group chat; a new To-dos calendar stays in sync with the computer and can be edited offline",
+          "Routine cards line up; files attached to the chat no longer count as \"sent out\" in work receipts; Quitting no longer hangs; language and appearance apply at once; creating a routine no longer pulls the chat away",
+          "Fixed: a timed-out permission check is no longer shown as a refusal; a slow model is no longer reported as a network failure; changed-file rows no longer end in \"…\" on computers without git",
+          "Bots use the built-in Bot browser by default (your own browser becomes an option once the extension is in the stores); prompts live in Markdown files next to the code, so they are easy to read and improve (content and behaviour unchanged)",
+          "New in the role library: Wren, a proactive assistant that checks your calendar and to-dos on a schedule and only alerts you when something needs you (mail comes in a later version)",
+          "Fixed: bold text ending in Chinese punctuation renders; deleting a subfolder in a script is no longer reported as deleting the whole workplace; a failed test is sent back for a fix instead of stalling; files a member sends reach the group task result",
+          "Custom providers work with more gateways: the system prompt goes out as role system, and tool schemas drop a regex syntax some gateways reject, so SiliconFlow, AMD, InternLM and similar OpenAI-compatible endpoints can chat"
+        ]
+      }
+    },
+    {
       "version": "0.0.2",
       "date": "2026-11-19",
       "kind": "fix",
