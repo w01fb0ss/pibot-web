@@ -2,6 +2,8 @@
 
 支持 [Agent Client Protocol（ACP）](https://agentclientprotocol.com) 的编辑器（如 Zed）可以直接用 Pi Bot 的 Bot 干活：编辑器里发的话由 Pi Bot 的 Bot 处理，命令执行和审批仍走 Pi Bot 在这台电脑上的权限。
 
+反过来，把电脑上的 Codex、Claude Agent 等编程助手作为 Bot 加进 Pi Bot，见 [2 · Bot 与角色](02-bots-and-roles.md#外部-agent)。
+
 ## 连接
 
 1. 先打开桌面 Pi Bot（ACP 连接的是正在运行的应用，不会另开一个）。

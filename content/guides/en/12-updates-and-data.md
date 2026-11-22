@@ -10,7 +10,7 @@ On this page:
 
 ## Check for and install updates
 
-After it starts and every few hours while running, Pi Bot asks pibot.space for the latest version. Only version information is read; no identity or usage data is sent. Downloading and installing always wait for you.
+After it starts and every few hours while running, Pi Bot asks pibot.space for the latest version. Only version information is read; the request carries just the app version and platform, with no identifier or usage data. Downloading and installing always wait for you.
 
 To check yourself: your avatar › **Check for updates**.
 

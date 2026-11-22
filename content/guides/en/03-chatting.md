@@ -55,6 +55,7 @@ Execute / Plan only shares a row with the working folder: in a new topic you can
 - **Step rows**: for example "6 steps · Edit file, Run command, Use browser ×4"; expand to see each step.
 - **Approval cards**: actions that need your consent show up as cards in the chat (see [5 · Approvals and permissions](05-approvals-and-permissions.md)).
 - **Changed files**: "Changed 3 files this turn"; **View** opens the changes panel (see [4 · Working folders and changes](04-folders-and-changes.md)).
+- **Attached files**: documents, pictures, sheets, decks, web pages, recordings and archives the Bot created this turn, and files it names in its reply or puts in the output folder, are attached under the reply by the program, without relying on the Bot to send them. A reply carries up to 10 files; a note says which folder holds the rest. A run that fails or is stopped still attaches the files it wrote. Edited source code isn't attached file by file; see the changed files instead.
 - **Web results**: when a development task produces a web page, a local HTML file or a web service, the Bot opens it in its own browser to check it; visual results get a screenshot self-check, and obvious layout errors are fixed before hand-off.
 
 ## Work receipts

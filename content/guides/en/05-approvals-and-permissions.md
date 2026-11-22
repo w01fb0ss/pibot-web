@@ -11,6 +11,8 @@ On this page:
 - [Command isolation (sandbox)](#command-isolation-sandbox)
 - [Computer use](#computer-use)
 - [Activity records](#activity-records)
+- [Sandbox doctor](#sandbox-doctor)
+- [Example: approve a command once for this project](#example-approve-a-command-once-for-this-project)
 
 ## Permission settings
 
@@ -26,7 +28,7 @@ Each item has three levels: **Never**, **Ask**, **Always** (some have only the f
 | | Read files | Files outside the work location ask first |
 | | List folders | See what is in a folder, find files, search file contents |
 | | Write files | Writes outside the work location are confirmed each time |
-| Network | Visit websites | Each website asks the first time |
+| Network | Visit websites | Allowed by default; the first automatic sign-in and the first form submission on each site still ask |
 | | Commands run by bots can access the network | When off, commands can only reach the Allowed websites list |
 | Use computer | Use computer | Each task asks with an approval card first |
 | Connections and sending | Use plugins | Read-only tools follow this level; writes go through a draft |
@@ -63,13 +65,15 @@ Buttons:
 
 ![Website approval card](../images/en/approval-web.png)
 
+**Scripts are judged by their content**: when a Bot wants to run a script (for example `python tidy.py`), Pi Bot reads the script first. A script that only reads and does nothing risky runs without a card; a risky one asks, and the card says "A script checked by its content (asks again if it changes)". If the script changes after the check, the command isn't run.
+
 If a card in a chat isn't answered within 10 minutes, the task pauses and waits for you. Approvals from routines go to the Inbox and are denied automatically after 24 hours. A message you send while an approval is pending is sent as a new request once the approval is handled.
 
 ## Remembered permissions
 
-![Open the Bot’s Permissions tab before managing saved approvals](../images/en/bot-permissions.png)
+Permissions granted with **Always allow** are stored on that Bot; review and revoke them on the Permissions tab of its profile. Routines also have **Preauthorizations for this routine**, which apply only to that routine (see [7 · Routines and to-dos](07-routines-and-todos.md#preauthorizations-and-how-it-runs)).
 
-Permissions granted with **Always allow** are stored on that Bot; review and revoke them on the Permissions tab of its profile. Routines also have **Preauthorizations for this routine**, which apply only to that routine (see [7 · Routines and to-dos](07-routines-and-todos.md)).
+![Open the Bot’s Permissions tab before managing saved approvals](../images/en/bot-permissions.png)
 
 ## YOLO mode
 
@@ -84,8 +88,6 @@ Turn on **YOLO mode** from "…" at the top right of a chat. Actions YOLO can ap
 
 ## Command isolation (sandbox)
 
-![Advanced permissions entry; the platform-specific sandbox behavior is described below](../images/en/settings-permissions-3.png)
-
 Commands Bots run are isolated by default: they can write only the working folders, and network access is limited by the Allowed websites list.
 
 - **macOS**: uses the system's built-in sandbox; nothing to install.
@@ -96,7 +98,7 @@ When the sandbox blocks a command, the Bot explains why and can ask you to confi
 
 ## Computer use
 
-Bots can operate apps on your computer the way a person does (press buttons, fill in fields, take screenshots). Each task asks with an approval card first. The settings are in Settings › Computer use:
+Bots can operate apps on your computer the way a person does (press buttons, fill in fields, take screenshots). Each task asks with an approval card first, where you tick the apps it may use. **Ask me before taking over the foreground** is ticked by default: a step that needs the foreground and moves your mouse first shows a **Foreground confirmation** card, where you choose **Allow** or **Skip this step**. If the window is on another desktop or behind a full-screen app, the Bot tells you to switch to it. The settings are in Settings › Computer use:
 
 ![Computer use](../images/en/settings-computer-use-1.png)
 

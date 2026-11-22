@@ -11,6 +11,7 @@ On this page:
 - [Local models and custom gateways](#local-models-and-custom-gateways)
 - [Web search](#web-search)
 - [A different model per Bot](#a-different-model-per-bot)
+- [Troubleshoot a model connection](#troubleshoot-a-model-connection)
 
 ## Default and auxiliary models
 
@@ -26,7 +27,7 @@ Pi Bot has dozens of built-in providers, grouped into Popular, Gateways, Cloud, 
 
 1. Under **Add a provider**, click a provider, for example OpenAI.
 2. Paste the key into **API key**.
-3. Click **Save & test**. Once the test passes, pick one of its models as the default model, or open its model list.
+3. Click **Save & test**. Once the test passes, pick one of its models as the default model, or open its model list. Models the provider has retired are not listed; if the default pick has been retired (for example when testing a Google key), the test moves on to the next available model.
 
 ![OpenAI](../images/en/provider-openai.png)
 
@@ -38,18 +39,19 @@ Cloud providers (Amazon Bedrock, Azure, Google Vertex AI, Cloudflare) use cloud 
 
 ![The ChatGPT plan selected in the welcome flow](../images/en/welcome-model-chatgpt.png)
 
-With a ChatGPT Go, Plus, Pro or Business plan you can run OpenAI models on your plan's allowance instead of an API key. The plan and an OpenAI API key are two separate providers you can use at the same time: each Bot picks an OpenAI model or a ChatGPT plan model, and model pickers list them in two groups, **OpenAI** and **ChatGPT plan**.
+With a ChatGPT Go, Plus, Pro or Business plan you can run OpenAI models (including GPT-6.2 Astra and GPT-6.2 Sol) on your plan's allowance instead of an API key. The plan and an OpenAI API key are two separate providers you can use at the same time: each Bot picks an OpenAI model or a ChatGPT plan model, and model pickers list them in two groups, **OpenAI** and **ChatGPT plan**.
 
 1. Settings › Models & API keys, click the **Subscriptions** group and choose **ChatGPT plan**.
 2. Click **Continue with ChatGPT**.
 3. The first time, Pi Bot explains: you sign in on OpenAI's page; afterwards, conversations of Bots that use this plan go straight to OpenAI and count toward your ChatGPT plan's usage, with no other server involved; sign-in tokens are stored encrypted on this computer only. Click **Got it, continue**.
-4. Finish signing in in your browser; the browser returns to Pi Bot. If it doesn't, click **Browser didn't return to Pi Bot?**, paste the last address the browser opened, and click **Finish sign-in**.
+4. Finish signing in in your browser; the browser returns to Pi Bot. If the browser says "can't be reached" or doesn't return (for example when Pi Bot runs in a virtual machine or remote desktop), click the matching link on the page, paste the full address from the browser's address bar (it starts with `http://127.0.0.1`), and click **Finish sign-in**.
 5. The page then shows "Signed in as …", with **Manage usage** and **Disconnect**. Then pick a model from the **ChatGPT plan** group as a Bot's model.
 
 Notes:
 
 - When the plan's usage runs out you see **Usage limit reached**. Manage usage in ChatGPT, or give the Bot an OpenAI (API key) model in its settings.
 - When the sign-in expires you're asked to sign in again.
+- **Subscriptions** also has **ChatGPT (Codex sign-in)**: it also runs on your ChatGPT plan, but signs in as the Codex command-line tool, and works with any account that can use ChatGPT on the web. Try **ChatGPT plan** first; use this one if it says your account isn't eligible. It isn't OpenAI's route for third-party apps, and OpenAI may restrict it later. Its sign-in tokens are likewise stored encrypted on this computer only, and you can disconnect at any time.
 - Subscription sign-ins stay on the computer and are not synced to the phone's offline mode (see [11 · Phone app](11-phone-app.md)).
 
 ## Claude plans
@@ -67,14 +69,12 @@ The **Local** group:
 ![Local providers](../images/en/providers-local.png)
 
 - **Ollama**, **LM Studio**, **vLLM**: model servers you can run on your computer. When you use a local endpoint, requests to that model stay on that computer. Web search and connected external apps have their own data flows.
-- **Custom (gateway / proxy)**: any service with an OpenAI-compatible or other common interface. Enter a name, the address and a key (local models can leave it empty), choose the interface type, click **Fetch models** or **Add model manually** (model ID, context window, maximum output tokens, image and reasoning support), then save.
+- **Custom (gateway / proxy)**: any service with an OpenAI-compatible or other common interface (for example SiliconFlow, AMD or InternLM endpoints). Enter a name, the address and a key (local models can leave it empty), choose the interface type, click **Fetch models** or **Add model manually** (model ID, context window, maximum output tokens, image and reasoning support), then save. The system prompt goes out with the standard system role and tool parameters avoid a syntax some gateways reject, so most compatible endpoints can chat directly.
 - **Qwen API · Pay as you go**, **Z.ai API · Pay as you go**: pay-per-use endpoints.
 
-If your network needs a proxy, set it in Settings › General › Network proxy. Every model provider uses this proxy; only model servers on this computer (localhost, 127.0.0.1) connect directly. Pi Bot uses only the proxy entered here and ignores the system proxy.
+If your network needs a proxy, set it in Settings › General › Network proxy (or in the welcome flow). Every model provider uses this proxy; only model servers on this computer (localhost, 127.0.0.1) connect directly. Pi Bot uses only the proxy entered here and never uses the system proxy on its own; if this computer is already using a proxy, its address is filled in for you and takes effect once you turn on **Use proxy**.
 
 ## Web search
-
-![The web search provider section in Models & API keys](../images/en/providers-local.png)
 
 **Web search** on the same page picks the service Bots use to search the web. The selected service receives your search terms, and choosing it is your consent:
 

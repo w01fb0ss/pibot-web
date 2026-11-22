@@ -1,6 +1,6 @@
 # 15 · Self-hosting the relay
 
-> Deploying your own relay requires access to the Pi Bot source code. The steps below cover deployment and verification from source.
+> Deploying your own relay requires the Pi Bot source code (open source on [GitHub](https://github.com/w01fb0ss/PiBot)). The steps below cover deployment and verification from source.
 
 When the phone or a runner connects to your computer, they connect directly whenever they can (over the LAN or through NAT, see chapter 11); when a direct connection is not possible, traffic goes through the **relay**. The relay only forwards end-to-end encrypted data: it cannot see chats, files or approvals, and it stores no messages. The official relay `wss://relay.pibot.space` is the default. To use only your own infrastructure, deploy the relay to your own Cloudflare account.
 

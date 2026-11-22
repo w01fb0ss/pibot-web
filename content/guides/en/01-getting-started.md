@@ -14,21 +14,21 @@ On this page:
 
 | System | Package | Notes |
 |---|---|---|
-| macOS | `.dmg` (one for Apple silicon, one for Intel) | In-app updates need Pi Bot in the Applications folder |
-| Windows | `.exe` installer | 64-bit Windows |
-| Linux | `.AppImage` | Command isolation needs `bubblewrap` and `socat`; only the AppImage updates in-app |
+| macOS | `.dmg` (one for Apple silicon, one for Intel) | Requires macOS 13 Ventura or later; in-app updates need Pi Bot in the Applications folder |
+| Windows | `.exe` installer | 64-bit Windows 10 / 11 |
+| Linux | `.AppImage` (also `.tar.gz`) | Command isolation needs `bubblewrap` and `socat`; only the AppImage updates in-app |
 
 You also need a model: an API key for an online provider, a ChatGPT plan, or a model running on your computer (such as Ollama). See [9 · Models and keys](09-models-and-keys.md).
 
 ## Install
 
-Download the package for your system from [download and installation page](/en/download/).
+Download the package for your system from the [download page](https://pibot.space/en/download/).
 
 ### macOS
 
 1. Open the `.dmg` and drag **Pi Bot** into the Applications folder.
 2. Open Pi Bot from Applications or Launchpad.
-3. Pi Bot v0.0.1 has not been notarized by Apple. If macOS says it can't verify Pi Bot, first check that you downloaded it from this site. If you choose to continue, try opening it and then find Pi Bot under System Settings › Privacy & Security and click **Open Anyway**. See the [Apple Support instructions](https://support.apple.com/en-us/102445).
+3. Pi Bot has not been notarized by Apple yet. If macOS says it can't verify Pi Bot, first check that you downloaded it from the official site. If you choose to continue, try opening it once, then find Pi Bot under System Settings › Privacy & Security and click **Open Anyway**. See the [Apple Support instructions](https://support.apple.com/en-us/102445).
 
 Pi Bot normally has no Dock icon. After you close the window you find it in the menu bar (see [Tray and background](#tray-and-background)).
 
@@ -65,15 +65,15 @@ This page covers three things: a team of Bots, your data stays on your computer,
 
 "Which model should Pi use?" has four options:
 
-- **OpenRouter** (Recommended): one key for many models, with a low-cost model that handles tools already picked. Messages go to OpenRouter, then to the model's vendor. Paste your key and click **Save & test**.
+- **Recommended**: follows the language you picked. In English it is **OpenRouter**: one key for many models, with a low-cost model that handles tools already picked; messages go to OpenRouter, then to the model's vendor. In Chinese it is **DeepSeek**: the official API with DeepSeek V4.1 Flash picked; messages go straight to DeepSeek. Paste your key and click **Save & test**.
 
   ![OpenRouter](../images/en/welcome-model-openrouter.png)
 
-- **ChatGPT plan**: Select ChatGPT plan in the welcome flow, then choose Continue with ChatGPT. Sign in in your browser and return to Pi Bot to pick a model.
+- **ChatGPT plan**: use your ChatGPT plan's allowance, no API key needed. Choose **Continue with ChatGPT**, sign in in your browser and return to Pi Bot to pick a model (details in [9 · Models and keys](09-models-and-keys.md#sign-in-with-a-chatgpt-plan)).
 
   ![ChatGPT plan in the welcome flow](../images/en/welcome-model-chatgpt.png)
 
-- **Local · Ollama**: fully offline; the model runs on this computer and your conversation stays here. Install Ollama first; if it isn't detected you get a link to the installation instructions and a **Check again** button.
+- **Local · Ollama**: install and start Ollama on this computer and download a model, then return to Pi Bot and click **Check again**. Once the service is detected, choose a model and continue. The screenshot shows the page before Ollama is detected.
 
   ![Local Ollama](../images/en/welcome-model-ollama.png)
 
@@ -85,9 +85,9 @@ This page covers three things: a team of Bots, your data stays on your computer,
 
   ![Provider list](../images/en/welcome-providers.png)
 
-Keys are encrypted with this computer's system secret store and never shown again. If the matching environment variable is already set (for example `OPENROUTER_API_KEY`), the page says it was detected and offers **Import**.
+Keys are encrypted with this computer's system secret store and never shown again. If the matching environment variable is already set (for example `OPENROUTER_API_KEY` or `DEEPSEEK_API_KEY`), the page says it was detected and offers **Import**.
 
-You can also connect a [ChatGPT plan](09-models-and-keys.md#sign-in-with-a-chatgpt-plan) later in Settings → Models & API keys.
+**Network proxy**: in some regions, model services such as Google and OpenAI need a proxy. Each online route has **Need a proxy? Set up a network proxy** below it, where you enter the proxy address; if this computer is already using a proxy, it is filled in for you and takes effect once you turn on **Use proxy**. When a model can't be reached, the error offers **Set up a network proxy** right there. You can change it later in Settings › General › Network proxy (see [9 · Models and keys](09-models-and-keys.md#local-models-and-custom-gateways)).
 
 ### 3. Pick a Bot to start with
 
@@ -103,7 +103,7 @@ If you want Bots to operate apps on this computer (press buttons, take screensho
 - **Screen Recording**: screenshots, cropped to the apps you allow
 - **Automation**: lets Bots script System Events and Finder
 
-![Skip during setup if needed, then check system permissions under Computer use](../images/en/settings-computer-use-1.png)
+![System permissions](../images/en/welcome-permissions.png)
 
 If Screen Recording hasn't taken effect after you enable it, click **Restart Pi Bot**. If you don't need computer use, click **Not now**; you can turn it on later in Settings › Computer use. Windows needs no extra permission; Linux needs none on X11, and on Wayland screenshots are confirmed once per session.
 

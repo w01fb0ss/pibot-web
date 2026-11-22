@@ -7,6 +7,7 @@ On this page:
 - [Create a Bot](#create-a-bot)
 - [The Bot profile panel](#the-bot-profile-panel)
 - [Memory](#memory)
+- [External agents](#external-agents)
 - [Import and sidebar groups](#import-and-sidebar-groups)
 
 ## Create a Bot
@@ -19,14 +20,18 @@ Click "+" at the top of the sidebar and choose **New Bot** (⌘1 / Ctrl+1).
 
 ![Pick a role](../images/en/role-picker.png)
 
-"Pick a role" lists every built-in role; filter by category (Engineering, Product & design, Data & research, Content & marketing, Office & operations, General) or search. A role brings working norms, skills and default permissions. For example:
+"Pick a role" lists the roles you can use; filter by category (Engineering, Product & design, Data & research, Content & marketing, Office & operations, General) or search. A role brings working norms, skills and default permissions. All roles:
 
-- **Engineering**: Backend Developer, Frontend Developer, Full-stack Developer, Code Reviewer, DevOps / Ops, QA Engineer
-- **Product & design**: Product Manager, UI / UX Designer, Presentation Designer, Image Designer
-- **Data & research**: Researcher, Data Analyst
-- **Content & marketing**: Copywriter, Social Media Manager, Technical Writer, Translator, Video Scriptwriter
-- **Office & operations**: Personal Assistant, Project Manager, Recruiter / HR
-- **General**: General Assistant, Tutor
+- **Engineering**: Backend Developer, Frontend Developer, Full-stack Developer, Code Reviewer, DevOps / Ops, QA Engineer, Technical Writer, Plugin Builder
+- **Product & design**: Product Manager, UI / UX Designer, Image Designer
+- **Data & research**: Researcher, Data Analyst, Tutor
+- **Content & marketing**: Copywriter, Social Media Manager, Presentation Designer, Translator, Video Scriptwriter
+- **Office & operations**: Personal Assistant, Project Manager, Recruiter / HR, Proactive Assistant
+- **General**: General Assistant
+
+The installer ships the common ones (such as Full-stack Developer, QA Engineer, Code Reviewer, Researcher, Social Media Manager, Presentation Designer and Plugin Builder), which work offline. The other roles and group templates live in the **role library**: they appear next to the bundled ones and are downloaded the first time you pick them, after their official signature is checked. **Check role library** and **Refresh role library** above the list fetch the latest roles and new versions. You can also browse every role and group template in the [role library](https://pibot.space/en/roles/) on the website and click **Open in Pi Bot** to add one (needs Pi Bot 0.0.3 or later; the app asks you before adding it).
+
+The **Proactive Assistant** (Wren) checks your calendar and to-dos on the schedule you set and only alerts you when something needs you; otherwise it stays quiet. It only reads and organizes, and never replies or changes your calendar for you. A mail connection comes in a later version.
 
 The Image Designer needs a model that can generate images, set up in Settings › Models & API keys; until then it can't be created.
 
@@ -103,6 +108,14 @@ Ways to add memory:
 **When it learns something new** can be **Remember** or **Ask first**. With Ask first, the Bot asks you before it writes a memory. **Sort into place** in About you uses the model to move memories that belong to one Bot's work back to that Bot; the move proposals appear in the Inbox for you to confirm one by one.
 
 Memory is stored only on this computer and can be edited or deleted any time. Each run's work receipt lists which memories it used (see [3 · Chatting](03-chatting.md#work-receipts)).
+
+## External agents
+
+Coding agents already installed on your computer (Codex, Claude Agent, Cursor, OpenCode, or any agent that supports ACP) can join Pi Bot as Bots. In "Pick a role", choose the **External agents** category: Pi Bot checks which ones are installed (only their paths and versions; it never reads their accounts or chats). Pick one and follow **Add … as a Bot**.
+
+- It uses its own sign-in and billing; Pi Bot never reads or stores its tokens.
+- It runs in Pi Bot's sandbox and can only write to the topic's working folder. Windows has no command sandbox, so the card is marked **Runs without sandbox**.
+- Sign-in or plan problems show up early: the profile and chat show **Sign in needed** or **Plan limited** with the sign-in command to run in a terminal (**Copy command**). Fix it, then click **Check again**, instead of finding out when a run fails.
 
 ## Import and sidebar groups
 

@@ -10,6 +10,7 @@ On this page:
 - [The changes panel](#the-changes-panel)
 - [Independent review by another Bot](#independent-review-by-another-bot)
 - [Commit](#commit)
+- [Git](#git)
 - [Separate workspaces](#separate-workspaces)
 - [Where deliverables go](#where-deliverables-go)
 
@@ -101,9 +102,18 @@ Notes:
 - Push, branches and pull requests are done with Git or GitHub.
 - If a background command is still running in this folder, stop it before committing.
 
+## Git
+
+Seeing all uncommitted changes, discarding and committing, and running several group steps at the same time all need Git.
+
+- **Windows**: the installer includes Git, unpacked the first time it's needed; nothing else to install.
+- **macOS and Linux**: when the computer has no Git, a **Pi Bot needs to install Git** card appears where a feature needs it (the changes panel, parallel group steps), with why, what it does and where it goes. After you click **Install**: on macOS, Apple's Command Line Developer Tools installer opens, where you click **Install**; on Linux, the detected system package manager installs it (the card shows the exact command) and the system asks for an administrator password. Git goes to a system location every program can use. This runs outside the sandbox, only after you click **Install**, and is written to the Log.
+- **Not now** skips it: the changes panel shows only each turn's changes, and parallel group steps take turns.
+- If the install fails, the card says why; click **Try again**, or install it yourself as the card suggests and click **Check again**.
+
 ## Separate workspaces
 
-**Separate workspaces** at the top of the changes panel creates a separate workspace for a Git project, so the Bot can work there without touching the main project, and integrate the result back afterwards. Integration only takes committed work; uncommitted files in the main project or the workspace need handling first. Parallel development tasks in group chats use separate workspaces automatically (see [6 · Group chats](06-groups.md)).
+**Separate workspaces** at the top of the changes panel creates a separate workspace for a Git project, so the Bot can work there without touching the main project, and integrate the result back afterwards. Integration only takes committed work; uncommitted files in the main project or the workspace need handling first. On macOS, group development steps that run at the same time use separate workspaces automatically; on Windows and Linux, and without Git, they take turns in the group's folder instead (see [6 · Group chats](06-groups.md#tasks-panel-and-plans)).
 
 ## Where deliverables go
 

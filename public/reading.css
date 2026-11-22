@@ -50,6 +50,7 @@
 .guide-content img{height:auto;border:1px solid var(--b1);border-radius:14px;margin:18px 0 6px}
 .guide-screenshot-portrait img{width:min(100%,360px)}
 .guide-shot-caption{display:block;color:var(--text2);font-size:13px}
+.guide-video{display:block;width:100%;height:auto;border:1px solid var(--b1);border-radius:14px;margin:18px 0 6px;background:var(--card)}
 .guide-content blockquote{padding:8px 14px;border-inline-start:3px solid var(--brand);background:var(--card)}
 .guide-content code{overflow-wrap:anywhere}
 .guide-content pre{background:var(--card);border:1px solid var(--b1);border-radius:12px;padding:14px;overflow:auto}

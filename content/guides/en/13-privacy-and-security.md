@@ -31,12 +31,16 @@ Data leaves this computer only in the cases you choose:
 | The model provider you chose | Conversation content, relevant file excerpts and web content the Bot read | When you use an online model. With a local model (such as Ollama) nothing leaves |
 | The auxiliary model's provider | Relevant content for context compaction, handoffs, translation, web extraction | If you chose an auxiliary model; by default it follows the main model |
 | The search service | Search terms | When a Bot searches the web; you choose the service, and keyless services ask the first time |
-| Websites Bots visit | Ordinary web requests | When a Bot visits a site; each site asks the first time |
+| Websites Bots visit | Ordinary web requests | When a Bot visits a site; allowed by default, and you can set Visit websites to Ask in permissions |
 | Connected services (such as Notion, MCP servers) | What a call to that service needs | After you connect them and give them to Bots; writes and outgoing sends are confirmed each time |
 | The relay | End-to-end encrypted data (the relay can't read it), IP address, connection times, frame sizes, presence | After you turn on **Allow paired devices to connect**, when phones and runners connect |
-| pibot.space | Only reads the latest version information; no identity or usage data | When checking for updates |
+| A STUN service (Cloudflare by default) | Only a query for your public IP address; no data | When paired devices try to connect directly across networks; can be set to LAN only |
+| roles.pibot.space | Requests for the role library and the packs you install; no identifier | When you check or install from the role library |
+| pibot.space | Only reads the latest version information; the request carries just the app version and platform, no identifier or usage data | When checking for updates (shortly after start, then every few hours) |
 
 With a ChatGPT plan, conversations go straight to OpenAI with no other server involved.
+
+The complete list, including skills, plugins, external agents and phone notifications, with how to turn each one off: [Outbound connections](../../privacy/en/outbound-connections.md).
 
 ## No telemetry
 

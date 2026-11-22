@@ -13,6 +13,7 @@ On this page:
 - [When the computer sleeps or Pi Bot quits](#when-the-computer-sleeps-or-pi-bot-quits)
 - [Inbox](#inbox)
 - [Personal to-dos](#personal-to-dos)
+- [Example: summarize new files every weekday](#example-summarize-new-files-every-weekday)
 
 ## The Routines page
 
@@ -65,7 +66,7 @@ After choosing **Once at a specified time**, click **Pick a date and time**:
 
 ![Triggers and pre-approval in the routine editor](../images/en/routine-trigger.png)
 
-**Preauthorizations for this routine**: you may be away when a routine runs, so you can allow reading files, listing folders, writing files, running commands, visiting websites and so on in its work location ahead of time. They apply only to this routine and don't change chat permissions. Dangerous operations and sudo can't be preauthorized, and the current policy and isolation still apply at run time. Computer use can't be allowed in advance; when it's needed, it goes to the Inbox.
+**Preauthorizations for this routine**: you may be away when a routine runs, so you can allow reading files, listing folders, writing files, running commands, visiting websites and so on in its work location ahead of time. They apply only to this routine and don't change chat permissions. Dangerous operations and sudo can't be preauthorized, and the current policy and isolation still apply at run time. A routine that runs a script can preauthorize that one exact script; if the script's content changes, the run asks you again. Computer use can't be allowed in advance; when it's needed, it goes to the Inbox.
 
 **How it runs**:
 

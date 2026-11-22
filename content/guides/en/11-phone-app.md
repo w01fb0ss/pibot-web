@@ -11,12 +11,11 @@ On this page:
 - [When the computer is offline: the phone replies](#when-the-computer-is-offline-the-phone-replies)
 - [Notifications, wake-up and staying connected](#notifications-wake-up-and-staying-connected)
 - [Unpair](#unpair)
+- [Example: approve a desktop task from your phone](#example-approve-a-desktop-task-from-your-phone)
 
 ## Install
 
-The official v0.0.1 APK targets ARM64 Android devices. After installing it, open Pi Bot and start pairing from the first-launch screen.
-
-The phone app is currently available as an Android package (APK) from [download page](/en/download/). The desktop app updates itself; on the phone, download and install the new APK to update. An iOS version isn't available for download yet.
+The phone app is currently available as an Android package (APK) from the [download page](https://pibot.space/en/download/). The desktop app updates itself; on the phone, download and install the new APK to update. An iOS version isn't available for download yet. After installing it, open Pi Bot and start pairing from the first-launch screen.
 
 ## Turn on remote access on the computer
 
@@ -46,19 +45,21 @@ The text below the switch explains what the relay sees: IP addresses, connection
 
 2. On the phone, open Pi Bot to **Connect your computer**. Tap **Allow camera to scan**, grant access, and point the camera at the QR code on the computer. You can also copy the code on the computer and tap **Paste pairing code** on the phone.
 
-   ![Android pairing screen with camera and paste options, captured in an isolated emulator using the v0.0.1 test build.](../images/en/android-pair-guide.png)
+   ![Android pairing screen with camera and paste options](../images/en/android-pair-guide.png)
+
 3. Both sides show the same safety code. If they match, nobody intercepted the connection: tap **They match, finish pairing**. If not, cancel and scan again.
 
 One phone can pair with up to 16 computers.
 
 ## Chats, tasks and approvals
 
-The phone app has four tabs at the bottom:
+The phone app has five tabs at the bottom:
 
 - **Chats**: chats with Bots and groups, the same history as on the computer. While the computer is offline you can keep writing; messages are queued and sent in order once it's back (Bots with offline replies turned on answer from the phone, see below).
 
    ![Chats lists Pi and shows when the test computer was last online.](../images/en/android-chats-guide.png)
 
+- **To-dos**: your personal to-dos on a month calendar (the same list as **Personal to-dos** in the computer's Inbox). Tap a day to see its to-dos, tap the circle to mark one done, tap a to-do to change its title, date, time, end date, colour and sticker, or delete it; **+** adds one on the selected day. It works with the computer offline too: changes stay on the phone marked **Not synced yet** and sync in order once the computer is back; if the same to-do was changed on the computer later, the newer change wins.
 - **Tasks**: running tasks, group tasks and routine runs; you can stop or resume them.
 
    ![Tasks shows run counts, routines and recent results. No task has been started in this test environment.](../images/en/android-tasks-guide.png)
@@ -71,11 +72,16 @@ The phone app has four tabs at the bottom:
 
 Loosening a Bot's permissions, deleting memories and removing a Bot from a group also need you to unlock the phone.
 
+In a group chat:
+
+- **Tasks N/M** at the top opens **Task progress**: each step of the plan with who does it and whether it is in progress, waiting, needs you or done; tap a step to see what it does and its result.
+- A stuck step marked **Needs you** has **Retry**, which has its Bot do it again. Edit the plan, skip or reassign steps on the computer.
+- When a group member needs your approval, the approval card appears right in the group chat, where you can handle it.
+- While the group is working, **Pause** stops it and keeps progress; **Continue** picks up from the stopped steps. It is the same pause as on the computer (see [6 · Group chats](06-groups.md#pause-and-continue)).
+
 ## When the computer is offline: the phone replies
 
 When the computer is off, asleep or without network, the phone shows "Computer offline · last seen: …" and quietly reconnects in the background, switching back automatically when the computer returns.
-
-The [Chats screenshot above](#chats-tasks-and-approvals) shows the **Computer offline** banner and the last synced list.
 
 If you turned on offline replies for this phone on the computer, private chats with Bots are answered by the phone while the computer is offline: it calls the model directly with that Bot's persona from the computer and selected memories, using only the phone's capabilities. To set it up on the computer:
 
@@ -99,7 +105,7 @@ If the phone is authorized for a runner (**Runners it can direct** on the device
 
 ![Wake and connection options on the desktop](../images/en/devices-advanced.png)
 
-- The phone gets a notification when a Bot needs your approval or a task finishes. Notifications contain only the Bot's name and a fixed short sentence, never chat or approval content; tapping one opens the app and reloads.
+- The phone gets a notification when a Bot needs your approval or a task finishes. The title is only the Bot's or group's name ("Pi Bot" for notifications that arrive as a push), and the text is a fixed short sentence, never chat or approval content; tapping one opens the app and reloads.
 - When the computer needs one of the phone's capabilities, it can wake the phone app with a high-priority push.
 - On Android you can turn on **Stay connected** to keep the connection with a foreground service (off by default; uses more battery).
 

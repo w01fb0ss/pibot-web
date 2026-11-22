@@ -31,9 +31,16 @@ const replacements = new Map([
   ['activity-log', 'activity-log-empty'],
 ]);
 const screenshotCaption = {
-  zh: '实拍于独立测试环境中的 macOS v0.0.1。',
-  en: 'Captured in a separate macOS v0.0.1 test profile.',
+  zh: '实拍于独立的 macOS 测试环境。',
+  en: 'Captured in a separate macOS test profile.',
 };
+// The repository guide links a GIF preview to an mp4 under docs/assets (GitHub cannot play video
+// inline). Here the same markdown becomes a real player: the web cut and a poster sit in
+// public/assets/guides as <name>.mp4 and <name>-poster.jpg, with the size listed below.
+const guideVideos = new Map([
+  ['pibot-group-pause', { width: 1920, height: 1080 }],
+]);
+const githubDocs = 'https://github.com/w01fb0ss/PiBot/blob/main/docs/';
 
 const freshShots = new Set([
   'welcome-intro', 'welcome-model-openrouter', 'welcome-model-chatgpt', 'welcome-model-ollama',
@@ -58,7 +65,12 @@ function localizeGuideLink(href, prefix) {
   const slug = slugs.get(file);
   if (slug) return `${prefix}/guides/${slug}/${anchor ? '#' + anchor : ''}`;
   if (/^https:\/\/pibot\.space\/?$/.test(href)) return prefix + '/';
+  const site = href.match(/^https:\/\/pibot\.space(?:\/(?:cn|en))?(\/(?:download|guides|roles)\/.*)$/);
+  if (site) return prefix + site[1];
   if (/^\/(?:download|guides)\//.test(href)) return prefix + href;
+  // Other repository docs (privacy notes) are read on GitHub.
+  const doc = href.match(/^\.\.\/\.\.\/((?:privacy)\/(?:zh|en)\/[a-z0-9-]+\.md(?:#.*)?)$/);
+  if (doc) return githubDocs + doc[1];
   return href;
 }
 
@@ -106,6 +118,27 @@ export async function buildManual(output, locale) {
     const provenance = freshShots.has(name) ? ` · ${screenshotCaption[locale]}` : '';
     return image + `<small class="guide-shot-caption">${alt}${provenance}</small>`;
   };
+  md.renderer.rules.guide_video = (tokens, index) => {
+    const { name, alt } = tokens[index].meta;
+    const { width, height } = guideVideos.get(name);
+    // The repository alt text tells GitHub readers to click through; the player needs no such hint.
+    const label = md.utils.escapeHtml(alt.replace(/\s*[（(][^（）()]*[）)]\s*$/u, ''));
+    return `<video class="guide-video" controls playsinline preload="metadata" width="${width}" height="${height}" poster="/assets/guides/${name}-poster.jpg" aria-label="${label}"><source src="/assets/guides/${name}.mp4" type="video/mp4"></video><small class="guide-shot-caption">${label}</small>`;
+  };
+  md.core.ruler.push('guide_videos', state => {
+    for (const token of state.tokens) {
+      if (token.type !== 'inline' || !token.children) continue;
+      const children = token.children;
+      for (let index = 0; index + 2 < children.length; index++) {
+        const [open, image, close] = children.slice(index, index + 3);
+        const name = open.type === 'link_open' && open.attrGet('href')?.match(/^\.\.\/\.\.\/assets\/([a-z0-9-]+)\.mp4$/)?.[1];
+        if (!name || !guideVideos.has(name) || image.type !== 'image' || close.type !== 'link_close') continue;
+        const video = new state.Token('guide_video', 'video', 0);
+        video.meta = { name, alt: image.content };
+        children.splice(index, 3, video);
+      }
+    }
+  });
   md.core.ruler.push('guide_headings_and_links', state => {
     for (const [index, token] of state.tokens.entries()) {
       if (token.type === 'heading_open') {

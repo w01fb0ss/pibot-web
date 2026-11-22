@@ -17,6 +17,7 @@ On this page:
 - [Import skills and plugin packages](#import-skills-and-plugin-packages)
 - [Knowledge](#knowledge)
 - [Access tokens](#access-tokens)
+- [Mail](#mail)
 
 ## Apps
 
@@ -95,9 +96,9 @@ Then say "do a pre-launch check" in a chat and the Bot follows the skill. Each B
 
 ## Import skills and plugin packages
 
-![Import from a folder or link using the Add menu in Connections](../images/en/connections-add.png)
-
 **Import a plugin package from a folder** and **Import from link** bring in ready-made skill packages (compatible with the Claude Code plugin format), including large skills with scripts and dependencies. You preview before importing; a package containing links or files that can't be imported for safety reasons is refused with the reason.
+
+![Import from a folder or link using the Add menu in Connections](../images/en/connections-add.png)
 
 ## Knowledge
 
@@ -110,17 +111,19 @@ Bots only read knowledge sources and never change your notes.
 
 ## Access tokens
 
-1. Open Connections, then choose **Access tokens** at the top right. The dialog lists tokens used by connections and tokens you added yourself. A fresh profile shows **No access tokens yet**.
+**Access tokens** at the top right manages the tokens connections use (for example ones brought over from other tools).
 
-![The Access tokens dialog in a fresh test profile](../images/en/connections-tokens.png)
+1. Open Connections, then choose **Access tokens** at the top right. The dialog lists tokens used by connections and tokens you added yourself; with none yet it shows **No access tokens yet**.
 
-2. To add or replace a connection's token, check which connection the entry belongs to and use the button on that entry. After you save the new value, Pi Bot attempts to reconnect with it.
-3. To add a separate token for commands, choose **New token** and enter a name and value. Saved values are encrypted on this computer. You can replace them later without revealing the original value.
+   ![The Access tokens dialog](../images/en/connections-tokens.png)
 
-![The New token form with all fields empty](../images/en/connections-token-form.png)
+2. To add or replace a connection's token, check which connection the entry belongs to and use the button on that entry. After you save the new value, Pi Bot reconnects with it.
+3. To add a separate token for commands, choose **New token** and enter a name and value. Tokens are stored encrypted on this computer; you can replace a value later but not view the original.
+
+   ![The New token form](../images/en/connections-token-form.png)
 
 Manage model API keys under **Settings → Models & API keys** and website credentials under **Settings → Permissions → Saved accounts**.
 
-## Gmail 插件 / Gmail plugin
+## Mail
 
-Gmail supports app passwords and your own OAuth client. The tool returns an authorization URL; the user must open it and consent in a browser. The callback binds only to a random 127.0.0.1 port and uses PKCE. Refresh tokens stay in the plugin’s encrypted scope, and `oauth_revoke` revokes and clears them. Imported `command: node` plugins use Pi Bot’s bundled Node.
+This version has no built-in mail connection (Gmail and others) yet; it comes in a later version. Until then, paste mail into the chat or connect your own mail MCP server.

@@ -2,6 +2,8 @@
 
 Editors that speak the [Agent Client Protocol (ACP)](https://agentclientprotocol.com), such as Zed, can put Pi Bot's Bots to work: what you type in the editor is handled by a Pi Bot Bot, and commands and approvals still go through Pi Bot's permissions on this computer.
 
+The other way round, adding coding agents on your computer such as Codex or Claude Agent to Pi Bot as Bots, is described in [2 · Bots and roles](02-bots-and-roles.md#external-agents).
+
 ## Connect
 
 1. Open the desktop Pi Bot first (ACP connects to the running app; it does not start another one).
