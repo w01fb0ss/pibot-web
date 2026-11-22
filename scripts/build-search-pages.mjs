@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile, rm } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { searchContent } from './search-content.mjs';
 import { localizedHomepage, sharedChrome, applyLegalChrome } from './build-homepage.mjs';
@@ -260,6 +260,18 @@ export async function buildSearchPages(output, config) {
     }
   }
 
-  const entries = routes.map(route => `  <url><loc>${origin}${route}</loc></url>`).join('\n');
+  const roleRoutes = [];
+  for (const lang of ['zh', 'en']) {
+    const directory = path.join(output, localized('/roles/', lang));
+    const files = await readdir(directory, { recursive: true, withFileTypes: true });
+    for (const file of files) {
+      if (file.isFile() && file.name === 'index.html') {
+        const relative = path.relative(output, file.parentPath).split(path.sep).join('/');
+        roleRoutes.push(`/${relative}/`);
+      }
+    }
+  }
+  const entries = [...routes, ...roleRoutes.sort()]
+    .map(route => `  <url><loc>${origin}${route}</loc></url>`).join('\n');
   await writeFile(path.join(output, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries}\n</urlset>\n`);
 }
