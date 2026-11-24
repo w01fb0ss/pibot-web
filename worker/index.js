@@ -255,7 +255,11 @@ async function gmailInput(request) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid_request');
   return value;
 }
-function googleFetch(url, options) { return fetch(url, { ...options, signal: AbortSignal.timeout(20000), redirect: 'error' }); }
+function googleFetch(url, options) {
+  // Workers rejects the 'error' mode before sending the request. Leave redirects unfollowed so
+  // callers can reject non-success responses without forwarding OAuth credentials elsewhere.
+  return fetch(url, { ...options, signal: AbortSignal.timeout(20000), redirect: 'manual' });
+}
 async function gmailStart(request, env) {
   if (request.method !== 'POST' || !env.GMAIL_OAUTH_CLIENT_ID || !env.GMAIL_OAUTH_CLIENT_SECRET) return jsonError('gmail_oauth_not_configured', 503);
   let input; try { input = await gmailInput(request); } catch { return jsonError('invalid_request'); }
