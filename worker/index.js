@@ -364,14 +364,20 @@ async function cachedDownloadStats(request, env, ctx) {
   if (request.method !== 'GET') return publicDownloadStats(request, env);
   const cache = caches.default;
   const key = new Request(new URL('/__cache/download-stats', request.url), { method: 'GET' });
+  // Browsers get no-store: the zone's browser-cache TTL would otherwise stretch a public max-age.
+  const toClient = (response) => {
+    const copy = new Response(response.body, response);
+    copy.headers.set('Cache-Control', 'no-store');
+    return copy;
+  };
   const hit = await cache.match(key);
-  if (hit) return hit;
+  if (hit) return toClient(hit);
   const fresh = await publicDownloadStats(request, env);
   if (!fresh.ok) return fresh;
-  const response = new Response(fresh.body, fresh);
-  response.headers.set('Cache-Control', 'public, max-age=30');
-  ctx.waitUntil(cache.put(key, response.clone()));
-  return response;
+  const stored = new Response(fresh.body, fresh);
+  stored.headers.set('Cache-Control', 'public, max-age=30');
+  ctx.waitUntil(cache.put(key, stored.clone()));
+  return toClient(stored);
 }
 
 export default {
