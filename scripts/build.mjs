@@ -1,4 +1,4 @@
-import { cp, mkdir, rm, readFile, stat } from 'node:fs/promises';
+import { cp, mkdir, readFile, rm, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { buildSearchPages } from './build-search-pages.mjs';

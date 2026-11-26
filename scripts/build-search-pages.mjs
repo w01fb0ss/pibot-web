@@ -1,5 +1,6 @@
-import { mkdir, readdir, readFile, writeFile, rm } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { parse, parseFragment, serialize } from 'parse5';
 import { searchContent } from './search-content.mjs';
 import { localizedHomepage, sharedChrome, applyLegalChrome } from './build-homepage.mjs';
 import { buildManual } from './build-manual.mjs';
@@ -35,6 +36,150 @@ function localized(route, lang) {
 
 function alternates(route) {
   return alternateLinks(route);
+}
+
+function getAttribute(node, name) {
+  return node.attrs?.find(attribute => attribute.name === name)?.value ?? '';
+}
+
+function hasClass(node, className) {
+  return getAttribute(node, 'class').split(/\s+/).includes(className);
+}
+
+function findNodes(node, predicate, matches = []) {
+  if (!node) return matches;
+  if (predicate(node)) matches.push(node);
+  for (const child of node.childNodes ?? []) findNodes(child, predicate, matches);
+  return matches;
+}
+
+function findNode(node, predicate) {
+  return findNodes(node, predicate, [])[0];
+}
+
+function textContent(node) {
+  return (node?.childNodes ?? []).map(child => child.nodeName === '#text'
+    ? child.value
+    : textContent(child)).join('').replace(/\s+/g, ' ').trim();
+}
+
+function removeChildren(parent, predicate) {
+  parent.childNodes = (parent.childNodes ?? []).filter(child => !predicate(child));
+}
+
+async function walkFiles(directory, files = []) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const file = path.join(directory, entry.name);
+    if (entry.isDirectory()) await walkFiles(file, files);
+    else files.push(file);
+  }
+  return files;
+}
+
+function roleRoute(output, file) {
+  const relative = path.relative(output, file).split(path.sep).join('/');
+  return `/${relative.replace(/\/index\.html$/, '/')}`;
+}
+
+async function rolePages(output) {
+  const files = [];
+  for (const language of ['cn', 'en']) {
+    const directory = path.join(output, language, 'roles');
+    await walkFiles(directory, files);
+  }
+  return files.filter(file => file.endsWith(`${path.sep}index.html`))
+    .map(file => ({ file, route: roleRoute(output, file) }))
+    .sort((left, right) => left.route.localeCompare(right.route));
+}
+
+function jsonLdForRolePage(document, route, canonical) {
+  const html = findNode(document, node => node.tagName === 'html');
+  const main = findNode(document, node => node.tagName === 'main');
+  const breadcrumbNav = findNode(document, node => node.tagName === 'nav' && hasClass(node, 'reading-breadcrumb'));
+  const breadcrumbItems = findNodes(breadcrumbNav, node => node.tagName === 'li').map((item, index) => {
+    const link = findNode(item, child => child.tagName === 'a');
+    return {
+      '@type': 'ListItem',
+      position: index + 1,
+      name: textContent(item),
+      item: link ? new URL(getAttribute(link, 'href'), origin).href : canonical,
+    };
+  });
+  const heading = textContent(findNode(main, node => node.tagName === 'h1'));
+  const lead = textContent(findNode(main, node => node.tagName === 'p' && hasClass(node, 'reading-lead')));
+  if (!breadcrumbItems.length || !heading || !lead) throw new Error(`Role page is missing visible SEO fields: ${route}`);
+  const indexPage = route === '/cn/roles/' || route === '/en/roles/';
+  const entity = {
+    '@type': indexPage ? 'CollectionPage' : 'CreativeWork',
+    '@id': `${canonical}#page`,
+    url: canonical,
+    name: heading,
+    description: lead,
+    inLanguage: getAttribute(html, 'lang'),
+    mainEntityOfPage: canonical,
+  };
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [{
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbItems,
+    }, entity],
+  };
+}
+
+async function standardizeRolePage({ file, route }) {
+  const document = parse(await readFile(file, 'utf8'));
+  const head = findNode(document, node => node.tagName === 'head');
+  if (!head) throw new Error(`Role page has no head: ${route}`);
+  const localizedRoute = route.replace(/^\/(?:cn|en)/, '');
+  const canonicalNode = findNode(head, node => node.tagName === 'link' && getAttribute(node, 'rel').split(/\s+/).includes('canonical'));
+  const canonical = getAttribute(canonicalNode, 'href');
+  if (canonical !== origin + route) throw new Error(`Role page canonical mismatch: ${route}`);
+
+  removeChildren(head, node => {
+    if (node.tagName === 'script' && getAttribute(node, 'type') === 'application/ld+json') return true;
+    if (node.tagName === 'link' && getAttribute(node, 'rel').split(/\s+/).includes('alternate')) return true;
+    if (node.tagName !== 'meta') return false;
+    const name = getAttribute(node, 'name');
+    const property = getAttribute(node, 'property');
+    return name === 'robots' || name === 'twitter:card' || property === 'og:type' || property === 'og:url';
+  });
+
+  const graph = JSON.stringify(jsonLdForRolePage(document, route, canonical)).replaceAll('<', '\\u003c');
+  const fragment = parseFragment(`${alternates(localizedRoute)}
+  <meta name="robots" content="max-image-preview:large">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${escape(canonical)}">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">${graph}</script>`);
+  head.childNodes.push(...fragment.childNodes);
+  await writeFile(file, serialize(document));
+}
+
+async function standardizeRolePages(output) {
+  const pages = await rolePages(output);
+  for (const page of pages) await standardizeRolePage(page);
+  return pages.map(page => page.route);
+}
+
+async function assertSitemap(output, routes, roleRoutes) {
+  const uniqueRoutes = [...new Set(routes)];
+  if (uniqueRoutes.length !== routes.length) throw new Error('Sitemap routes contain duplicates');
+  const missing = [];
+  for (const route of uniqueRoutes) {
+    try {
+      if (!(await stat(path.join(output, route.slice(1), 'index.html'))).isFile()) missing.push(route);
+    } catch {
+      missing.push(route);
+    }
+  }
+  if (missing.length) throw new Error(`Sitemap routes missing from dist: ${missing.join(', ')}`);
+  const htmlFiles = (await walkFiles(output)).filter(file => file.endsWith('.html'));
+  const roleHtmlFiles = htmlFiles.filter(file => /[\\/]roles[\/](?:.*[\/])?index\.html$/.test(file));
+  if (roleHtmlFiles.length !== roleRoutes.length) {
+    throw new Error(`Role page count mismatch: dist=${roleHtmlFiles.length}, sitemap=${roleRoutes.length}`);
+  }
+  return { htmlCount: htmlFiles.length, sitemapCount: uniqueRoutes.length, roleCount: roleRoutes.length };
 }
 
 function frame({ route, lang, title, description, heading, body, homepage, schema, showLead = true }) {
@@ -260,18 +405,10 @@ export async function buildSearchPages(output, config) {
     }
   }
 
-  const roleRoutes = [];
-  for (const lang of ['zh', 'en']) {
-    const directory = path.join(output, localized('/roles/', lang));
-    const files = await readdir(directory, { recursive: true, withFileTypes: true });
-    for (const file of files) {
-      if (file.isFile() && file.name === 'index.html') {
-        const relative = path.relative(output, file.parentPath).split(path.sep).join('/');
-        roleRoutes.push(`/${relative}/`);
-      }
-    }
-  }
-  const entries = [...routes, ...roleRoutes.sort()]
-    .map(route => `  <url><loc>${origin}${route}</loc></url>`).join('\n');
+  const roleRoutes = await standardizeRolePages(output);
+  const allRoutes = [...new Set([...routes, ...roleRoutes])];
+  const stats = await assertSitemap(output, allRoutes, roleRoutes);
+  const entries = allRoutes.map(route => `  <url><loc>${origin}${route}</loc></url>`).join('\n');
   await writeFile(path.join(output, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries}\n</urlset>\n`);
+  console.log(`Built search pages: HTML=${stats.htmlCount} / sitemap=${stats.sitemapCount} / roles=${stats.roleCount}`);
 }

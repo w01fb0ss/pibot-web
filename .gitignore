@@ -7,3 +7,6 @@ public/downloads/*
 .wrangler/
 .review/
 .dev.vars
+
+# Pi Bot work output (reports), not site content
+.pibot/
