@@ -2,7 +2,8 @@ import { display } from './display.js';
 import { downloadStatsCopy, downloadStatsMarkup } from './download-stats-view.js';
 
 const sections = [...document.querySelectorAll('[data-download-stats]')];
-const refreshInterval = 5000;
+// Daily totals: once a minute is live enough and keeps request volume low (paused while hidden).
+const refreshInterval = 60_000;
 let data;
 let failed = false;
 let language;

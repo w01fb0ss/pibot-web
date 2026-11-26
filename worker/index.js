@@ -359,6 +359,21 @@ async function publicDownloadStats(request, env) {
   } catch { return unavailable(); }
 }
 
+// A per-colo edge copy for 30 s: every page polls this, and each miss reads the counter object.
+async function cachedDownloadStats(request, env, ctx) {
+  if (request.method !== 'GET') return publicDownloadStats(request, env);
+  const cache = caches.default;
+  const key = new Request(new URL('/__cache/download-stats', request.url), { method: 'GET' });
+  const hit = await cache.match(key);
+  if (hit) return hit;
+  const fresh = await publicDownloadStats(request, env);
+  if (!fresh.ok) return fresh;
+  const response = new Response(fresh.body, fresh);
+  response.headers.set('Cache-Control', 'public, max-age=30');
+  ctx.waitUntil(cache.put(key, response.clone()));
+  return response;
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -378,7 +393,7 @@ export default {
       return new Response(response.body, { status: response.status, headers });
     }
     if (url.pathname === '/_stats') return stats(request, env);
-    if (url.pathname === '/api/download-stats') return publicDownloadStats(request, env);
+    if (url.pathname === '/api/download-stats') return cachedDownloadStats(request, env, ctx);
     if (url.pathname.startsWith('/updates/')) {
       const response = await env.ASSETS.fetch(request);
       const key = request.method === 'GET' && (response.ok || response.status === 304) ? updateKey(url.pathname, request.headers.get('user-agent')) : undefined;
