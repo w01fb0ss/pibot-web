@@ -1,9 +1,11 @@
-# Receives `repository_dispatch` (`pibot-release-publish`) from `w01fb0ss/PiBot`'s Release
-# workflow, updates `public/updates/*` (and `public/releases.json` on stable `--launch`),
-# commits the change to `w01fb0ss/pibot-web`, and deploys the Cloudflare Worker automatically.
+# Copy this file to `PiBot_web/.github/workflows/pibot-release-deploy.yml`.
 #
-# Required secrets in `w01fb0ss/pibot-web`:
-#   - CLOUDFLARE_API_TOKEN (Workers Scripts Edit + Zone/Account deploy permission)
+# Receives `repository_dispatch` (`pibot-release-publish`) from `PiBot`'s Release workflow,
+# updates `public/updates/*` (and `public/releases.json` on stable `--launch`), commits the
+# change to `PiBot_web`, and deploys the Cloudflare Worker / Pages site automatically.
+#
+# Required secrets in `PiBot_web`:
+#   - CLOUDFLARE_API_TOKEN (Workers/Pages deploy permission)
 #   - CLOUDFLARE_ACCOUNT_ID
 name: Deploy Pi Bot Release Feeds & Website
 
@@ -53,13 +55,13 @@ jobs:
             platforms = {},
             files = {},
           } = payload;
-          if (!version || !["stable", "rc"].includes(channel)) {
-            throw new Error(`Invalid dispatch payload: channel=${channel} version=${version}`);
+          if (!version || channel !== "stable") {
+            throw new Error(`Refusing non-stable website deploy: channel=${channel} version=${version}`);
           }
 
           const publicRoot = resolve("public");
           for (const [relPath, content] of Object.entries(files)) {
-            if (!/^updates\/(?:rc\/)?[A-Za-z0-9._-]+$/u.test(relPath)) {
+            if (!/^updates\/[A-Za-z0-9._-]+$/u.test(relPath)) {
               throw new Error(`Refusing unexpected feed path: ${relPath}`);
             }
             const dest = resolve(publicRoot, relPath);
@@ -144,7 +146,7 @@ jobs:
             git push origin main
           fi
       - run: pnpm install --frozen-lockfile
-      - name: Build & deploy pibot-web to Cloudflare
+      - name: Build & deploy PiBot_web to Cloudflare
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

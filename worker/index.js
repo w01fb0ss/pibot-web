@@ -11,7 +11,7 @@ const RETIRED_VERSION = '0.0.2';
 // exactly its desktop files are served (installers, update zips, blockmaps); the withdrawn APK and
 // runner builds of that number stay 404.
 const RELEASED_0_0_2 = /^PiBot-0\.0\.2-(mac-(arm64|x64)\.(zip|dmg)|win-x64\.exe|linux-x86_64\.AppImage)(\.blockmap)?$/;
-const RELEASE_FILE = /^(\d{1,4}\.\d{1,4}\.\d{1,4}(?:-rc\.\d{1,4})?)\/([A-Za-z0-9._-]+)$/;
+const RELEASE_FILE = /^(\d{1,4}\.\d{1,4}\.\d{1,4})\/([A-Za-z0-9._-]+)$/;
 const DOWNLOAD_TARGETS = [
   ['desktop', 'mac-arm64.dmg', 'darwin', 'arm64'],
   ['desktop', 'mac-x64.dmg', 'darwin', 'x64'],
