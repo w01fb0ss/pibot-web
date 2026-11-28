@@ -88,7 +88,29 @@ function releaseHistoryPage(config, lang, escape, link) {
     ? `<span>${t.manualInstall}</span><span>${link('/download/', t.download)}</span>`
     : `<span>${t.installed}</span><span>${t.fresh} ${link('/download/', t.download)}</span>`;
   const nodes = list.map((r, index) => `<li class="rh-node${index ? ' rh-old' : ''}"><a href="#v${escape(r.version)}">v${escape(r.version)}</a> ${badge(r)} <span class="rh-meta">${escape(r.date)} · ${escape(partNames(r.updated))}</span>${r.from ? `<p class="rh-edge">${r.from.inApp ? t.edge(r) : t.manualEdge(escape(r.from.version))}</p>` : ''}</li>`).join('');
-  const notes = (r) => `<ul>${(r.notes[en ? 'en' : 'zh'] ?? []).map((line) => `<li>${escape(line)}</li>`).join('')}</ul>`;
+  const notesLanguage = en ? 'en' : 'zh';
+  const noteList = (items) => `<ul>${items.map((item) => `<li>${item}</li>`).join('')}</ul>`;
+  const notes = ({ version, notes }) => {
+    if (!notes.sections) return noteList((notes[notesLanguage] ?? []).map(escape));
+    const groups = notes.sections.map(({ title, items }, index) => ({
+      id: `v${escape(version)}-category-${index + 1}`,
+      title: escape(title[notesLanguage]),
+      items,
+    }));
+    const label = en ? 'Browse by feature' : '按功能浏览';
+    const links = groups.map(({ id, title }) => `<a href="#${id}">${title}</a>`).join('');
+    const categories = `<nav class="rh-categories" aria-label="${label}"><p>${label}</p><div>${links}</div></nav>`;
+    const sections = groups.map(({ id, title, items }) => {
+      const lines = items.map((item) => {
+        const body = escape(item[notesLanguage]);
+        if (!item.pullRequest) return body;
+        const { number, author } = item.pullRequest;
+        return `${body} <a href="${sourceRepository}/pull/${escape(String(number))}">#${escape(String(number))} · @${escape(author)}</a>`;
+      });
+      return `<section class="rh-note-section" id="${id}"><h3>${title}</h3>${noteList(lines)}</section>`;
+    });
+    return `<p class="rh-intro">${escape(notes.introduction[notesLanguage])}</p>${categories}${sections.join('')}`;
+  };
   const scope = (r) => {
     const rest = Object.keys(r.components).filter((k) => !r.updated.includes(k));
     return r.kind === 'first' ? t.firstOf(partNames(r.updated)) : `${t.updates}${partNames(r.updated)}${rest.length ? (en ? '. ' : '。') + t.unchangedRest(partNames(rest)) : ''}`;

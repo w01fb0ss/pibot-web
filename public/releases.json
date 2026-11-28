@@ -1,62 +1,62 @@
 {
   "status": "available",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "platforms": {
     "mac-arm64": {
-      "url": "https://pibot.space/downloads/0.0.3/PiBot-0.0.3-mac-arm64.dmg",
+      "url": "https://pibot.space/downloads/0.1.0/PiBot-0.1.0-mac-arm64.dmg",
       "label": "macOS · Apple 芯片",
-      "detail": "v0.0.3",
-      "status": "tested",
-      "version": "0.0.3"
+      "detail": "v0.1.0",
+      "status": "testing",
+      "version": "0.1.0"
     },
     "mac-x64": {
-      "url": "https://pibot.space/downloads/0.0.3/PiBot-0.0.3-mac-x64.dmg",
+      "url": "https://pibot.space/downloads/0.1.0/PiBot-0.1.0-mac-x64.dmg",
       "label": "macOS · Intel 芯片",
-      "detail": "v0.0.3",
-      "status": "tested",
-      "version": "0.0.3"
+      "detail": "v0.1.0",
+      "status": "testing",
+      "version": "0.1.0"
     },
     "windows": {
-      "url": "https://pibot.space/downloads/0.0.3/PiBot-0.0.3-win-x64.exe",
+      "url": "https://pibot.space/downloads/0.1.0/PiBot-0.1.0-win-x64.exe",
       "label": "Windows",
-      "detail": "v0.0.3",
-      "status": "tested",
-      "version": "0.0.3"
+      "detail": "v0.1.0",
+      "status": "testing",
+      "version": "0.1.0"
     },
     "linux": {
-      "url": "https://pibot.space/downloads/0.0.3/PiBot-0.0.3-linux-x86_64.AppImage",
+      "url": "https://pibot.space/downloads/0.1.0/PiBot-0.1.0-linux-x86_64.AppImage",
       "label": "Linux",
-      "detail": "v0.0.3",
-      "status": "tested",
-      "version": "0.0.3"
+      "detail": "v0.1.0",
+      "status": "testing",
+      "version": "0.1.0"
     },
     "android": {
-      "url": "https://pibot.space/downloads/0.0.3/PiBot-0.0.3-android.apk",
+      "url": "https://pibot.space/downloads/0.1.0/PiBot-0.1.0-android.apk",
       "label": "Android",
-      "detail": "v0.0.3",
-      "status": "tested",
-      "version": "0.0.3"
+      "detail": "v0.1.0",
+      "status": "testing",
+      "version": "0.1.0"
     },
     "runner-windows": {
-      "url": "https://pibot.space/downloads/0.0.1/PiBot-Runner-0.0.1-win-x64.exe",
+      "url": "https://pibot.space/downloads/0.1.0/PiBot-Runner-0.1.0-win-x64.exe",
       "label": "执行端 · Windows",
-      "detail": "v0.0.1",
-      "status": "tested",
-      "version": "0.0.1"
+      "detail": "v0.1.0",
+      "status": "testing",
+      "version": "0.1.0"
     },
     "runner-mac": {
-      "url": "https://pibot.space/downloads/0.0.1/PiBot-Runner-0.0.1-mac-x64.zip",
+      "url": "https://pibot.space/downloads/0.1.0/PiBot-Runner-0.1.0-mac-x64.zip",
       "label": "执行端 · macOS",
-      "detail": "v0.0.1",
-      "status": "tested",
-      "version": "0.0.1"
+      "detail": "v0.1.0",
+      "status": "testing",
+      "version": "0.1.0"
     },
     "runner-linux": {
-      "url": "https://pibot.space/downloads/0.0.1/PiBot-Runner-0.0.1-linux-x64.deb",
+      "url": "https://pibot.space/downloads/0.1.0/PiBot-Runner-0.1.0-linux-x64.deb",
       "label": "执行端 · Linux",
-      "detail": "v0.0.1",
-      "status": "tested",
-      "version": "0.0.1"
+      "detail": "v0.1.0",
+      "status": "testing",
+      "version": "0.1.0"
     }
   }
 }

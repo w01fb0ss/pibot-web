@@ -103,6 +103,15 @@
 .rh-version{margin-top:30px;padding-top:22px;border-top:1px solid var(--b1);scroll-margin-top:90px;max-width:760px}
 .rh-version h2{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;font-size:clamp(24px,3.4vw,34px)}
 .rh-updated{margin:6px 0 12px;color:var(--text2);font-size:14px}
+.rh-intro{margin:0 0 20px}
+.rh-categories{margin-bottom:20px}
+.rh-categories p{margin:0 0 8px;color:var(--text2);font-size:14px;font-weight:600}
+.rh-categories div{display:flex;flex-wrap:wrap;gap:8px}
+.rh-categories a{padding:6px 12px;border:1px solid var(--b1);border-radius:var(--radius-pill);background:var(--card);font-size:14px;font-weight:600}
+.rh-categories a:hover,.rh-categories a:focus-visible{color:var(--ink-violet);background:var(--hover)}
+.rh-note-section{margin-top:12px;padding:clamp(14px,3vw,22px);border:1px solid var(--b1);border-radius:var(--radius-card);background:var(--card);scroll-margin-top:90px}
+.rh-note-section h3{margin:0 0 10px;font-size:clamp(18px,2.6vw,22px)}
+.rh-note-section li>a{color:var(--ink-violet);text-decoration:underline;text-underline-offset:3px}
 .rh-version ul{margin:0;padding-inline-start:22px}.rh-version li+li{margin-top:6px}
 details.rh-version summary{cursor:pointer;list-style:none}
 details.rh-version summary::-webkit-details-marker{display:none}
