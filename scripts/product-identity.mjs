@@ -35,40 +35,59 @@ export function productIdentity(config, lang, escape) {
 
 const history = JSON.parse(readFileSync(new URL('../public/release-history.json', import.meta.url), 'utf8')).releases;
 
+export function publicReleaseHistory(config) {
+  // History is newest-first. A prepared release stays out of the site until it is current.
+  const current = history.findIndex(release => release.version === config.version);
+  const hasReleaseDate = release => /^\d{4}-\d{2}-\d{2}$/.test(release.date);
+  if (current < 0 || !hasReleaseDate(history[current])) {
+    throw new Error('The current public release needs a dated history entry');
+  }
+  return history.slice(current).filter(release =>
+    /^\d{1,4}\.\d{1,4}\.\d{1,4}$/.test(release.version) && hasReleaseDate(release));
+}
+
+
 /** /releases/: the current version, the update path between versions and every version's notes. */
 function releaseHistoryPage(config, lang, escape, link) {
   const en = lang === 'en';
   const t = en ? {
     title: 'Pi Bot releases | Update path and what changed', heading: 'Pi Bot releases',
-    description: 'What each Pi Bot version changed and how to update from the one before. The notes match what the app shows when it updates.',
-    released: 'released', kinds: { fix: 'Urgent fix', feature: 'Feature release', first: 'First public release' },
+    description: 'What each Pi Bot version changed and how to update from the one before. Includes highlights from the app’s release notes.',
+    released: 'released', kinds: { fix: 'Urgent fix', feature: 'Feature release', beta: 'Public beta', first: 'First public release' },
     parts: { desktop: 'Desktop', android: 'Android', runner: 'Runner' },
     platforms: 'macOS / Windows / Linux', updatedHere: 'Updated in this version', unchanged: (v) => `Unchanged · works with desktop ${v}`,
     installed: 'Already installed: <b>menu › Check for updates</b> updates in the app', fresh: 'First install:', download: 'Go to downloads',
+    manualInstall: 'To install or upgrade, download the installer for your platform.',
+    manualEdge: (version) => `<b>From v${version}: download and run the installer for your platform.</b>`,
     notesLink: 'What changed ↓', path: 'Update path', updates: 'Updated: ', unchangedRest: (xs) => `${xs} unchanged.`, firstOf: (xs) => `First public release: ${xs}.`,
     edge: (r) => `<b>From v${r.from.version}: in-app update, one step.</b> ${r.from.downloadMB?.windows ? `Windows downloads only the changed parts (about ${r.from.downloadMB.windows} MB of ${r.from.fullMB.windows} MB); ` : ''}macOS downloads the full update once (about ${r.from.downloadMB?.mac ?? '—'} MB) and only changed parts after that. Your data stays.`,
     footnote: 'This history is generated at each release; per-platform test status is on the download page.',
   } : {
     title: 'Pi Bot 版本记录｜更新路径与每个版本的更新内容', heading: 'Pi Bot 版本记录',
-    description: '每个版本更新了什么、从哪个版本怎么升级上来。应用内更新时看到的内容和这里一致。',
-    released: '发布', kinds: { fix: '紧急修复', feature: '功能版本', first: '首个公开版本' },
+    description: '每个版本更新了什么、从哪个版本怎么升级上来。收录应用发布说明中的主要改动。',
+    released: '发布', kinds: { fix: '紧急修复', feature: '功能版本', beta: '公开测试版', first: '首个公开版本' },
     parts: { desktop: '桌面版', android: 'Android 手机版', runner: '执行端' },
     platforms: 'macOS / Windows / Linux', updatedHere: '本次更新', unchanged: (v) => `未变 · 与桌面 ${v} 兼容`,
     installed: '已安装 Pi Bot：<b>菜单 › 检查更新</b>，应用内直接升级', fresh: '第一次安装：', download: '前往下载页',
+    manualInstall: '安装或升级时，从下载页选择对应平台的安装包。',
+    manualEdge: (version) => `<b>从 v${version} 升级：下载对应平台的安装包并运行。</b>`,
     notesLink: '查看本次更新内容 ↓', path: '更新路径', updates: '更新：', unchangedRest: (xs) => `${xs}不变。`, firstOf: (xs) => `首次公开：${xs}。`,
     edge: (r) => `<b>从 v${r.from.version} 升级：应用内更新，一步到达。</b>${r.from.downloadMB?.windows ? `Windows 只下载变化的部分（约 ${r.from.downloadMB.windows} MB / 完整 ${r.from.fullMB.windows} MB）；` : ''}macOS 首次应用内更新下载完整包（约 ${r.from.downloadMB?.mac ?? '—'} MB），之后只下载变化部分。数据保留。`,
     footnote: '版本记录在每次发布时生成；各平台的测试状态见下载页。',
   };
-  const list = history.filter((r) => /^\d{1,4}\.\d{1,4}\.\d{1,4}$/.test(r.version));
-  const current = list.find((r) => r.version === config.version) ?? list[0];
+  const list = publicReleaseHistory(config);
+  const current = list[0];
   const sep = en ? ', ' : '、';
-  const badge = (r) => `<span class="rh-badge rh-${escape(r.kind)}">${escape(t.kinds[r.kind] ?? r.kind)}</span>`;
+  const badge = (r) => `<span class="rh-badge rh-${escape(r.kind === 'beta' ? 'feature' : r.kind)}">${escape(t.kinds[r.kind] ?? r.kind)}</span>`;
   const partNames = (keys) => keys.map((k) => t.parts[k]).join(sep);
   const parts = Object.entries(current.components).map(([key, version]) => {
     const updated = current.updated.includes(key);
     return `<div class="rh-part${updated ? ' rh-new' : ''}"><b>${t.parts[key]} ${escape(version)}</b><span>${updated ? `${t.updatedHere}${key === 'desktop' ? ` · ${t.platforms}` : ''}` : escape(t.unchanged(current.components.desktop))}</span></div>`;
   }).join('');
-  const nodes = list.map((r, index) => `<li class="rh-node${index ? ' rh-old' : ''}"><a href="#v${escape(r.version)}">v${escape(r.version)}</a> ${badge(r)} <span class="rh-meta">${escape(r.date)} · ${escape(partNames(r.updated))}</span>${r.from ? `<p class="rh-edge">${t.edge(r)}</p>` : ''}</li>`).join('');
+  const upgradeRoute = current.from?.inApp === false
+    ? `<span>${t.manualInstall}</span><span>${link('/download/', t.download)}</span>`
+    : `<span>${t.installed}</span><span>${t.fresh} ${link('/download/', t.download)}</span>`;
+  const nodes = list.map((r, index) => `<li class="rh-node${index ? ' rh-old' : ''}"><a href="#v${escape(r.version)}">v${escape(r.version)}</a> ${badge(r)} <span class="rh-meta">${escape(r.date)} · ${escape(partNames(r.updated))}</span>${r.from ? `<p class="rh-edge">${r.from.inApp ? t.edge(r) : t.manualEdge(escape(r.from.version))}</p>` : ''}</li>`).join('');
   const notes = (r) => `<ul>${(r.notes[en ? 'en' : 'zh'] ?? []).map((line) => `<li>${escape(line)}</li>`).join('')}</ul>`;
   const scope = (r) => {
     const rest = Object.keys(r.components).filter((k) => !r.updated.includes(k));
@@ -86,7 +105,7 @@ function releaseHistoryPage(config, lang, escape, link) {
     body: `<section class="rh-current" aria-label="${escape(t.heading)}">
       <div class="rh-top"><span class="rh-ver">v${escape(current.version)}</span>${badge(current)}<span class="rh-meta">${escape(current.date)} ${t.released}</span></div>
       <div class="rh-parts">${parts}</div>
-      <div class="rh-get"><span>${t.installed}</span><span>${t.fresh} ${link('/download/', t.download)}</span><a href="#v${escape(current.version)}">${t.notesLink}</a></div>
+      <div class="rh-get">${upgradeRoute}<a href="#v${escape(current.version)}">${t.notesLink}</a></div>
     </section>
     <section class="reading-section"><h2>${t.path}</h2><ol class="rh-path">${nodes}</ol></section>
     ${versions}
