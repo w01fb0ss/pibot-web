@@ -237,12 +237,6 @@ figcaption{margin-top:14px;font-size:12.5px;color:var(--text2);text-align:center
 .option-text{flex:1;min-width:0}
 .option-text b{display:block;font-size:13.5px;font-weight:600}
 .option-text small{display:block;color:var(--text2);font-size:12px;line-height:1.45}
-.option-status{flex:none;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:var(--radius-pill);white-space:nowrap}
-.option-status:empty{display:none}
-.status-tested{background:var(--okBg);color:var(--ok)}
-.status-testing{background:var(--warnBg);color:var(--warn)}
-.status-untested{background:var(--tert);color:var(--text2)}
-.download-note{margin:2px 6px 0;font-size:12.5px;color:var(--site-on-panel-soft)}
 .download-resources{display:flex;flex-wrap:wrap;gap:6px 16px;margin-inline:6px;font-size:13px}
 .download-resources a{text-decoration:underline;text-underline-offset:3px}
 

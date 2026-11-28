@@ -18,13 +18,13 @@ export function productIdentity(config, lang, escape) {
       : 'Pi Bot 是在自己电脑上运行的开源多 Bot 协作桌面应用，支持 macOS、Windows 和 Linux。这里提供 GitHub 源码、官方下载和使用指南。',
     body: en ? [
       section('Which Pi Bot is this?', '<p>This site describes Pi Bot, the desktop app at <strong>pibot.space</strong>. You create named Bots, give them work in private or group chats, and review permissions, task progress, file changes, and activity logs.</p><p>The desktop app works on its own after you configure a model. An Android phone and a Runner on another computer are optional connections.</p>'),
-      section('Official product links', `<ul><li>${link('/', 'Official website')}</li><li>${link('/download/', 'Installers and platform test status')}</li><li>${link('/guides/', 'User manual with screenshots')}</li><li>${link('/releases/', 'Public releases')}</li><li>${link('/guides/updates-and-data/', 'Updates, data, and issue reports')}</li></ul><p>Products and projects may share the name Pi Bot or PiBot. Use the domain, download links, and app screenshots above to identify this product.</p>`),
-      section('Public release and source links', `<p>The current public release is <strong>v${version}</strong>. The download page lists the available desktop, Android, and Runner installers and their test status.</p><p>Pi Bot is open source under the <a href="${sourceRepository}/blob/main/LICENSE">Apache 2.0 license</a>. View the <a href="${sourceRepository}">official Pi Bot source code on GitHub</a>.</p>`),
+      section('Official product links', `<ul><li>${link('/', 'Official website')}</li><li>${link('/download/', 'Download installers')}</li><li>${link('/guides/', 'User manual with screenshots')}</li><li>${link('/releases/', 'Public releases')}</li><li>${link('/guides/updates-and-data/', 'Updates, data, and issue reports')}</li></ul><p>Products and projects may share the name Pi Bot or PiBot. Use the domain, download links, and app screenshots above to identify this product.</p>`),
+      section('Public release and source links', `<p>The current public release is <strong>v${version}</strong>. The download page lists the available desktop, Android, and Runner installers.</p><p>Pi Bot is open source under the <a href="${sourceRepository}/blob/main/LICENSE">Apache 2.0 license</a>. View the <a href="${sourceRepository}">official Pi Bot source code on GitHub</a>.</p>`),
       section('Where the work and data live', `<p>Chat history, settings, memory, and activity records are stored on your computer. Online model providers receive the content needed for your selected model; using a local model and connecting external services have different data boundaries.</p><p>${link('/guides/privacy-and-security/', 'Read the data flow and security guide')} and ${link('/guides/approvals-and-permissions/', 'learn how permissions and approvals work')}.</p>`),
     ].join('') : [
       section('这是哪个 Pi Bot？', '<p>本站介绍的是官方域名为 <strong>pibot.space</strong> 的 Pi Bot 桌面应用。你可以创建有名字的 Bot，在私聊或群聊中派活，并查看权限、任务进度、文件改动和操作记录。</p><p>桌面应用配置模型后即可独立使用。Android 手机和另一台电脑上的执行端都是按需连接的设备。</p>'),
-      section('官方产品入口', `<ul><li>${link('/', '官方网站')}</li><li>${link('/download/', '安装包与各平台测试状态')}</li><li>${link('/guides/', '带截图的使用手册')}</li><li>${link('/releases/', '公开版本与发布说明')}</li><li>${link('/guides/updates-and-data/', '更新、数据与问题反馈')}</li></ul><p>网络上可能存在同样叫 Pi Bot 或 PiBot 的产品、项目。请结合这里列出的域名、下载链接和应用界面辨认本站产品。</p>`),
-      section('公开版本与源码入口', `<p>当前公开版本为 <strong>v${version}</strong>。下载页列出桌面版、Android 手机版和执行端的安装包及对应测试状态。</p><p>Pi Bot 采用 <a href="${sourceRepository}/blob/main/LICENSE">Apache 2.0 许可证</a>开源。你可以在 GitHub 查看 <a href="${sourceRepository}">Pi Bot 官方源码</a>。</p>`),
+      section('官方产品入口', `<ul><li>${link('/', '官方网站')}</li><li>${link('/download/', '下载安装包')}</li><li>${link('/guides/', '带截图的使用手册')}</li><li>${link('/releases/', '公开版本与发布说明')}</li><li>${link('/guides/updates-and-data/', '更新、数据与问题反馈')}</li></ul><p>网络上可能存在同样叫 Pi Bot 或 PiBot 的产品、项目。请结合这里列出的域名、下载链接和应用界面辨认本站产品。</p>`),
+      section('公开版本与源码入口', `<p>当前公开版本为 <strong>v${version}</strong>。下载页列出桌面版、Android 手机版和执行端的安装包。</p><p>Pi Bot 采用 <a href="${sourceRepository}/blob/main/LICENSE">Apache 2.0 许可证</a>开源。你可以在 GitHub 查看 <a href="${sourceRepository}">Pi Bot 官方源码</a>。</p>`),
       section('任务和数据在哪里运行？', `<p>聊天记录、设置、记忆和操作记录保存在你的电脑上。使用在线模型时，完成任务所需的内容会发给你选定的模型服务商；使用本地模型、连接外部应用时的数据边界各不相同。</p><p>${link('/guides/privacy-and-security/', '查看数据流转与隐私说明')}，以及${link('/guides/approvals-and-permissions/', '了解权限与审批如何工作')}。</p>`),
     ].join(''),
     schema: { '@type': 'SoftwareApplication', '@id': 'https://pibot.space/#desktop-app', name: 'Pi Bot', alternateName: 'PiBot', url: `https://pibot.space${prefix}/`, operatingSystem: 'macOS, Windows, Linux', applicationCategory: 'ProductivityApplication', softwareVersion: config.version, installUrl: `https://pibot.space${prefix}/download/` },
@@ -61,7 +61,7 @@ function releaseHistoryPage(config, lang, escape, link) {
     manualEdge: (version) => `<b>From v${version}: download and run the installer for your platform.</b>`,
     notesLink: 'What changed ↓', path: 'Update path', updates: 'Updated: ', unchangedRest: (xs) => `${xs} unchanged.`, firstOf: (xs) => `First public release: ${xs}.`,
     edge: (r) => `<b>From v${r.from.version}: in-app update, one step.</b> ${r.from.downloadMB?.windows ? `Windows downloads only the changed parts (about ${r.from.downloadMB.windows} MB of ${r.from.fullMB.windows} MB); ` : ''}macOS downloads the full update once (about ${r.from.downloadMB?.mac ?? '—'} MB) and only changed parts after that. Your data stays.`,
-    footnote: 'This history is generated at each release; per-platform test status is on the download page.',
+    footnote: 'This history is updated with every release.',
   } : {
     title: 'Pi Bot 版本记录｜更新路径与每个版本的更新内容', heading: 'Pi Bot 版本记录',
     description: '每个版本更新了什么、从哪个版本怎么升级上来。收录应用发布说明中的主要改动。',
@@ -73,7 +73,7 @@ function releaseHistoryPage(config, lang, escape, link) {
     manualEdge: (version) => `<b>从 v${version} 升级：下载对应平台的安装包并运行。</b>`,
     notesLink: '查看本次更新内容 ↓', path: '更新路径', updates: '更新：', unchangedRest: (xs) => `${xs}不变。`, firstOf: (xs) => `首次公开：${xs}。`,
     edge: (r) => `<b>从 v${r.from.version} 升级：应用内更新，一步到达。</b>${r.from.downloadMB?.windows ? `Windows 只下载变化的部分（约 ${r.from.downloadMB.windows} MB / 完整 ${r.from.fullMB.windows} MB）；` : ''}macOS 首次应用内更新下载完整包（约 ${r.from.downloadMB?.mac ?? '—'} MB），之后只下载变化部分。数据保留。`,
-    footnote: '版本记录在每次发布时生成；各平台的测试状态见下载页。',
+    footnote: '版本记录会随每次发布更新。',
   };
   const list = publicReleaseHistory(config);
   const current = list[0];

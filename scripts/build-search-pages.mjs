@@ -317,14 +317,10 @@ function downloadSections(config, lang) {
   const groups = downloads.map((keys, index) => {
     const rows = keys.filter(key => availablePlatforms[key]?.url).map(key => {
       const item = availablePlatforms[key];
-      const status = Object.hasOwn(copy.status, item.status) ? item.status : 'untested';
-      // Each row carries its own version and status: an unchanged component (an older Android or
-      // Runner beside a newer desktop) keeps the status it was tested with.
-      const currentStatus = status;
       const platform = escape(copy.platformNames[key]);
       const url = new URL(item.url, origin + '/');
       const href = url.origin === origin ? url.pathname + url.search + url.hash : url.href;
-      return `<li><div><strong>${platform}</strong><span class="option-status status-${currentStatus}">${copy.status[currentStatus]}</span></div><a class="button" href="${escape(href)}" data-download-link rel="nofollow" aria-label="${escape(copy.downloadButtons + ' · ' + copy.groups[index] + ' · ' + copy.platformNames[key])}">${copy.downloadButtons}</a></li>`;
+      return `<li><strong>${platform}</strong><a class="button" href="${escape(href)}" data-download-link rel="nofollow" aria-label="${escape(copy.downloadButtons + ' · ' + copy.groups[index] + ' · ' + copy.platformNames[key])}">${copy.downloadButtons}</a></li>`;
     });
     return rows.length ? `<section class="reading-section"><h2>${copy.groups[index]}</h2><ul class="installer-list">${rows.join('\n')}</ul></section>` : '';
   }).filter(Boolean);

@@ -22,7 +22,6 @@ const zh = {
   unavailable: '安装包暂未开放下载。',
   groups: ['桌面版', 'Android 手机版', '执行端'],
   downloadButtons: '下载安装包',
-  status: { tested: '已测试', testing: '测试中', untested: '未实机测试' },
   platformNames: {
     'mac-arm64': 'macOS · Apple 芯片', 'mac-x64': 'macOS · Intel 芯片',
     windows: 'Windows', linux: 'Linux', android: 'Android',
@@ -86,7 +85,6 @@ const en = {
   unavailable: 'Installers are not available yet.',
   groups: ['Desktop app', 'Android app', 'Runner'],
   downloadButtons: 'Download installer',
-  status: { tested: 'Tested', testing: 'Testing', untested: 'Not tested on hardware' },
   platformNames: {
     'mac-arm64': 'macOS · Apple silicon', 'mac-x64': 'macOS · Intel',
     windows: 'Windows', linux: 'Linux', android: 'Android',

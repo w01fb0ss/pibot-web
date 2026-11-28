@@ -1,18 +1,17 @@
 // Download cards (桌面 / 手机 / 执行端): one button per device opens a small platform menu.
-// releases.json decides every link and status chip; an unavailable config never enables a download.
+// releases.json supplies download links; an unavailable config never enables a download.
 import {display, t} from './display.js';
 import {recordDownloadClick} from './download-click.js';
 
 const releaseDialog = document.querySelector('#release-dialog');
 const macFirstOpen = document.querySelector('.mac-first-open');
 const picks = [...document.querySelectorAll('.download-pick')];
-const STATUS_TEXT = { tested: '已测试', testing: '测试中', untested: '未实机测试' };
 let releaseConfig;
 const downloadBase = new URL('/', location.origin);
 const configReady = fetch('/releases.json', { cache: 'no-store', signal: AbortSignal.timeout(5000) })
   .then(response => { if (!response.ok) throw new Error('Release configuration unavailable'); return response.json(); })
   .then(config => { releaseConfig = config; renderRelease(); })
-  .catch(() => { /* Fail closed: no config, no links and no status claims. */ });
+  .catch(() => { /* Fail closed: no config, no download links. */ });
 
 function downloadURL(value) {
   if (typeof value !== 'string' || !value.trim()) return null;
@@ -23,13 +22,6 @@ function downloadURL(value) {
   return null;
 }
 
-// 「已测试」 belongs to the version it was run through on; once the site lists another version it
-// reads 测试中 until someone re-tests and updates the entry's version.
-function platformStatus(platform) {
-  const status = Object.hasOwn(STATUS_TEXT, platform?.status) ? platform.status : 'untested';
-  return status;
-}
-
 export function renderRelease() {
   if (!releaseConfig) return;
   macFirstOpen.hidden = releaseConfig.version !== macFirstOpen.dataset.releaseVersion ||
@@ -38,10 +30,6 @@ export function renderRelease() {
   macFirstOpen.querySelector('a').href = `https://support.apple.com/${appleSupportLocale}/102445`;
   document.querySelectorAll('.download-option').forEach(option => {
     const platform = releaseConfig.platforms?.[option.dataset.platform];
-    const status = platformStatus(platform);
-    const chip = option.querySelector('.option-status');
-    chip.className = `option-status status-${status}`;
-    chip.textContent = t(STATUS_TEXT[status]);
     if (downloadURL(platform?.url)) option.querySelector('[data-platform-detail]').textContent = t(platform.detail || '下载应用');
   });
   if (Object.values(releaseConfig.platforms || {}).some(platform => downloadURL(platform.url))) {
