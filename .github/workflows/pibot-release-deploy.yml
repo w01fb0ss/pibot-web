@@ -1,0 +1,152 @@
+# Receives `repository_dispatch` (`pibot-release-publish`) from `w01fb0ss/PiBot`'s Release
+# workflow, updates `public/updates/*` (and `public/releases.json` on stable `--launch`),
+# commits the change to `w01fb0ss/pibot-web`, and deploys the Cloudflare Worker automatically.
+#
+# Required secrets in `w01fb0ss/pibot-web`:
+#   - CLOUDFLARE_API_TOKEN (Workers Scripts Edit + Zone/Account deploy permission)
+#   - CLOUDFLARE_ACCOUNT_ID
+name: Deploy Pi Bot Release Feeds & Website
+
+on:
+  repository_dispatch:
+    types: [pibot-release-publish]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pibot-web-release-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Update feeds & deploy to Cloudflare
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - name: Apply release feeds and releases.json update
+        env:
+          PAYLOAD: ${{ toJSON(github.event.client_payload) }}
+        run: |
+          node - <<'EOF'
+          import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+          import { dirname, join, resolve } from "node:path";
+
+          const payload = JSON.parse(process.env.PAYLOAD || "{}");
+          const {
+            channel,
+            version,
+            downloadFolder,
+            launch,
+            updateOnly = false,
+            updatedComponents = ["desktop"],
+            sizesMB = {},
+            releaseNotes,
+            platforms = {},
+            files = {},
+          } = payload;
+          if (!version || !["stable", "rc"].includes(channel)) {
+            throw new Error(`Invalid dispatch payload: channel=${channel} version=${version}`);
+          }
+
+          const publicRoot = resolve("public");
+          for (const [relPath, content] of Object.entries(files)) {
+            if (!/^updates\/(?:rc\/)?[A-Za-z0-9._-]+$/u.test(relPath)) {
+              throw new Error(`Refusing unexpected feed path: ${relPath}`);
+            }
+            const dest = resolve(publicRoot, relPath);
+            if (!dest.startsWith(`${publicRoot}/`)) throw new Error(`Path escape: ${relPath}`);
+            mkdirSync(dirname(dest), { recursive: true });
+            writeFileSync(dest, String(content));
+            console.log(`Wrote public/${relPath}`);
+          }
+
+          if (channel === "stable" && launch) {
+            const releasesPath = join(publicRoot, "releases.json");
+            const releases = JSON.parse(readFileSync(releasesPath, "utf8"));
+            releases.status = "available";
+            releases.version = version;
+            for (const [button, entry] of Object.entries(platforms)) {
+              const previous = releases.platforms?.[button];
+              releases.platforms[button] = {
+                ...previous,
+                ...entry,
+                status: "tested",
+              };
+            }
+            writeFileSync(releasesPath, `${JSON.stringify(releases, null, 2)}\n`);
+            console.log(`Updated public/releases.json -> ${version}`);
+          }
+
+          if (channel === "stable" && releaseNotes?.zh?.length && releaseNotes?.en?.length) {
+            const historyPath = join(publicRoot, "release-history.json");
+            const history = JSON.parse(readFileSync(historyPath, "utf8"));
+            const existingIndex = history.releases.findIndex((item) => item.version === version);
+            const previous = history.releases.find((item) => item.version !== version);
+            const updated = [...new Set(updatedComponents.filter((c) => ["desktop", "android", "runner"].includes(c)))];
+            const components = {
+              desktop: version,
+              android: updated.includes("android") ? version : (previous?.components?.android ?? version),
+              runner: updated.includes("runner") ? version : (previous?.components?.runner ?? version),
+            };
+            const patch = Number(version.split(".")[2] ?? "0");
+            const entry = {
+              version,
+              date: new Date().toISOString().slice(0, 10),
+              kind: updateOnly || patch > 0 ? "fix" : "feature",
+              components,
+              updated,
+              ...(previous
+                ? {
+                    from: {
+                      version: previous.version,
+                      inApp: true,
+                      downloadMB: {
+                        windows: null,
+                        mac: sizesMB.mac ?? null,
+                        linux: null,
+                      },
+                      fullMB: {
+                        windows: sizesMB.windows ?? null,
+                      },
+                    },
+                  }
+                : {}),
+              notes: { zh: releaseNotes.zh, en: releaseNotes.en },
+            };
+            if (existingIndex >= 0) history.releases[existingIndex] = entry;
+            else history.releases.unshift(entry);
+            writeFileSync(historyPath, `${JSON.stringify(history, null, 2)}\n`);
+            console.log(`Updated public/release-history.json -> ${version}`);
+          }
+          console.log(`Applied ${channel} release ${downloadFolder || version}`);
+          EOF
+      - name: Commit updated feeds & releases.json
+        env:
+          CHANNEL: ${{ github.event.client_payload.channel }}
+          FOLDER: ${{ github.event.client_payload.downloadFolder }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/
+          if git diff --cached --quiet; then
+            echo "No changes in public/"
+          else
+            git commit -m "chore(release): publish Pi Bot ${FOLDER} (${CHANNEL})"
+            git push origin main
+          fi
+      - run: pnpm install --frozen-lockfile
+      - name: Build & deploy pibot-web to Cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: "false"
+        run: pnpm deploy
